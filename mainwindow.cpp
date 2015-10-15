@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(worker, SIGNAL(workRequested()), thread, SLOT(start()));
     connect(thread, SIGNAL(started()), worker, SLOT(doWork()));
     connect(worker, SIGNAL(finished()), thread, SLOT(quit()), Qt::DirectConnection);
-
+    connect(worker, SIGNAL(GPstarted(QString)), this, SLOT(received_GPstarted(QString)));
     connect(worker, SIGNAL(send_best_fitness(double,int)), this, SLOT(received_best_fitness(double,int)));
     connect(worker, SIGNAL(progressChanged(int)), ui->progressBar, SLOT(setValue(int)));
 
@@ -144,6 +144,11 @@ void MainWindow::received_best_fitness(double value, int gen)
         // create graph and assign data to it:
         ui->outputPlot->graph(0)->addData(gen,value);
         ui->outputPlot->replot();
+}
+
+void MainWindow::received_GPstarted(QString value)
+{
+    ui->actionRun->setIconText(value);
 }
 
 void MainWindow::on_actionLoad_file_triggered()

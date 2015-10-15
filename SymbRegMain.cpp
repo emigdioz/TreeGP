@@ -214,6 +214,7 @@ int Worker::start_main(int argc, char** argv) {
   emit Worker::valueChanged(" Swap point mutation distribution proba.:   " + QString::number(lMutSwapDistribProba));
   emit Worker::valueChanged(" Random number generator seed value:        " + QString::number(lSeed));
 
+  emit Worker::GPstarted("Stop");
   // Create evolution context add primitives used into it.
   std::cout << "Creating evolution context" << std::endl;
   emit Worker::valueChanged("Creating evolution context");
@@ -225,13 +226,14 @@ int Worker::start_main(int argc, char** argv) {
   lContext.insert(new Divide);
   lContext.insert(new TokenT<double>("X1", 0.0));
   lContext.insert(new TokenT<double>("X2", 0.0));
+  lContext.insert(new TokenT<double>("X3", 0.0));
   lContext.insert(new Ephemeral);
 
   // Sample equation on 20 random points in [-1.0, 1.0].
   std::cout << "Sampling equation to regress" << std::endl;
   emit Worker::valueChanged("Sampling equation to regress");
-  std::vector<double> lX(20);
-  std::vector<double> lF(20);
+  std::vector<double> lX(100);
+  std::vector<double> lF(100);
   for(unsigned int i=0; i<lX.size(); ++i) {
     lX[i] = lContext.mRandom.rollUniform(-1.0, 1.0);
     lF[i] = lX[i]*(lX[i]*(lX[i]*(lX[i]+1.0)+1.0)+1.0);
@@ -278,6 +280,8 @@ int Worker::start_main(int argc, char** argv) {
   //std::cout << lBestIndividual[0].mFitness << std:: endl;
 
   std::cout << "Exiting program" << std::endl << std::flush;
+
+  emit Worker::GPstarted("Run");
   return 0;
 }
 

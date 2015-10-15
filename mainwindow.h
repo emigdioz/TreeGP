@@ -53,6 +53,7 @@ private slots:
     void received_best_fitness(double value, int gen);
     void on_actionLoad_file_triggered();
     void checkString(QString &temp, QChar character = 0);
+    void received_GPstarted(QString value);
 
     void on_horizontalSlider_valueChanged(int value);
 };
