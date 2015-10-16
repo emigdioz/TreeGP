@@ -77,12 +77,15 @@
 #include <string>
 #include <QVector>
 #include <QString>
+#include <sstream>
+#include <QDebug>
 
 #include "Puppy.hpp"
 #include "SymbRegPrimits.hpp"
 #include "mainwindow.h"
 #include "optionsdialog.h"
 #include "worker.h"
+#include "matrix.h"
 
 #define POP_SIZE_DEFAULT 100
 #define NBR_GEN_DEFAULT 100
@@ -106,7 +109,11 @@ unsigned int evaluateSymbReg(std::vector<Tree>& ioPopulation,
                              Context& ioContext,
                              const std::vector<double>& inX,
                              const std::vector<double>& inF);
-                             
+
+unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
+                             Context& ioContext,
+                             double* inX,
+                             double* inF,int cols, int rows);
 
 void usage(char** argv);
 
@@ -224,10 +231,28 @@ int Worker::start_main(int argc, char** argv) {
   lContext.insert(new Subtract);
   lContext.insert(new Multiply);
   lContext.insert(new Divide);
-  lContext.insert(new TokenT<double>("X1", 0.0));
-  lContext.insert(new TokenT<double>("X2", 0.0));
-  lContext.insert(new TokenT<double>("X3", 0.0));
   lContext.insert(new Ephemeral);
+  // Add terminals
+  std::stringstream str;
+  for(unsigned int i=0; i<Worker::dataset_cols-1;i++) {
+    str<<"X"<<(i+1);
+    lContext.insert(new TokenT<double>(str.str(), 0.0));
+    str.str(std::string());
+  }
+
+  // Prepare data, separating input and output variables
+  double *inputV = new double [Worker::dataset_rows*(Worker::dataset_cols-1)];
+  double *outputV = new double[Worker::dataset_rows];
+
+  for(unsigned int j = 0;j < (Worker::dataset_cols-1);j++) {
+      for(unsigned int i = 0;i < Worker::dataset_rows;i++) {
+          inputV[(j*Worker::dataset_rows)+i] = Worker::dataset[(j*Worker::dataset_rows)+i];
+      }
+  }
+  for(unsigned int i = 0;i < Worker::dataset_rows;i++) {
+    outputV[i] = Worker::dataset[((Worker::dataset_cols-1)*Worker::dataset_rows)+i];
+    //qDebug()<<outputV[i];
+  }
 
   // Sample equation on 20 random points in [-1.0, 1.0].
   std::cout << "Sampling equation to regress" << std::endl;
@@ -238,13 +263,14 @@ int Worker::start_main(int argc, char** argv) {
     lX[i] = lContext.mRandom.rollUniform(-1.0, 1.0);
     lF[i] = lX[i]*(lX[i]*(lX[i]*(lX[i]+1.0)+1.0)+1.0);
   }
-  
+
   // Initialize population.
   std::vector<Tree> lPopulation(lPopSize);
   std::cout << "Initializing population" << std::endl;
   emit Worker::valueChanged("Initializing population");
   initializePopulation(lPopulation, lContext, lInitGrowProba, lMinInitDepth, lMaxInitDepth);
-  evaluateSymbReg(lPopulation, lContext, lX, lF);
+  //evaluateSymbReg(lPopulation, lContext, lX, lF);
+  evaluateFitness(lPopulation, lContext, inputV, outputV,Worker::dataset_cols-1,Worker::dataset_rows);
 
   QString message;
   double best_fitness;
@@ -259,8 +285,9 @@ int Worker::start_main(int argc, char** argv) {
     applySelectionTournament(lPopulation, lContext, lNbrPartTournament);  
     applyCrossover(lPopulation, lContext, lCrossoverProba, lCrossDistribProba, lMaxDepth);
     applyMutationStandard(lPopulation, lContext, lMutStdProba, lMutMaxRegenDepth, lMaxDepth);
-    applyMutationSwap(lPopulation, lContext, lMutSwapProba, lMutSwapDistribProba);
-    evaluateSymbReg(lPopulation, lContext, lX, lF);
+    applyMutationSwap(lPopulation, lContext, lMutSwapProba, lMutSwapDistribProba);    
+    //evaluateSymbReg(lPopulation, lContext, lX, lF);
+    evaluateFitness(lPopulation, lContext, inputV, outputV,Worker::dataset_cols-1,Worker::dataset_rows);
     calculateStats(lPopulation, i, message, best_fitness);
     emit Worker::valueChanged(message);
     emit Worker::send_best_fitness(best_fitness,i);
@@ -281,6 +308,9 @@ int Worker::start_main(int argc, char** argv) {
 
   std::cout << "Exiting program" << std::endl << std::flush;
 
+  // Clean up data
+  delete inputV;
+  delete outputV;
   emit Worker::GPstarted("Run");
   return 0;
 }
@@ -320,6 +350,40 @@ unsigned int evaluateSymbReg(std::vector<Tree>& ioPopulation,
   return lNbrEval;
 }
 
+unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
+                             Context& ioContext,
+                             double* inX,
+                             double* inF,int cols, int rows)
+{
+  //assert(inX.size() == inF.size());
+  std::stringstream var;
+  double rowV;
+  unsigned int lNbrEval = 0;
+  //qDebug()<<inX[100];
+  for(unsigned int i=0; i<ioPopulation.size(); ++i) {
+    if(ioPopulation[i].mValid) continue;
+    double lQuadErr = 0.0;
+    for(unsigned int j=0; j<rows; ++j) {
+      // Copy col wise data for variable usage
+      for(unsigned int k=0; k<cols;k++) {
+        rowV =  inX[(k*rows)+j];
+        var<<"X"<<(k+1);
+        ioContext.mPrimitiveMap[var.str()]->setValue(&rowV);
+        var.str(std::string());
+      }
+      double lResult = 0.0;
+      ioPopulation[i].interpret(&lResult, ioContext);
+      double lErr = lResult - inF[j];
+      lQuadErr += (lErr * lErr);
+
+    }
+    double lRMS = std::sqrt(lQuadErr / rows);
+    ioPopulation[i].mFitness = 1. / (1. + lRMS);
+    ioPopulation[i].mValid = true;
+    ++lNbrEval;
+  }
+  return lNbrEval;
+}
 
 /*!
  *  \brief Show program usage at STDERR and exit.
