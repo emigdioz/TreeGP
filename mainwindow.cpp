@@ -153,6 +153,7 @@ void MainWindow::received_GPstarted(QString value)
 
 void MainWindow::on_actionLoad_file_triggered()
 {
+    int i,j;
     model = new QStandardItemModel(this);
     ui->tableView->setModel(model);
     QString fileName = QFileDialog::getOpenFileName (this, "Open CSV file",
@@ -188,6 +189,15 @@ void MainWindow::on_actionLoad_file_triggered()
     }
     ui->lineEdit_2->setText(QString::number(iCols));
     ui->lineEdit_3->setText("1:" + QString::number(iRows));
+    worker->dataset = new double[iRows*iCols];
+    for(j = 0;j < iCols;j++) {
+        for(i = 0;i < iRows;i++) {
+            worker->dataset[(j*iRows)+i] = model->item(i,j)->text().toDouble();
+        }
+    }
+    worker->dataset_cols = iCols;
+    worker->dataset_rows = iRows;
+    ui->actionRun->setEnabled(true);
 }
 
 void MainWindow::checkString(QString &temp, QChar character)
