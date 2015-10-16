@@ -31,7 +31,8 @@ HEADERS += \
     SymbRegPrimits.hpp \
     worker.h \
     optionsdialog.h \
-    qcustomplot.h
+    qcustomplot.h \
+    matrix.h
 
 FORMS += \
     mainwindow.ui \
