@@ -34,7 +34,9 @@ public:
     float mutationp;
     int mutationmaxr;
     int randomseed;
-
+    double *dataset;
+    int dataset_cols;
+    int dataset_rows;
 private:
     /**
      * @brief Process is aborted when @em true
