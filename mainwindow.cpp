@@ -56,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->outputPlot->replot();
 
     oDialog->accept(); // Send default data from options dialog
+    worker->trainingP = ui->horizontalSlider->value(); // Training size in percentage
 
 }
 
@@ -226,4 +227,5 @@ void MainWindow::checkString(QString &temp, QChar character)
 void MainWindow::on_horizontalSlider_valueChanged(int value)
 {
     ui->label_5->setText("Training/Testing (" + QString::number(value) + "/" + QString::number(100-value) + ")");
+    worker->trainingP = value;
 }
