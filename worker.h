@@ -37,6 +37,10 @@ public:
     double *dataset;
     int dataset_cols;
     int dataset_rows;
+    int trainingP;
+
+    void subsetData(double *input, double *training, double *testing, int cols, int rows, int trainsize, int *index);
+
 private:
     /**
      * @brief Process is aborted when @em true
