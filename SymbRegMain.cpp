@@ -79,6 +79,7 @@
 #include <QString>
 #include <sstream>
 #include <QDebug>
+#include <algorithm>
 
 #include "Puppy.hpp"
 #include "SymbRegPrimits.hpp"
@@ -241,28 +242,52 @@ int Worker::start_main(int argc, char** argv) {
   }
 
   // Prepare data, separating input and output variables
+  std::vector<int> index;
+  for (unsigned int i=1; i<Worker::dataset_rows; ++i) index.push_back(i);
+  std::random_shuffle ( index.begin(), index.end() );
+  int *index_int = new int [Worker::dataset_rows];
+  std::copy(index.begin(), index.end(), index_int);
+
+  int size_training = (float)Worker::dataset_rows*(float)Worker::trainingP/100;
+  double *trainingSet = new double[size_training*Worker::dataset_cols];
+  double *testingSet = new double[(Worker::dataset_rows-size_training)*Worker::dataset_cols];
+  Worker::subsetData(Worker::dataset,trainingSet,testingSet,Worker::dataset_cols,Worker::dataset_rows,size_training,index_int);
+
+  double *trainingIn = new double [size_training*(Worker::dataset_cols-1)];
+  double *trainingOut = new double [size_training];
+  double *testingIn = new double [(Worker::dataset_rows-size_training)*(Worker::dataset_cols-1)];
+  double *testingOut = new double [(Worker::dataset_rows-size_training)];
+
   double *inputV = new double [Worker::dataset_rows*(Worker::dataset_cols-1)];
   double *outputV = new double[Worker::dataset_rows];
 
   for(unsigned int j = 0;j < (Worker::dataset_cols-1);j++) {
-      for(unsigned int i = 0;i < Worker::dataset_rows;i++) {
-          inputV[(j*Worker::dataset_rows)+i] = Worker::dataset[(j*Worker::dataset_rows)+i];
+      // Training data
+      for(unsigned int i = 0;i < size_training;i++) {
+          trainingIn[(j*size_training)+i] = trainingSet[(j*size_training)+i];
       }
+      for(unsigned int i = 0;i < (Worker::dataset_rows-size_training);i++) {
+          testingIn[(j*(Worker::dataset_rows-size_training))+i] = trainingSet[(j*(Worker::dataset_rows-size_training))+i];
+      }
+
   }
-  for(unsigned int i = 0;i < Worker::dataset_rows;i++) {
-    outputV[i] = Worker::dataset[((Worker::dataset_cols-1)*Worker::dataset_rows)+i];
-    //qDebug()<<outputV[i];
+  for(unsigned int i = 0;i < size_training;i++) {
+    trainingOut[i] = trainingSet[((Worker::dataset_cols-1)*size_training)+i];
+  }
+  for(unsigned int i = 0;i < (Worker::dataset_rows-size_training);i++) {
+    testingOut[i] = testingSet[((Worker::dataset_cols-1)*(Worker::dataset_rows-size_training))+i];
+    //qDebug()<<i<<": "<<trainingOut[i];
   }
 
-  // Sample equation on 20 random points in [-1.0, 1.0].
-  std::cout << "Sampling equation to regress" << std::endl;
-  emit Worker::valueChanged("Sampling equation to regress");
-  std::vector<double> lX(100);
-  std::vector<double> lF(100);
-  for(unsigned int i=0; i<lX.size(); ++i) {
-    lX[i] = lContext.mRandom.rollUniform(-1.0, 1.0);
-    lF[i] = lX[i]*(lX[i]*(lX[i]*(lX[i]+1.0)+1.0)+1.0);
-  }
+//  // Sample equation on 20 random points in [-1.0, 1.0].
+//  std::cout << "Sampling equation to regress" << std::endl;
+//  emit Worker::valueChanged("Sampling equation to regress");
+//  std::vector<double> lX(100);
+//  std::vector<double> lF(100);
+//  for(unsigned int i=0; i<lX.size(); ++i) {
+//    lX[i] = lContext.mRandom.rollUniform(-1.0, 1.0);
+//    lF[i] = lX[i]*(lX[i]*(lX[i]*(lX[i]+1.0)+1.0)+1.0);
+//  }
 
   // Initialize population.
   std::vector<Tree> lPopulation(lPopSize);
@@ -270,7 +295,7 @@ int Worker::start_main(int argc, char** argv) {
   emit Worker::valueChanged("Initializing population");
   initializePopulation(lPopulation, lContext, lInitGrowProba, lMinInitDepth, lMaxInitDepth);
   //evaluateSymbReg(lPopulation, lContext, lX, lF);
-  evaluateFitness(lPopulation, lContext, inputV, outputV,Worker::dataset_cols-1,Worker::dataset_rows);
+  evaluateFitness(lPopulation, lContext, trainingIn, trainingOut,Worker::dataset_cols-1,size_training);
 
   QString message;
   double best_fitness;
@@ -287,7 +312,7 @@ int Worker::start_main(int argc, char** argv) {
     applyMutationStandard(lPopulation, lContext, lMutStdProba, lMutMaxRegenDepth, lMaxDepth);
     applyMutationSwap(lPopulation, lContext, lMutSwapProba, lMutSwapDistribProba);    
     //evaluateSymbReg(lPopulation, lContext, lX, lF);
-    evaluateFitness(lPopulation, lContext, inputV, outputV,Worker::dataset_cols-1,Worker::dataset_rows);
+    evaluateFitness(lPopulation, lContext, trainingIn, trainingOut,Worker::dataset_cols-1,size_training);
     calculateStats(lPopulation, i, message, best_fitness);
     emit Worker::valueChanged(message);
     emit Worker::send_best_fitness(best_fitness,i);
@@ -311,6 +336,8 @@ int Worker::start_main(int argc, char** argv) {
   // Clean up data
   delete inputV;
   delete outputV;
+  delete trainingSet;
+  delete testingSet;
   emit Worker::GPstarted("Run");
   return 0;
 }
@@ -358,14 +385,14 @@ unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
   //assert(inX.size() == inF.size());
   std::stringstream var;
   double rowV;
-  unsigned int lNbrEval = 0;
+  unsigned int lNbrEval = 0,i,j,k;
   //qDebug()<<inX[100];
-  for(unsigned int i=0; i<ioPopulation.size(); ++i) {
+  for(i=0; i<ioPopulation.size(); ++i) {
     if(ioPopulation[i].mValid) continue;
     double lQuadErr = 0.0;
-    for(unsigned int j=0; j<rows; ++j) {
+    for(j=0; j<rows; ++j) {
       // Copy col wise data for variable usage
-      for(unsigned int k=0; k<cols;k++) {
+      for(k=0; k<cols;k++) {
         rowV =  inX[(k*rows)+j];
         var<<"X"<<(k+1);
         ioContext.mPrimitiveMap[var.str()]->setValue(&rowV);
