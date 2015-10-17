@@ -1,6 +1,7 @@
 #include "worker.h"
 #include <QTimer>
 #include <QEventLoop>
+#include <vector>
 
 #include <QThread>
 #include <QDebug>
@@ -77,3 +78,24 @@ void Worker::doWork()
     emit finished();
 }
 
+void Worker::subsetData(double *input, double *training, double *testing, int cols, int rows, int trainsize, int *index)
+{
+  double rowV;
+  int j;
+  // Training partition
+  for(unsigned int ind=0;ind<trainsize;ind++) {
+    j = index[ind];
+    for(unsigned int k=0; k<cols;k++) {
+      rowV =  input[(k*rows)+j];
+      training[(k*trainsize)+ind] = rowV;
+    }
+  }
+  // Testing partition
+  for(unsigned int ind=0;ind<(rows-trainsize);ind++) {
+    j = index[trainsize+ind];
+    for(unsigned int k=0; k<cols;k++) {
+      rowV =  input[(k*rows)+j];
+      testing[(k*(rows-trainsize))+ind] = rowV;
+    }
+  }
+}
