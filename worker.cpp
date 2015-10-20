@@ -45,7 +45,7 @@ void Worker::doWork()
     if (abort) {
         qDebug()<<"Aborting worker process in Thread "<<thread()->currentThreadId();
     }
-    start_main(0,NULL);
+    start_main();
 //    for (int i = 0; i < 60; i ++) {
 
 //        // Checks if the process should be aborted

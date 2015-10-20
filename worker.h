@@ -22,7 +22,7 @@ public:
      * It is thread safe as it uses #mutex to protect access to #_abort variable.
      */
     void abort();
-    int start_main(int argc, char** argv);
+    int start_main(void);
     int ngen;
     int popsize;
     int tournamentsize;

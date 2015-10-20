@@ -116,8 +116,6 @@ unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
                              double* inX,
                              double* inF,int cols, int rows);
 
-void usage(char** argv);
-
 
 /*!
  *  \brief Program main routine.
@@ -125,7 +123,7 @@ void usage(char** argv);
  *  \param argv Command-line arguments.
  *  \ingroup SymbReg
  */
-int Worker::start_main(int argc, char** argv) {
+int Worker::start_main(void) {
 
   // Create parameter variables with default values.
   unsigned int  lPopSize             = POP_SIZE_DEFAULT;
@@ -142,36 +140,6 @@ int Worker::start_main(int argc, char** argv) {
   float         lMutSwapProba        = MUT_SWAP_PROBA_DEFAULT;
   float         lMutSwapDistribProba = MUT_SWAP_DISTRIB_PROBA_DEFAULT;
   unsigned long lSeed                = SEED_DEFAULT;
-
-
-  // Parse command-line to set new parameter values.
-  for(int i=1; i<argc; ++i) {
-    if(argv[i][0] == '-') {
-      switch(argv[i][1]) {
-        case 'p': lPopSize = std::atoi(argv[i]+2); break;
-        case 'g': lNbrGen = std::atoi(argv[i]+2); break;
-        case 't': lNbrPartTournament = std::atoi(argv[i]+2); break;
-        case 'd': lMaxDepth = std::atoi(argv[i]+2); break;
-        case 'i': lMinInitDepth = std::atoi(argv[i]+2); break;
-        case 'j': lMaxInitDepth = std::atoi(argv[i]+2); break;
-        case 'h': lInitGrowProba = std::atof(argv[i]+2); break;
-        case 'c': lCrossoverProba = std::atof(argv[i]+2); break;
-        case 'e': lCrossDistribProba = std::atof(argv[i]+2); break;
-        case 'm': lMutStdProba = std::atof(argv[i]+2); break;
-        case 'n': lMutMaxRegenDepth = std::atoi(argv[i]+2); break;
-        case 's': lMutSwapProba = std::atof(argv[i]+2); break;
-        case 'w': lMutSwapDistribProba = std::atof(argv[i]+2); break;
-        case 'r': lSeed = std::atoi(argv[i]+2); break;
-        default: usage(argv); break;
-      }
-    }
-  }
-  //MainWindow::window::textEdit->append("new text to append");
-  //int tnGens;
-  //QString temp;
-  //emit Worker::sendSignal(20);
-  //emit Worker::read_data(1);
-  //Worker::recover_data(temp);
 
   lNbrGen = Worker::ngen;
   lPopSize = Worker::popsize;
@@ -243,7 +211,8 @@ int Worker::start_main(int argc, char** argv) {
 
   // Prepare data, separating input and output variables
   std::vector<int> index;
-  for (unsigned int i=1; i<Worker::dataset_rows; ++i) index.push_back(i);
+  for (unsigned int i=0; i<Worker::dataset_rows; ++i) index.push_back(i);
+  // Make random indexing for training,testing partitioning
   std::random_shuffle ( index.begin(), index.end() );
   int *index_int = new int [Worker::dataset_rows];
   std::copy(index.begin(), index.end(), index_int);
@@ -266,17 +235,22 @@ int Worker::start_main(int argc, char** argv) {
       for(unsigned int i = 0;i < size_training;i++) {
           trainingIn[(j*size_training)+i] = trainingSet[(j*size_training)+i];
       }
+      // Testing data
       for(unsigned int i = 0;i < (Worker::dataset_rows-size_training);i++) {
-          testingIn[(j*(Worker::dataset_rows-size_training))+i] = trainingSet[(j*(Worker::dataset_rows-size_training))+i];
+          testingIn[(j*(Worker::dataset_rows-size_training))+i] = testingSet[(j*(Worker::dataset_rows-size_training))+i];
       }
 
   }
+
+  //qDebug()<<"Training";
   for(unsigned int i = 0;i < size_training;i++) {
     trainingOut[i] = trainingSet[((Worker::dataset_cols-1)*size_training)+i];
+    //qDebug()<<i<<": "<<trainingOut[i];
   }
+  //qDebug()<<"Testing";
   for(unsigned int i = 0;i < (Worker::dataset_rows-size_training);i++) {
     testingOut[i] = testingSet[((Worker::dataset_cols-1)*(Worker::dataset_rows-size_training))+i];
-    //qDebug()<<i<<": "<<trainingOut[i];
+    //qDebug()<<i<<": "<<testingOut[i];
   }
 
 //  // Sample equation on 20 random points in [-1.0, 1.0].
@@ -411,43 +385,3 @@ unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
   }
   return lNbrEval;
 }
-
-/*!
- *  \brief Show program usage at STDERR and exit.
- *  \param argv Command-line arguments given to the program.
- *  \ingroup SymbReg
- */
-void usage(char** argv)
-{
-  std::cerr << "BEAGLE Puppy symbolic regression" << std::endl;
-  std::cerr << "Copyright 2001-2004 by Christian Gagne and Marc Parizeau" << std::endl;
-  std::cerr << "usage> " << argv[0] << " [OPTIONS]" << std::endl;
-  std::cerr << "Options are:" << std::endl;
-  std::cerr << " -p#: population size (def: " << POP_SIZE_DEFAULT << ")" << std::endl;
-  std::cerr << " -g#: number of generations (def: " << NBR_GEN_DEFAULT << ")" << std::endl;
-  std::cerr << " -t#: selection tournament size (def: "
-            << NBR_PART_TOURNAMENT_DEFAULT << ")" << std::endl;
-  std::cerr << " -d#: maximum tree depth (def: " << MAX_DEPTH_DEFAULT << ")" << std::endl;
-  std::cerr << " -i#: min initialization tree depth (def: "
-            << MIN_INIT_DEPTH_DEFAULT << ")" << std::endl;
-  std::cerr << " -j#: max initialization tree depth (def: "
-            << MAX_INIT_DEPTH_DEFAULT << ")" << std::endl;
-  std::cerr << " -h#.#: grow initialization proba. (def: "
-            << INIT_GROW_PROBA_DEFAULT << ")" << std::endl;
-  std::cerr << " -c#.#: crossover probability (def: "
-            << CROSSOVER_PROBA_DEFAULT << ")" << std::endl;  
-  std::cerr << " -e#.#: crossover distribution probability (def: "
-            << CROSSOVER_DISTRIB_PROBA_DEFAULT << ")" << std::endl;
-  std::cerr << " -m#.#: standard (Koza) mutation probability (def: "
-            << MUT_STD_PROBA_DEFAULT << ")" << std::endl;
-  std::cerr << " -n#: standard mutation max. regeneration depth (def: "
-            << MUT_MAX_REGEN_DEPTH_DEFAULT << ")" << std::endl;
-  std::cerr << " -s#.#: swap point mutation probability (def: "
-            << MUT_SWAP_PROBA_DEFAULT << ")" << std::endl;            
-  std::cerr << " -s#.#: swap point mutation distribution probability (def: "
-            << MUT_SWAP_DISTRIB_PROBA_DEFAULT << ")" << std::endl;
-  std::cerr << " -r#.#: random number generator seed (def: "
-            << SEED_DEFAULT << ")" << std::endl << std::endl;
-  std::exit(1);
-}
-
