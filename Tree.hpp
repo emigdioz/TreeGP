@@ -95,6 +95,8 @@ public:
 
   float mFitness;  //!< Fitness value of the GP tree
   float mFitnessTest;
+  float rFitness;
+  float rFitnessTest;
   bool  mValid;    //!< Flag indicating whether the fitness is valid.
   int nNodes;
               
