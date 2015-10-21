@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>718</width>
-    <height>565</height>
+    <width>928</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,13 +49,29 @@
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
-       <widget class="QCustomPlot" name="outputPlot" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>350</width>
-          <height>200</height>
-         </size>
-        </property>
+       <widget class="QWidget" name="verticalLayoutWidget_3">
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QCustomPlot" name="outputPlot" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>350</width>
+             <height>200</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCustomPlot" name="sizePlot" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>350</width>
+             <height>200</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="verticalLayoutWidget">
         <layout class="QVBoxLayout" name="verticalLayout">
@@ -138,7 +154,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>718</width>
+     <width>928</width>
      <height>22</height>
     </rect>
    </property>
