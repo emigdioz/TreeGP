@@ -67,7 +67,7 @@ signals:
      * @brief This signal is emitted when counted value is changed
      */
     void valueChanged(const QString &value);
-    void send_best_fitness(const double value, const int gen);
+    void send_best_fitness(const double train, const double test, double avgsize, const int gen);
     void sendSignal(int value);
     void progressChanged(const int value);
     void GPstarted(const QString value);
