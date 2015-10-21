@@ -87,6 +87,7 @@
 #include "optionsdialog.h"
 #include "worker.h"
 #include "matrix.h"
+#include "infix.h"
 
 #define POP_SIZE_DEFAULT 100
 #define NBR_GEN_DEFAULT 100
@@ -106,10 +107,6 @@
 
 using namespace Puppy;
 
-unsigned int evaluateSymbReg(std::vector<Tree>& ioPopulation,
-                             Context& ioContext,
-                             const std::vector<double>& inX,
-                             const std::vector<double>& inF);
 
 unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
                              Context& ioContext,
@@ -162,7 +159,6 @@ int Worker::start_main(void) {
   lMutMaxRegenDepth = Worker::mutationmaxr;
   lSeed = Worker::randomseed;
 
-
   // Display message with parameters used.
   std::cout << "BEAGLE Puppy symbolic regression" << std::endl;
 
@@ -205,11 +201,40 @@ int Worker::start_main(void) {
   emit Worker::valueChanged("Creating evolution context");
   Context lContext;
   lContext.mRandom.seed(lSeed);
-  lContext.insert(new Add);
-  lContext.insert(new Subtract);
-  lContext.insert(new Multiply);
-  lContext.insert(new Divide);
-  lContext.insert(new Ephemeral);
+  emit Worker::valueChanged("Function set selected");
+  if(Worker::functionselection.at(0)) {
+    emit Worker::valueChanged("Add");
+    lContext.insert(new Add);
+  }
+  if(Worker::functionselection.at(1)) {
+    emit Worker::valueChanged("Substract");
+    lContext.insert(new Subtract);
+  }
+  if(Worker::functionselection.at(2)) {
+    emit Worker::valueChanged("Multiply");
+    lContext.insert(new Multiply);
+  }
+  if(Worker::functionselection.at(3)) {
+    emit Worker::valueChanged("Divide");
+    lContext.insert(new Divide);
+  }
+  if(Worker::functionselection.at(4)) {
+    emit Worker::valueChanged("Sin");
+    lContext.insert(new Sin);
+  }
+  if(Worker::functionselection.at(5)) {
+    emit Worker::valueChanged("Cos");
+    lContext.insert(new Cos);
+  }
+  if(Worker::functionselection.at(6)) {
+    emit Worker::valueChanged("Log");
+    lContext.insert(new Log);
+  }
+  if(Worker::functionselection.at(7)) {
+    emit Worker::valueChanged("Exp");
+    lContext.insert(new Exp);
+  }
+
   // Add terminals
   std::stringstream str;
   for(unsigned int i=0; i<Worker::dataset_cols-1;i++) {
@@ -222,7 +247,7 @@ int Worker::start_main(void) {
   std::vector<int> index;
   for (unsigned int i=0; i<Worker::dataset_rows; ++i) index.push_back(i);
   // Make random indexing for training,testing partitioning
-  //std::random_shuffle ( index.begin(), index.end() );
+  std::random_shuffle ( index.begin(), index.end() );
   int *index_int = new int [Worker::dataset_rows];
   std::copy(index.begin(), index.end(), index_int);
 
@@ -282,15 +307,18 @@ int Worker::start_main(void) {
   //evaluateSymbReg(lPopulation, lContext, lX, lF);
   evaluateFitness(lPopulation, lContext, trainingIn, trainingOut,Worker::dataset_cols-1,size_training);
 
+  Stats GPthis;
   QString message;
   double bfitTrain,bfitTest,avgSize;
   int bindex; // Best individual index
-  calculateStats(lPopulation, 0, message, bfitTrain, bindex, avgSize);
+  calculateStats(lPopulation, 0, message, GPthis.train, bindex, GPthis.avgsize, GPthis.maxsize, GPthis.minsize);
   emit Worker::valueChanged(message);
   float progress_float;
   bool abort = Worker::_abort;
   unsigned int i;
   QString output;
+  infix q;
+
 
   // Evolve population for the given number of generations
   std::cout << "Starting evolution" << std::endl;
@@ -302,10 +330,12 @@ int Worker::start_main(void) {
     applyMutationSwap(lPopulation, lContext, lMutSwapProba, lMutSwapDistribProba);    
     //evaluateSymbReg(lPopulation, lContext, lX, lF);
     evaluateFitness(lPopulation, lContext, trainingIn, trainingOut,Worker::dataset_cols-1,size_training);
-    calculateStats(lPopulation, i, message, bfitTrain, bindex, avgSize);
+    calculateStats(lPopulation, i, message, GPthis.train, bindex, GPthis.avgsize, GPthis.maxsize, GPthis.minsize);
     evaluateFitnessTesting(lPopulation[bindex],lContext,testingIn,testingOut,Worker::dataset_cols-1,(Worker::dataset_rows-size_training));
     //evaluateFitnessTesting(lPopulation[bindex],lContext,trainingIn,trainingOut,Worker::dataset_cols-1,size_training);
-    bfitTest = lPopulation[bindex].mFitnessTest;
+    //GPthis.test = lPopulation[bindex].mFitnessTest;
+    GPthis.test = lPopulation[bindex].rFitnessTest;
+    GPthis.gen = i;
 
     lPopulation[bindex].write_qstring(output);
     qDebug()<<i<<" Train: "<<lPopulation[bindex].mFitness<<" Test: "<<lPopulation[bindex].mFitnessTest<<" "<<output;
@@ -314,7 +344,7 @@ int Worker::start_main(void) {
     output.clear();
 
     emit Worker::valueChanged(message);
-    emit Worker::send_best_fitness(bfitTrain,bfitTest,avgSize,i);
+    emit Worker::send_stats(GPthis);
     progress_float = (i/(float)lNbrGen)*100;
     emit Worker::progressChanged((int)progress_float);
 
@@ -340,7 +370,7 @@ int Worker::start_main(void) {
   std::cout << *lBestIndividual << std:: endl;
   //std::cout << lBestIndividual[0].mFitness << std:: endl;
 
-  std::cout << "Exiting program" << std::endl << std::flush;
+  //std::cout << "Exiting program" << std::endl << std::flush;
 
   // Clean up data
   delete inputV;
@@ -349,41 +379,6 @@ int Worker::start_main(void) {
   delete testingSet;
   emit Worker::GPstarted("Run");
   return 0;
-}
-
-
-/*!
- *  \brief Evaluate fitness of a population
- *  \param ioPopulation Population to evaluate fitness.
- *  \param ioContext Evolutionary context.
- *  \param inX Independant sample values for evaluation.
- *  \param inF Dependant sample values for evaluation.
- *  \return Number of fitness evaluated.
- *  \ingroup SymbReg
- */
-unsigned int evaluateSymbReg(std::vector<Tree>& ioPopulation,
-                             Context& ioContext,
-                             const std::vector<double>& inX,
-                             const std::vector<double>& inF)
-{
-  assert(inX.size() == inF.size());
-  unsigned int lNbrEval = 0;
-  for(unsigned int i=0; i<ioPopulation.size(); ++i) {
-    if(ioPopulation[i].mValid) continue;
-    double lQuadErr = 0.0;
-    for(unsigned int j=0; j<inX.size(); ++j) {
-      ioContext.mPrimitiveMap["X1"]->setValue(&inX[j]);
-      double lResult = 0.0;
-      ioPopulation[i].interpret(&lResult, ioContext);
-      double lErr = lResult - inF[j];
-      lQuadErr += (lErr * lErr);
-    }
-    double lRMS = std::sqrt(lQuadErr / inX.size());
-    ioPopulation[i].mFitness = 1. / (1. + lRMS);
-    ioPopulation[i].mValid = true;
-    ++lNbrEval;
-  }
-  return lNbrEval;
 }
 
 unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
@@ -418,6 +413,8 @@ unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
     }
     lRMS = std::sqrt(lQuadErr / rows);
     ioPopulation[i].mFitness = 1. / (1. + lRMS);
+    ioPopulation[i].rFitness = lRMS;
+    //ioPopulation[i].mFitness = lRMS;
     ioPopulation[i].mValid = true;
     ++lNbrEval;
   }
@@ -451,6 +448,8 @@ unsigned int evaluateFitnessTesting(Tree &individual,
   }
   lRMS = std::sqrt(lQuadErr / rows);
   individual.mFitnessTest = 1. / (1. + lRMS);
+  individual.rFitnessTest = lRMS;
+  //individual.mFitnessTest = lRMS;
   individual.mValid = true;
   ++lNbrEval;
   return lNbrEval;
@@ -483,6 +482,7 @@ unsigned int evaluateFitnessTraining(Tree &individual,
   }
   lRMS = std::sqrt(lQuadErr / rows);
   individual.mFitness = 1. / (1. + lRMS);
+  //individual.mFitness = lRMS;
   //individual.mValid = true;
   ++lNbrEval;
   return lNbrEval;
