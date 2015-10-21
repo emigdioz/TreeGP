@@ -116,6 +116,15 @@ unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
                              double* inX,
                              double* inF,int cols, int rows);
 
+unsigned int evaluateFitnessTesting(Tree &individual,
+                             Context& ioContext,
+                             double* inX,
+                             double* inF,int cols, int rows);
+
+unsigned int evaluateFitnessTraining(Tree &individual,
+                             Context& ioContext,
+                             double* inX,
+                             double* inF,int cols, int rows);
 
 /*!
  *  \brief Program main routine.
@@ -213,7 +222,7 @@ int Worker::start_main(void) {
   std::vector<int> index;
   for (unsigned int i=0; i<Worker::dataset_rows; ++i) index.push_back(i);
   // Make random indexing for training,testing partitioning
-  std::random_shuffle ( index.begin(), index.end() );
+  //std::random_shuffle ( index.begin(), index.end() );
   int *index_int = new int [Worker::dataset_rows];
   std::copy(index.begin(), index.end(), index_int);
 
@@ -252,6 +261,8 @@ int Worker::start_main(void) {
     testingOut[i] = testingSet[((Worker::dataset_cols-1)*(Worker::dataset_rows-size_training))+i];
     //qDebug()<<i<<": "<<testingOut[i];
   }
+  emit Worker::valueChanged("Training size = " + QString::number(size_training) + " x " + QString::number(Worker::dataset_cols-1));
+  emit Worker::valueChanged("Testing size = " + QString::number(Worker::dataset_rows-size_training) + " x " + QString::number(Worker::dataset_cols-1));
 
 //  // Sample equation on 20 random points in [-1.0, 1.0].
 //  std::cout << "Sampling equation to regress" << std::endl;
@@ -272,36 +283,60 @@ int Worker::start_main(void) {
   evaluateFitness(lPopulation, lContext, trainingIn, trainingOut,Worker::dataset_cols-1,size_training);
 
   QString message;
-  double best_fitness;
-  calculateStats(lPopulation, 0, message, best_fitness);
+  double bfitTrain,bfitTest,avgSize;
+  int bindex; // Best individual index
+  calculateStats(lPopulation, 0, message, bfitTrain, bindex, avgSize);
   emit Worker::valueChanged(message);
   float progress_float;
-  
+  bool abort = Worker::_abort;
+  unsigned int i;
+  QString output;
+
   // Evolve population for the given number of generations
   std::cout << "Starting evolution" << std::endl;
   emit Worker::valueChanged("Starting evolution");
-  for(unsigned int i=1; i<=lNbrGen; ++i) {
+  for(i=1; i<=lNbrGen; ++i) {
     applySelectionTournament(lPopulation, lContext, lNbrPartTournament);  
     applyCrossover(lPopulation, lContext, lCrossoverProba, lCrossDistribProba, lMaxDepth);
     applyMutationStandard(lPopulation, lContext, lMutStdProba, lMutMaxRegenDepth, lMaxDepth);
     applyMutationSwap(lPopulation, lContext, lMutSwapProba, lMutSwapDistribProba);    
     //evaluateSymbReg(lPopulation, lContext, lX, lF);
     evaluateFitness(lPopulation, lContext, trainingIn, trainingOut,Worker::dataset_cols-1,size_training);
-    calculateStats(lPopulation, i, message, best_fitness);
+    calculateStats(lPopulation, i, message, bfitTrain, bindex, avgSize);
+    evaluateFitnessTesting(lPopulation[bindex],lContext,testingIn,testingOut,Worker::dataset_cols-1,(Worker::dataset_rows-size_training));
+    //evaluateFitnessTesting(lPopulation[bindex],lContext,trainingIn,trainingOut,Worker::dataset_cols-1,size_training);
+    bfitTest = lPopulation[bindex].mFitnessTest;
+
+    lPopulation[bindex].write_qstring(output);
+    qDebug()<<i<<" Train: "<<lPopulation[bindex].mFitness<<" Test: "<<lPopulation[bindex].mFitnessTest<<" "<<output;
+    //evaluateFitnessTraining(lPopulation[bindex],lContext,trainingIn,trainingOut,Worker::dataset_cols-1,size_training);
+    //qDebug()<<i<<" Train: "<<lPopulation[bindex].mFitness;
+    output.clear();
+
     emit Worker::valueChanged(message);
-    emit Worker::send_best_fitness(best_fitness,i);
+    emit Worker::send_best_fitness(bfitTrain,bfitTest,avgSize,i);
     progress_float = (i/(float)lNbrGen)*100;
     emit Worker::progressChanged((int)progress_float);
+
+    // Checks if the process should be aborted
+    mutex.lock();
+    abort = _abort;
+    mutex.unlock();
+
+    if (abort) {
+      qDebug()<<"Aborting worker process";
+      break;
+    }
   }
   std::cout << "End of evolution" << std::endl;
 
   // Outputting best individual
   std::vector<Tree>::const_iterator lBestIndividual = std::max_element(lPopulation.begin(), lPopulation.end());
-  std::cout << "Best individual at generation " << lNbrGen << " is: ";
+  std::cout << "Best individual at generation " << (i-1) << " is: ";
 
-  QString output;
+
   lBestIndividual[0].write_qstring(output);
-  emit Worker::valueChanged("Best individual at generation " + QString::number(lNbrGen) + " is: " + output + " with fitness: " + QString::number(lBestIndividual[0].mFitness));
+  emit Worker::valueChanged("Best individual at generation " + QString::number(i-1) + " is: " + output + " with fitness: " + QString::number(lBestIndividual[0].mFitness));
   std::cout << *lBestIndividual << std:: endl;
   //std::cout << lBestIndividual[0].mFitness << std:: endl;
 
@@ -358,30 +393,97 @@ unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
 {
   //assert(inX.size() == inF.size());
   std::stringstream var;
-  double rowV;
+  double rowV,lQuadErr,lResult,lErr,lRMS;
   unsigned int lNbrEval = 0,i,j,k;
   //qDebug()<<inX[100];
-  for(i=0; i<ioPopulation.size(); ++i) {
-    if(ioPopulation[i].mValid) continue;
-    double lQuadErr = 0.0;
-    for(j=0; j<rows; ++j) {
+  //for(i=0;i<(cols*rows);i++) qDebug()<<i<<": "<<inX[i];
+  for(i=0; i<ioPopulation.size();i++) {
+    //if(ioPopulation[i].mValid) continue;
+    lQuadErr = 0.0;
+    for(j=0; j<rows; j++) {
       // Copy col wise data for variable usage
       for(k=0; k<cols;k++) {
         rowV =  inX[(k*rows)+j];
         var<<"X"<<(k+1);
         ioContext.mPrimitiveMap[var.str()]->setValue(&rowV);
         var.str(std::string());
+        //qDebug()<<k<<": "<<rowV;
       }
-      double lResult = 0.0;
+      lResult = 0.0;
+      lErr = 0.0;
       ioPopulation[i].interpret(&lResult, ioContext);
-      double lErr = lResult - inF[j];
+      lErr = lResult - inF[j];
       lQuadErr += (lErr * lErr);
 
     }
-    double lRMS = std::sqrt(lQuadErr / rows);
+    lRMS = std::sqrt(lQuadErr / rows);
     ioPopulation[i].mFitness = 1. / (1. + lRMS);
     ioPopulation[i].mValid = true;
     ++lNbrEval;
   }
+  return lNbrEval;
+}
+
+unsigned int evaluateFitnessTesting(Tree &individual,
+                             Context& ioContext,
+                             double* inX,
+                             double* inF,int cols, int rows)
+{
+  std::stringstream var;
+  double rowV;
+  unsigned int lNbrEval = 0,j,k;
+  double lQuadErr = 0.0,lResult,lErr,lRMS;
+  //for(j=0;j<(cols*rows);j++) qDebug()<<j<<": "<<inX[j];
+
+  for(j=0; j<rows; j++) {
+    // Copy col wise data for variable usage
+    for(k=0; k<cols;k++) {
+      rowV =  inX[(k*rows)+j];
+      var<<"X"<<(k+1);
+      ioContext.mPrimitiveMap[var.str()]->setValue(&rowV);
+      var.str(std::string());
+    }
+    lResult = 0.0;
+    individual.interpret(&lResult, ioContext);
+    lErr = lResult - inF[j];
+    lQuadErr += (lErr * lErr);
+
+  }
+  lRMS = std::sqrt(lQuadErr / rows);
+  individual.mFitnessTest = 1. / (1. + lRMS);
+  individual.mValid = true;
+  ++lNbrEval;
+  return lNbrEval;
+}
+
+unsigned int evaluateFitnessTraining(Tree &individual,
+                             Context& ioContext,
+                             double* inX,
+                             double* inF,int cols, int rows)
+{
+  std::stringstream var;
+  double rowV;
+  unsigned int lNbrEval = 0,j,k;
+  double lQuadErr = 0.0,lResult,lErr,lRMS;
+  //for(j=0;j<(cols*rows);j++) qDebug()<<j<<": "<<inX[j];
+
+  for(j=0; j<rows; j++) {
+    // Copy col wise data for variable usage
+    for(k=0; k<cols;k++) {
+      rowV =  inX[(k*rows)+j];
+      var<<"X"<<(k+1);
+      ioContext.mPrimitiveMap[var.str()]->setValue(&rowV);
+      var.str(std::string());
+    }
+    lResult = 0.0;
+    individual.interpret(&lResult, ioContext);
+    lErr = lResult - inF[j];
+    lQuadErr += (lErr * lErr);
+
+  }
+  lRMS = std::sqrt(lQuadErr / rows);
+  individual.mFitness = 1. / (1. + lRMS);
+  //individual.mValid = true;
+  ++lNbrEval;
   return lNbrEval;
 }
