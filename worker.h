@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QMutex>
+#include <iostream>
+#include <vector>
 
 class Worker : public QObject
 {
@@ -38,8 +40,18 @@ public:
     int dataset_cols;
     int dataset_rows;
     int trainingP;
+    std::vector<bool> functionselection;
 
     void subsetData(double *input, double *training, double *testing, int cols, int rows, int trainsize, int *index);
+    typedef struct
+    {
+      double train;
+      double test;
+      double avgsize;
+      double maxsize;
+      double minsize;
+      double gen;
+    } Stats;
 
 private:
     /**
@@ -67,7 +79,7 @@ signals:
      * @brief This signal is emitted when counted value is changed
      */
     void valueChanged(const QString &value);
-    void send_best_fitness(const double train, const double test, double avgsize, const int gen);
+    void send_stats(Worker::Stats data);
     void sendSignal(int value);
     void progressChanged(const int value);
     void GPstarted(const QString value);
