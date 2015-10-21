@@ -75,7 +75,7 @@ namespace Puppy {
 //                    unsigned int inGeneration,
 //                    std::ostream& ioOS=std::cout);
 void calculateStats(const std::vector<Tree>& inPopulation,
-                    unsigned int inGeneration, QString &ioOS, double &best_fit, int &best_index, double &avgSize);
+                    unsigned int inGeneration, QString &ioOS, double &best_fit, int &best_index, double &avgSize, double &maxSize, double &minSize);
 
 void applyCrossover(std::vector<Tree>& ioPopulation,
                     Context& ioContext,
