@@ -58,39 +58,53 @@
 //                           unsigned int inGeneration,
 //                           std::ostream& ioOS)
 void Puppy::calculateStats(const std::vector<Puppy::Tree>& inPopulation,
-                           unsigned int inGeneration, QString &ioOS, double &best_fit, int &best_index, double &avgSize)
+                           unsigned int inGeneration, QString &ioOS, double &best_fit, int &best_index, double &avgSize, double &maxSize, double &minSize)
 {
   double lAvg = 0.0;
   double lStd = 0.0;
   double lMax = 0.0;
   double lMin = 0.0;
   int tsize;
+  double sMax = 0.0;
+  double sMin = 0.0;
   unsigned int i;
 
   if(inPopulation.size() == 1) {
     assert(inPopulation.front().mValid);
-    lAvg = lMax = lMin = inPopulation.front().mFitness;
+    lAvg = lMax = lMin = inPopulation.front().rFitness;
     best_index = 0;
   }
   else if(inPopulation.size() > 1) {
     assert(inPopulation[0].mValid);
-    double lSum = inPopulation[0].mFitness;
+    double lSum = inPopulation[0].rFitness;
     double lPow2Sum = (lSum * lSum);
     double sumSize, lFitness;
+    tsize = inPopulation[0].size();
+    sMax = sMin = tsize;
     lMax = lMin = lSum;
     best_index = 0;
     for(i=1; i<inPopulation.size(); i++) {
       assert(inPopulation[i].mValid);
-      lFitness = inPopulation[i].mFitness;
+      // Fitness stats
+      //lFitness = inPopulation[i].mFitness;
+      lFitness = inPopulation[i].rFitness;
       lSum     += lFitness;
       lPow2Sum += (lFitness * lFitness);
       if(lFitness > lMax){
         lMax = lFitness;
+        //best_index = i;
+      }
+      if(lFitness < lMin){
+        lMin = lFitness;
         best_index = i;
       }
-      if(lFitness < lMin) lMin = lFitness;
+      // Size stats
       tsize = inPopulation[i].size();
       sumSize += tsize;
+      if(tsize > sMax) {
+        sMax = tsize;
+      }
+      if(tsize < sMin) sMin = tsize;
     }
     lAvg = lSum / inPopulation.size();
     avgSize = sumSize / inPopulation.size();
@@ -103,8 +117,11 @@ void Puppy::calculateStats(const std::vector<Puppy::Tree>& inPopulation,
   //emit Worker::abort();;
   ioOS = "Gen: " + QString::number(inGeneration) + ", avg: " + QString::number(lAvg) + ", std: " +
       QString::number(lStd) + ", max: " + QString::number(lMax) + ", min: " + QString::number(lMin) +
-      "avg Size: " + QString::number(avgSize);
-  best_fit = lMax;
+      ", avg Size: " + QString::number(avgSize);
+  //best_fit = lMax;
+  best_fit = lMin;
+  maxSize = sMax;
+  minSize = sMin;
 }
 
 
