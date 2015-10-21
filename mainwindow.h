@@ -29,10 +29,6 @@ public:
     ~MainWindow();
 
 private:
-//    void createToolBars();
-//    void createActions();
-//    QToolBar *fileToolBar;
-//    QAction *runAct;
     /**
      * @brief Thread object which will let us manipulate the running thread
      */
@@ -43,6 +39,9 @@ private:
     QList<QStringList> csv;
     QStandardItemModel *model;
     QList<QStandardItem*> standardItemList;
+    bool GPthreadstarted;
+    void setupPlots();
+    double maxSize;
 
 private slots:
     void runGP();
@@ -50,11 +49,11 @@ private slots:
     void on_actionE_xit_triggered();
     void on_actionOptions_triggered();
     void received_data(OptionsDialog::Options data);
-    void received_best_fitness(double value, int gen);
+    void received_best_fitness(double training, double testing, double avgsize, int gen);
     void on_actionLoad_file_triggered();
     void checkString(QString &temp, QChar character = 0);
     void received_GPstarted(QString value);
-
+    void thread_finished();
     void on_horizontalSlider_valueChanged(int value);
 };
 Q_DECLARE_METATYPE(OptionsDialog::Options)
