@@ -103,6 +103,53 @@ public:
 
 };
 
+class Sin : public Puppy::Primitive
+{
+
+public:
+
+           Sin();
+  virtual ~Sin() { }
+
+  virtual void execute(void* outDatum, Puppy::Context& ioContext);
+
+};
+
+class Cos : public Puppy::Primitive
+{
+
+public:
+
+           Cos();
+  virtual ~Cos() { }
+
+  virtual void execute(void* outDatum, Puppy::Context& ioContext);
+
+};
+
+class Log : public Puppy::Primitive
+{
+
+public:
+
+           Log();
+  virtual ~Log() { }
+
+  virtual void execute(void* outDatum, Puppy::Context& ioContext);
+
+};
+
+class Exp : public Puppy::Primitive
+{
+
+public:
+
+           Exp();
+  virtual ~Exp() { }
+
+  virtual void execute(void* outDatum, Puppy::Context& ioContext);
+
+};
 
 /*!
  *  \class Ephemeral SymbRegPrimits.hpp "SymbRegPrimits.hpp"
