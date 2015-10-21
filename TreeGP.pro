@@ -13,7 +13,8 @@ SOURCES += \
     SymbRegPrimits.cpp \
     worker.cpp \
     optionsdialog.cpp \
-    qcustomplot.cpp
+    qcustomplot.cpp \
+    infix.cpp
 
 # Default rules for deployment.
 include(deployment.pri)
@@ -32,7 +33,8 @@ HEADERS += \
     worker.h \
     optionsdialog.h \
     qcustomplot.h \
-    matrix.h
+    matrix.h \
+    infix.h
 
 FORMS += \
     mainwindow.ui \
