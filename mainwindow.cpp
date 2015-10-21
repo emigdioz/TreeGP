@@ -3,13 +3,16 @@
 #include "optionsdialog.h"
 #include <QDebug>
 #include "SymbRegPrimits.hpp"
+#include "worker.h"
+
+Q_DECLARE_METATYPE(Worker::Stats);  // Needed for MetaType recognize new data type
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    qRegisterMetaType<OptionsDialog::Options>();
+    qRegisterMetaType<OptionsDialog::Options>();    
 
     ui->progressBar->setMaximum(100);
     ui->progressBar->setMinimum(1);
@@ -18,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     thread = new QThread();
     worker = new Worker();
 
+    qRegisterMetaType<Worker::Stats>();
     worker->moveToThread(thread);
     connect(worker, SIGNAL(valueChanged(QString)), ui->textEdit, SLOT(append(QString)));
     connect(worker, SIGNAL(workRequested()), thread, SLOT(start()));
@@ -25,7 +29,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(worker, SIGNAL(finished()), thread, SLOT(quit()), Qt::DirectConnection);
     connect(worker, SIGNAL(finished()), this, SLOT(thread_finished()), Qt::DirectConnection);
     connect(worker, SIGNAL(GPstarted(QString)), this, SLOT(received_GPstarted(QString)));
-    connect(worker, SIGNAL(send_best_fitness(double,double,double,int)), this, SLOT(received_best_fitness(double,double,double,int)));
+    //connect(worker, SIGNAL(send_best_fitness(double,double,double,int)), this, SLOT(received_best_fitness(double,double,double,int)));
+    connect(worker, SIGNAL(send_stats(Worker::Stats)), this, SLOT(received_stats(Worker::Stats)));
     connect(worker, SIGNAL(progressChanged(int)), ui->progressBar, SLOT(setValue(int)));
 
     oDialog = new OptionsDialog(this);
@@ -41,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::setupPlots()
 {
+  // Fitness plot
   ui->outputPlot->addGraph();
   ui->outputPlot->addGraph();
   // give the axes some labels:
@@ -70,6 +76,9 @@ void MainWindow::setupPlots()
   ui->outputPlot->yAxis->setTickPen(QColor(127, 127, 127, 255));
   ui->outputPlot->yAxis->setSubTickPen(QColor(127, 127, 127, 255));
 
+  // Size plot
+  ui->sizePlot->addGraph();
+  ui->sizePlot->addGraph();
   ui->sizePlot->addGraph();
   // give the axes some labels:
   ui->sizePlot->xAxis->setLabel("Generations");
@@ -79,9 +88,20 @@ void MainWindow::setupPlots()
   ui->sizePlot->yAxis->setRange(0, 1);
   QPen orangeLinePen;
   orangeLinePen.setColor(QColor(248, 118, 109, 255));
-  orangeLinePen.setWidth(2);
+  orangeLinePen.setWidth(1);
   ui->sizePlot->graph(0)->setPen(orangeLinePen);
-  ui->sizePlot->graph(0)->setName("Average pop size");
+  ui->sizePlot->graph(0)->setBrush(QBrush(QColor(248, 118, 109, 20)));
+  ui->sizePlot->graph(0)->setName("Max pop size");
+  ui->sizePlot->graph(0)->setAntialiasedFill(false);
+  ui->sizePlot->graph(1)->setPen(orangeLinePen);
+  ui->sizePlot->graph(1)->setName("Min pop size");
+  ui->sizePlot->graph(0)->setChannelFillGraph(ui->sizePlot->graph(1));
+  orangeLinePen.setWidth(2);
+  ui->sizePlot->graph(2)->setPen(orangeLinePen);
+  ui->sizePlot->graph(2)->setName("Average pop size");
+  ui->sizePlot->legend->removeItem(0);
+  ui->sizePlot->legend->removeItem(0);
+
   ui->sizePlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignRight);
   ui->sizePlot->axisRect()->setBackground(QColor(229, 229, 229, 255));
   ui->sizePlot->xAxis->grid()->setPen(QColor(255, 255, 255, 255));
@@ -96,6 +116,7 @@ void MainWindow::setupPlots()
   ui->outputPlot->replot();
   ui->sizePlot->replot();
   maxSize = 0;
+  maxFitness = 1;
 }
 
 void MainWindow::runGP()
@@ -133,6 +154,8 @@ void MainWindow::on_actionRun_triggered()
       ui->outputPlot->graph(0)->clearData();
       ui->outputPlot->graph(1)->clearData();
       ui->sizePlot->graph(0)->clearData();
+      ui->sizePlot->graph(1)->clearData();
+      ui->sizePlot->graph(2)->clearData();
       maxSize = 0;
       runGP();
     }
@@ -166,29 +189,49 @@ void MainWindow::received_data(OptionsDialog::Options data)
     worker->mutationp = data.mutationp;
     worker->mutationmaxr = data.mutationmaxr;
     worker->randomseed = data.randomseed;
+    worker->functionselection = data.functionselection;
     ui->outputPlot->xAxis->setRange(1, worker->ngen);
     ui->outputPlot->graph(0)->clearData();
+    ui->outputPlot->yAxis->setRange(0, 1);
     ui->outputPlot->replot();
     ui->sizePlot->xAxis->setRange(1, worker->ngen);
     ui->sizePlot->graph(0)->clearData();
+    ui->sizePlot->graph(1)->clearData();
+    ui->sizePlot->graph(2)->clearData();
     ui->sizePlot->replot();
 }
 
-void MainWindow::received_best_fitness(double training, double testing, double avgsize, int gen)
+void MainWindow::received_stats(Worker::Stats data)
 {
-        ui->outputPlot->graph(0)->addData(gen,training);
-        ui->outputPlot->graph(1)->addData(gen,testing);
-        ui->outputPlot->legend->setVisible(true);
-        ui->outputPlot->replot();
-        ui->sizePlot->graph(0)->addData(gen,avgsize);
-        ui->sizePlot->legend->setVisible(true);
-        if(avgsize>maxSize){
-          ui->sizePlot->yAxis->setRange(0, avgsize);
-          maxSize = avgsize;
-        }
-        else
-          ui->sizePlot->yAxis->setRange(0, maxSize);
-        ui->sizePlot->replot();
+  ui->outputPlot->graph(0)->addData(data.gen,data.train);
+  ui->outputPlot->graph(1)->addData(data.gen,data.test);
+  ui->outputPlot->legend->setVisible(true);
+  ui->outputPlot->replot();
+  ui->sizePlot->graph(0)->addData(data.gen,data.maxsize);
+  ui->sizePlot->graph(1)->addData(data.gen,data.minsize);
+  ui->sizePlot->graph(2)->addData(data.gen,data.avgsize);
+  ui->sizePlot->legend->setVisible(true);
+
+  if(data.train>maxFitness || data.test>maxFitness){
+    if(data.test>data.train) {
+      ui->outputPlot->yAxis->setRange(0, data.test);
+      maxFitness = data.test;
+    }
+    else {
+      ui->outputPlot->yAxis->setRange(0, data.train);
+      maxFitness = data.train;
+    }
+  }
+  else
+    ui->outputPlot->yAxis->setRange(0, maxFitness);
+
+  if(data.maxsize>maxSize){
+    ui->sizePlot->yAxis->setRange(0, data.maxsize);
+    maxSize = data.maxsize;
+  }
+  else
+    ui->sizePlot->yAxis->setRange(0, maxSize);
+  ui->sizePlot->replot();
 }
 
 void MainWindow::received_GPstarted(QString value)
