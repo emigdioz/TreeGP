@@ -94,7 +94,9 @@ public:
   void         write_qstring(QString& ioOS, unsigned int inIndex=0) const;
 
   float mFitness;  //!< Fitness value of the GP tree
+  float mFitnessTest;
   bool  mValid;    //!< Flag indicating whether the fitness is valid.
+  int nNodes;
               
 };
 
