@@ -2,8 +2,10 @@
 #define OPTIONSDIALOG_H
 
 #include <QDialog>
+#include <QStandardItemModel>
 #include "worker.h"
-
+#include <iostream>
+#include <vector>
 
 namespace Ui {
 class OptionsDialog;
@@ -30,11 +32,14 @@ public:
       float mutationp;
       int mutationmaxr;
       unsigned long randomseed;
+      std::vector<bool> functionselection;
     } Options;
 
 
 private:
     Ui::OptionsDialog *ui;
+    QStandardItemModel *model;
+    QList<QStandardItem*> standardItemList;
 
 public slots:
     void write_gen(int value);
