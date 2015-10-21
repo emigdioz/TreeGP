@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->progressBar->setMaximum(100);
     ui->progressBar->setMinimum(1);
-
+    GPthreadstarted = false;
 
     thread = new QThread();
     worker = new Worker();
@@ -23,8 +23,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(worker, SIGNAL(workRequested()), thread, SLOT(start()));
     connect(thread, SIGNAL(started()), worker, SLOT(doWork()));
     connect(worker, SIGNAL(finished()), thread, SLOT(quit()), Qt::DirectConnection);
+    connect(worker, SIGNAL(finished()), this, SLOT(thread_finished()), Qt::DirectConnection);
     connect(worker, SIGNAL(GPstarted(QString)), this, SLOT(received_GPstarted(QString)));
-    connect(worker, SIGNAL(send_best_fitness(double,int)), this, SLOT(received_best_fitness(double,int)));
+    connect(worker, SIGNAL(send_best_fitness(double,double,double,int)), this, SLOT(received_best_fitness(double,double,double,int)));
     connect(worker, SIGNAL(progressChanged(int)), ui->progressBar, SLOT(setValue(int)));
 
     oDialog = new OptionsDialog(this);
@@ -32,46 +33,70 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(oDialog, SIGNAL(send_data(OptionsDialog::Options)), this, SLOT(received_data(OptionsDialog::Options)));
 
-    ui->outputPlot->addGraph();
-    // give the axes some labels:
-    ui->outputPlot->xAxis->setLabel("Generations");
-    ui->outputPlot->yAxis->setLabel("Fitness");
-    // set axes ranges, so we see all data:
-    ui->outputPlot->xAxis->setRange(1, worker->ngen);
-    ui->outputPlot->yAxis->setRange(0, 1);
-    QPen blueLinePen;
-    blueLinePen.setColor(QColor(0, 173, 250, 255));
-    blueLinePen.setWidth(2);
-    ui->outputPlot->graph(0)->setPen(blueLinePen);
-    //ui->outputPlot->setBackground(Qt::lightGray);
-    ui->outputPlot->axisRect()->setBackground(QColor(229, 229, 229, 255));
-    ui->outputPlot->xAxis->grid()->setPen(QColor(255, 255, 255, 255));
-    ui->outputPlot->yAxis->grid()->setPen(QColor(255, 255, 255, 255));
-    ui->outputPlot->xAxis->setBasePen(QColor(255, 255, 255, 255));
-    ui->outputPlot->yAxis->setBasePen(QColor(255, 255, 255, 255));
-    ui->outputPlot->xAxis->setTickPen(QColor(127, 127, 127, 255));
-    ui->outputPlot->xAxis->setSubTickPen(QColor(127, 127, 127, 255));
-    ui->outputPlot->yAxis->setTickPen(QColor(127, 127, 127, 255));
-    ui->outputPlot->yAxis->setSubTickPen(QColor(127, 127, 127, 255));
-    ui->outputPlot->replot();
-
+    setupPlots();
     oDialog->accept(); // Send default data from options dialog
     worker->trainingP = ui->horizontalSlider->value(); // Training size in percentage
 
 }
 
-//void MainWindow::createToolBars()
-//{
-//    fileToolBar = addToolBar(tr("Tools"));
-//    fileToolBar->addAction(runAct);
-//}
+void MainWindow::setupPlots()
+{
+  ui->outputPlot->addGraph();
+  ui->outputPlot->addGraph();
+  // give the axes some labels:
+  ui->outputPlot->xAxis->setLabel("Generations");
+  ui->outputPlot->yAxis->setLabel("Fitness");
+  // set axes ranges, so we see all data:
+  ui->outputPlot->xAxis->setRange(1, worker->ngen);
+  ui->outputPlot->yAxis->setRange(0, 1);
+  QPen blueLinePen;
+  QPen greenLinePen;
+  blueLinePen.setColor(QColor(0, 173, 250, 255));
+  blueLinePen.setWidth(2);
+  greenLinePen.setColor(QColor(94, 179, 0, 255));
+  greenLinePen.setWidth(2);
+  ui->outputPlot->graph(0)->setPen(blueLinePen);
+  ui->outputPlot->graph(1)->setPen(greenLinePen);
+  ui->outputPlot->graph(0)->setName("Train data");
+  ui->outputPlot->graph(1)->setName("Test data");
+  ui->outputPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignRight);
+  ui->outputPlot->axisRect()->setBackground(QColor(229, 229, 229, 255));
+  ui->outputPlot->xAxis->grid()->setPen(QColor(255, 255, 255, 255));
+  ui->outputPlot->yAxis->grid()->setPen(QColor(255, 255, 255, 255));
+  ui->outputPlot->xAxis->setBasePen(QColor(255, 255, 255, 255));
+  ui->outputPlot->yAxis->setBasePen(QColor(255, 255, 255, 255));
+  ui->outputPlot->xAxis->setTickPen(QColor(127, 127, 127, 255));
+  ui->outputPlot->xAxis->setSubTickPen(QColor(127, 127, 127, 255));
+  ui->outputPlot->yAxis->setTickPen(QColor(127, 127, 127, 255));
+  ui->outputPlot->yAxis->setSubTickPen(QColor(127, 127, 127, 255));
 
-//void MainWindow::createActions()
-//{
-//    runAct = new QAction(QIcon(""), tr("&Run"), this);
+  ui->sizePlot->addGraph();
+  // give the axes some labels:
+  ui->sizePlot->xAxis->setLabel("Generations");
+  ui->sizePlot->yAxis->setLabel("Size");
+  // set axes ranges, so we see all data:
+  ui->sizePlot->xAxis->setRange(1, worker->ngen);
+  ui->sizePlot->yAxis->setRange(0, 1);
+  QPen orangeLinePen;
+  orangeLinePen.setColor(QColor(248, 118, 109, 255));
+  orangeLinePen.setWidth(2);
+  ui->sizePlot->graph(0)->setPen(orangeLinePen);
+  ui->sizePlot->graph(0)->setName("Average pop size");
+  ui->sizePlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignRight);
+  ui->sizePlot->axisRect()->setBackground(QColor(229, 229, 229, 255));
+  ui->sizePlot->xAxis->grid()->setPen(QColor(255, 255, 255, 255));
+  ui->sizePlot->yAxis->grid()->setPen(QColor(255, 255, 255, 255));
+  ui->sizePlot->xAxis->setBasePen(QColor(255, 255, 255, 255));
+  ui->sizePlot->yAxis->setBasePen(QColor(255, 255, 255, 255));
+  ui->sizePlot->xAxis->setTickPen(QColor(127, 127, 127, 255));
+  ui->sizePlot->xAxis->setSubTickPen(QColor(127, 127, 127, 255));
+  ui->sizePlot->yAxis->setTickPen(QColor(127, 127, 127, 255));
+  ui->sizePlot->yAxis->setSubTickPen(QColor(127, 127, 127, 255));
 
-//    connect(runAct, SIGNAL(triggered()), this, SLOT(runGP()));
-//}
+  ui->outputPlot->replot();
+  ui->sizePlot->replot();
+  maxSize = 0;
+}
 
 void MainWindow::runGP()
 {
@@ -81,6 +106,7 @@ void MainWindow::runGP()
     worker->abort();
     thread->wait(); // If the thread is not running, this will immediately return.
     worker->requestWork();
+    GPthreadstarted = true;
     //ui->statusbar->showMessage("");
 }
 
@@ -96,9 +122,20 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionRun_triggered()
 {
-    ui->textEdit->clear();
-    ui->outputPlot->graph(0)->clearData();
-    runGP();
+    if(GPthreadstarted) {
+      worker->abort();
+      thread->wait(); // If the thread is not running, this will immediately return.
+      ui->actionRun->setIconText("Run");
+      GPthreadstarted = false;
+    }
+    else {
+      ui->textEdit->clear();
+      ui->outputPlot->graph(0)->clearData();
+      ui->outputPlot->graph(1)->clearData();
+      ui->sizePlot->graph(0)->clearData();
+      maxSize = 0;
+      runGP();
+    }
 }
 
 void MainWindow::on_actionE_xit_triggered()
@@ -132,19 +169,26 @@ void MainWindow::received_data(OptionsDialog::Options data)
     ui->outputPlot->xAxis->setRange(1, worker->ngen);
     ui->outputPlot->graph(0)->clearData();
     ui->outputPlot->replot();
+    ui->sizePlot->xAxis->setRange(1, worker->ngen);
+    ui->sizePlot->graph(0)->clearData();
+    ui->sizePlot->replot();
 }
 
-void MainWindow::received_best_fitness(double value, int gen)
+void MainWindow::received_best_fitness(double training, double testing, double avgsize, int gen)
 {
-//        QVector<double> x(101), y(101); // initialize with entries 0..100
-//        for (int i=0; i<101; ++i)
-//        {
-//          x[i] = i/50.0 - 1; // x goes from -1 to 1
-//          y[i] = x[i]*x[i]; // let's plot a quadratic function
-//        }
-        // create graph and assign data to it:
-        ui->outputPlot->graph(0)->addData(gen,value);
+        ui->outputPlot->graph(0)->addData(gen,training);
+        ui->outputPlot->graph(1)->addData(gen,testing);
+        ui->outputPlot->legend->setVisible(true);
         ui->outputPlot->replot();
+        ui->sizePlot->graph(0)->addData(gen,avgsize);
+        ui->sizePlot->legend->setVisible(true);
+        if(avgsize>maxSize){
+          ui->sizePlot->yAxis->setRange(0, avgsize);
+          maxSize = avgsize;
+        }
+        else
+          ui->sizePlot->yAxis->setRange(0, maxSize);
+        ui->sizePlot->replot();
 }
 
 void MainWindow::received_GPstarted(QString value)
@@ -228,4 +272,9 @@ void MainWindow::on_horizontalSlider_valueChanged(int value)
 {
     ui->label_5->setText("Training/Testing (" + QString::number(value) + "/" + QString::number(100-value) + ")");
     worker->trainingP = value;
+}
+
+void MainWindow::thread_finished()
+{
+  GPthreadstarted = false;
 }
