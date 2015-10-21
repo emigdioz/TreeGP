@@ -45,7 +45,7 @@ using namespace Puppy;
  *  \brief Construct Add GP primitive.
  */
 Add::Add() :
-  Primitive(2, "ADD")
+  Primitive(2, "+")
 { }
 
 
@@ -68,7 +68,7 @@ void Add::execute(void* outDatum, Context& ioContext)
  *  \brief Construct Subtract GP primitive.
  */
 Subtract::Subtract() :
-  Primitive(2, "SUB")
+  Primitive(2, "-")
 { }
 
 
@@ -91,7 +91,7 @@ void Subtract::execute(void* outDatum, Context& ioContext)
  *  \brief Construct Multiply GP primitive.
  */
 Multiply::Multiply() :
-  Primitive(2, "MUL")
+  Primitive(2, "*")
 { }
 
 
@@ -114,7 +114,7 @@ void Multiply::execute(void* outDatum, Context& ioContext)
  *  \brief Construct Divide GP primitive.
  */
 Divide::Divide() :
-  Primitive(2, "DIV")
+  Primitive(2, "/")
 { }
 
 
@@ -135,6 +135,87 @@ void Divide::execute(void* outDatum, Context& ioContext)
   }
 }
 
+/*!
+ *  \brief Construct Sin GP primitive.
+ */
+Sin::Sin() :
+  Primitive(1, "SIN")
+{ }
+
+
+/*!
+ *  \brief Execute characteristic operation of Sin primitive.
+ *  \param outDatum Result of the Sin operation.
+ *  \param ioContext Evolutionary context.
+ */
+void Sin::execute(void* outDatum, Context& ioContext)
+{
+  double& lResult = *(double*)outDatum;
+  getArgument(0, &lResult, ioContext);
+  lResult = std::sin(lResult);
+}
+
+/*!
+ *  \brief Construct Cos GP primitive.
+ */
+Cos::Cos() :
+  Primitive(1, "COS")
+{ }
+
+
+/*!
+ *  \brief Execute characteristic operation of cos primitive.
+ *  \param outDatum Result of the cos operation.
+ *  \param ioContext Evolutionary context.
+ */
+void Cos::execute(void* outDatum, Context& ioContext)
+{
+  double& lResult = *(double*)outDatum;
+  getArgument(0, &lResult, ioContext);
+  lResult = std::cos(lResult);
+}
+
+/*!
+ *  \brief Construct Log GP primitive.
+ */
+Log::Log() :
+  Primitive(1, "LOG")
+{ }
+
+
+/*!
+ *  \brief Execute characteristic operation of log primitive.
+ *  \param outDatum Result of the log operation.
+ *  \param ioContext Evolutionary context.
+ */
+void Log::execute(void* outDatum, Context& ioContext)
+{
+  double& lResult = *(double*)outDatum;
+  getArgument(0, &lResult, ioContext);
+  if(fabs(lResult) > 0.000001) lResult = log(fabs(lResult));
+  else lResult = 1.;
+}
+
+/*!
+ *  \brief Construct Exp GP primitive.
+ */
+Exp::Exp() :
+  Primitive(1, "EXP")
+{ }
+
+
+/*!
+ *  \brief Execute characteristic operation of exp primitive.
+ *  \param outDatum Result of the exp operation.
+ *  \param ioContext Evolutionary context.
+ */
+void Exp::execute(void* outDatum, Context& ioContext)
+{
+  double& lResult = *(double*)outDatum;
+  getArgument(0, &lResult, ioContext);
+  if(lResult < 80.) lResult = std::exp(lResult);
+  else lResult = 1.;
+}
 
 /*!
  *  \brief Construct ephemeral random constant generator primitive.
