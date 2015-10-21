@@ -58,31 +58,42 @@
 //                           unsigned int inGeneration,
 //                           std::ostream& ioOS)
 void Puppy::calculateStats(const std::vector<Puppy::Tree>& inPopulation,
-                           unsigned int inGeneration, QString &ioOS, double &best_fit)
+                           unsigned int inGeneration, QString &ioOS, double &best_fit, int &best_index, double &avgSize)
 {
   double lAvg = 0.0;
   double lStd = 0.0;
   double lMax = 0.0;
   double lMin = 0.0;
+  int tsize;
+  unsigned int i;
 
   if(inPopulation.size() == 1) {
     assert(inPopulation.front().mValid);
     lAvg = lMax = lMin = inPopulation.front().mFitness;
+    best_index = 0;
   }
   else if(inPopulation.size() > 1) {
     assert(inPopulation[0].mValid);
     double lSum = inPopulation[0].mFitness;
     double lPow2Sum = (lSum * lSum);
+    double sumSize, lFitness;
     lMax = lMin = lSum;
-    for(unsigned int i=1; i<inPopulation.size(); ++i) {
+    best_index = 0;
+    for(i=1; i<inPopulation.size(); i++) {
       assert(inPopulation[i].mValid);
-      double lFitness = inPopulation[i].mFitness;
+      lFitness = inPopulation[i].mFitness;
       lSum     += lFitness;
       lPow2Sum += (lFitness * lFitness);
-      if(lFitness > lMax) lMax = lFitness;
+      if(lFitness > lMax){
+        lMax = lFitness;
+        best_index = i;
+      }
       if(lFitness < lMin) lMin = lFitness;
+      tsize = inPopulation[i].size();
+      sumSize += tsize;
     }
     lAvg = lSum / inPopulation.size();
+    avgSize = sumSize / inPopulation.size();
     lStd = (lPow2Sum - ((lSum * lSum) / inPopulation.size())) / (inPopulation.size() - 1);
     lStd = std::sqrt(lStd);
   }
@@ -90,7 +101,9 @@ void Puppy::calculateStats(const std::vector<Puppy::Tree>& inPopulation,
   //ioOS << "Gen: " << inGeneration << ", avg: " << lAvg << ", std: " << lStd;
   //ioOS << ", max: " << lMax << ", min: " << lMin << std::endl << std::flush;
   //emit Worker::abort();;
-  ioOS = "Gen: " + QString::number(inGeneration) + ", avg: " + QString::number(lAvg) + ", std: " + QString::number(lStd) + ", max: " + QString::number(lMax) + ", min: " + QString::number(lMin);
+  ioOS = "Gen: " + QString::number(inGeneration) + ", avg: " + QString::number(lAvg) + ", std: " +
+      QString::number(lStd) + ", max: " + QString::number(lMax) + ", min: " + QString::number(lMin) +
+      "avg Size: " + QString::number(avgSize);
   best_fit = lMax;
 }
 
