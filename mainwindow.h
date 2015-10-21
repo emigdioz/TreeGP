@@ -42,6 +42,7 @@ private:
     bool GPthreadstarted;
     void setupPlots();
     double maxSize;
+    double maxFitness;
 
 private slots:
     void runGP();
@@ -49,7 +50,7 @@ private slots:
     void on_actionE_xit_triggered();
     void on_actionOptions_triggered();
     void received_data(OptionsDialog::Options data);
-    void received_best_fitness(double training, double testing, double avgsize, int gen);
+    void received_stats(Worker::Stats data);
     void on_actionLoad_file_triggered();
     void checkString(QString &temp, QChar character = 0);
     void received_GPstarted(QString value);
