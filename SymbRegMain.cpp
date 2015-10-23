@@ -123,6 +123,8 @@ unsigned int evaluateFitnessTraining(Tree &individual,
                              double* inX,
                              double* inF,int cols, int rows);
 
+void passTree(Tree &individual,Worker::TreeStruct& tree);
+
 /*!
  *  \brief Program main routine.
  *  \param argc Number of arguments given on the command-line.
@@ -318,7 +320,7 @@ int Worker::start_main(void) {
   unsigned int i;
   QString output;
   infix q;
-
+  TreeStruct chosenTree;
 
   // Evolve population for the given number of generations
   std::cout << "Starting evolution" << std::endl;
@@ -358,6 +360,45 @@ int Worker::start_main(void) {
       break;
     }
   }
+
+  chosenTree.mName.append("/");
+  chosenTree.mName.append("cos");
+  chosenTree.mName.append("X5");
+  chosenTree.mName.append("-");
+  chosenTree.mName.append("X1");
+  chosenTree.mName.append("X4");
+  chosenTree.mNumberArguments.append(2);
+  chosenTree.mNumberArguments.append(1);
+  chosenTree.mNumberArguments.append(0);
+  chosenTree.mNumberArguments.append(2);
+  chosenTree.mNumberArguments.append(0);
+  chosenTree.mNumberArguments.append(0);
+  chosenTree.mSubTreeSize.append(6);
+  chosenTree.mSubTreeSize.append(2);
+  chosenTree.mSubTreeSize.append(1);
+  chosenTree.mSubTreeSize.append(3);
+  chosenTree.mSubTreeSize.append(1);
+  chosenTree.mSubTreeSize.append(1);
+  chosenTree.posX.append(0);
+  chosenTree.posX.append(0);
+  chosenTree.posX.append(0);
+  chosenTree.posX.append(0);
+  chosenTree.posX.append(0);
+  chosenTree.posX.append(0);
+  chosenTree.posY.append(0);
+  chosenTree.posY.append(0);
+  chosenTree.posY.append(0);
+  chosenTree.posY.append(0);
+  chosenTree.posY.append(0);
+  chosenTree.posY.append(0);
+  chosenTree.index.append(-1);
+  chosenTree.index.append(-1);
+  chosenTree.index.append(-1);
+  chosenTree.index.append(-1);
+  chosenTree.index.append(-1);
+  chosenTree.index.append(-1);
+  emit Worker::send_tree(chosenTree);
+
   std::cout << "End of evolution" << std::endl;
 
   // Outputting best individual
@@ -486,4 +527,9 @@ unsigned int evaluateFitnessTraining(Tree &individual,
   //individual.mValid = true;
   ++lNbrEval;
   return lNbrEval;
+}
+
+void passTree(Tree &individual,Worker::TreeStruct& tree)
+{
+
 }
