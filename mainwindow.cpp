@@ -9,6 +9,7 @@
 #include <QGraphicsView>
 
 Q_DECLARE_METATYPE(Worker::Stats);  // Needed for MetaType recognize new data type
+Q_DECLARE_METATYPE(Worker::TreeStruct);
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -25,6 +26,8 @@ MainWindow::MainWindow(QWidget *parent) :
     worker = new Worker();
 
     qRegisterMetaType<Worker::Stats>();
+    qRegisterMetaType<Worker::TreeStruct>();
+
     worker->moveToThread(thread);
     connect(worker, SIGNAL(valueChanged(QString)), ui->textEdit, SLOT(append(QString)));
     connect(worker, SIGNAL(workRequested()), thread, SLOT(start()));
@@ -32,8 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(worker, SIGNAL(finished()), thread, SLOT(quit()), Qt::DirectConnection);
     connect(worker, SIGNAL(finished()), this, SLOT(thread_finished()), Qt::DirectConnection);
     connect(worker, SIGNAL(GPstarted(QString)), this, SLOT(received_GPstarted(QString)));
-    //connect(worker, SIGNAL(send_best_fitness(double,double,double,int)), this, SLOT(received_best_fitness(double,double,double,int)));
     connect(worker, SIGNAL(send_stats(Worker::Stats)), this, SLOT(received_stats(Worker::Stats)));
+    connect(worker, SIGNAL(send_tree(Worker::TreeStruct)), this, SLOT(received_tree(Worker::TreeStruct)));
     connect(worker, SIGNAL(progressChanged(int)), ui->progressBar, SLOT(setValue(int)));
 
     oDialog = new OptionsDialog(this);
@@ -58,11 +61,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->treeGraph->setMinimumSize(300, 300);
 
     Node *node1 = new Node(ui->treeGraph);
+    Node *node2 = new Node(ui->treeGraph);
     scene->addItem(node1);
-    //scene->addItem(node2);
-    //scene->addItem(new Edge(node1, node2));
+    scene->addItem(node2);
+    scene->addItem(new Edge(node1, node2));
     node1->setPos(-50, -50);
-    //node2->setPos(0, -50);
+    node2->setPos(50, 50);
 
 }
 
@@ -179,8 +183,9 @@ void MainWindow::on_actionRun_triggered()
       ui->sizePlot->graph(1)->clearData();
       ui->sizePlot->graph(2)->clearData();
       maxSize = 0;
-      Node *node2 = new Node(ui->treeGraph);
-      ui->treeGraph->scene()->addItem(node2);
+      maxFitness = 1;
+      //Node *node2 = new Node(ui->treeGraph);
+      //ui->treeGraph->scene()->addItem(node2);
       //scene->addItem(node2);
       //node2->setPos(0, -50);
       runGP();
@@ -218,7 +223,8 @@ void MainWindow::received_data(OptionsDialog::Options data)
     worker->functionselection = data.functionselection;
     ui->outputPlot->xAxis->setRange(1, worker->ngen);
     ui->outputPlot->graph(0)->clearData();
-    ui->outputPlot->yAxis->setRange(0, 1);
+    ui->outputPlot->graph(1)->clearData();
+    //ui->outputPlot->yAxis->setRange(0, 1);
     ui->outputPlot->replot();
     ui->sizePlot->xAxis->setRange(1, worker->ngen);
     ui->sizePlot->graph(0)->clearData();
@@ -258,6 +264,79 @@ void MainWindow::received_stats(Worker::Stats data)
   else
     ui->sizePlot->yAxis->setRange(0, maxSize);
   ui->sizePlot->replot();
+}
+
+void MainWindow::received_tree(Worker::TreeStruct data)
+{
+  selectedTree = data;
+  nLeaves = 0;
+  for(unsigned int i=0;i<selectedTree.mName.size();i++) {
+    nLeaves = countLeaves(i,nLeaves);
+  }
+  positionLeaves(0,0);
+  positionParents(0,0);
+
+
+  qDebug()<<nLeaves;
+  //treenode(0,0,0);
+}
+
+void MainWindow::treenode(unsigned int inIndex, int posx, int posy)
+{
+  assert(inIndex < selectedTree.mName.size());
+  unsigned int lNbArgs = selectedTree.mNumberArguments[inIndex];
+
+  Node *node= new Node(ui->treeGraph);
+  ui->treeGraph->scene()->addItem(node);
+  node->setPos(posx, posy);
+
+  qDebug()<<selectedTree.mName[inIndex];
+  //ioOS.append(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
+
+  unsigned int j = inIndex + 1;
+  posx = posx - 30;
+  posy = -50 + (inIndex*30);
+  for(unsigned int i=0; i<lNbArgs; ++i) {
+    treenode(j,posx,posy);
+    j += selectedTree.mSubTreeSize[j];
+  }
+}
+
+int MainWindow::countLeaves(int depth, int count)
+{
+  if(selectedTree.mSubTreeSize[depth] == 1) {
+    selectedTree.index[depth] = count;
+    count += 1;
+  }
+  return count;
+}
+
+void MainWindow::positionLeaves(int index, int depth)
+{
+  if(selectedTree.mSubTreeSize[index] == 1) {
+    selectedTree.posX[index] = (float)selectedTree.index[index] / (nLeaves - 1);
+    selectedTree.posY[index] = depth;
+  }
+  unsigned int j = index + 1;
+  for(unsigned int i = 0;i<selectedTree.mNumberArguments[index];i++) {
+    positionLeaves(j,depth+1);
+    j += selectedTree.mSubTreeSize[j];
+  }
+}
+
+void MainWindow::positionParents(int index,int depth)
+{
+  if(selectedTree.mSubTreeSize[index]>1) {
+    for(unsigned int i=0;i<selectedTree.mNumberArguments[index];i++) {
+
+    }
+    selectedTree.posY[index] = depth;
+  }
+  unsigned int j = index + 1;
+  for(unsigned int i = 0;i<selectedTree.mNumberArguments[index];i++) {
+    positionParents(j,depth+1);
+    j += selectedTree.mSubTreeSize[j];
+  }
 }
 
 void MainWindow::received_GPstarted(QString value)
