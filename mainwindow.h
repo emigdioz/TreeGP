@@ -46,6 +46,12 @@ private:
     double maxSize;
     double maxFitness;
     QGraphicsScene *scene;
+    void treenode(unsigned int inIndex, int posx, int posy);
+    int countLeaves(int depth, int count);
+    void positionLeaves(int index,int depth);
+    void positionParents(int index,int depth);
+    int nLeaves;
+    Worker::TreeStruct selectedTree;
 
 private slots:
     void runGP();
@@ -54,6 +60,7 @@ private slots:
     void on_actionOptions_triggered();
     void received_data(OptionsDialog::Options data);
     void received_stats(Worker::Stats data);
+    void received_tree(Worker::TreeStruct data);
     void on_actionLoad_file_triggered();
     void checkString(QString &temp, QChar character = 0);
     void received_GPstarted(QString value);
