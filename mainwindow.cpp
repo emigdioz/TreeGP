@@ -4,6 +4,9 @@
 #include <QDebug>
 #include "SymbRegPrimits.hpp"
 #include "worker.h"
+#include "node.h"
+#include "edge.h"
+#include <QGraphicsView>
 
 Q_DECLARE_METATYPE(Worker::Stats);  // Needed for MetaType recognize new data type
 
@@ -41,6 +44,25 @@ MainWindow::MainWindow(QWidget *parent) :
     setupPlots();
     oDialog->accept(); // Send default data from options dialog
     worker->trainingP = ui->horizontalSlider->value(); // Training size in percentage
+
+    // Tree graph
+    QGraphicsScene *scene = new QGraphicsScene(ui->treeGraph);
+    scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+    scene->setSceneRect(-200, -200, 400, 400);
+    ui->treeGraph->setScene(scene);
+    //ui->treeGraph->setCacheMode(QGraphicsView::CacheBackground);
+    ui->treeGraph->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+    ui->treeGraph->setRenderHint(QPainter::Antialiasing);
+    ui->treeGraph->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    ui->treeGraph->scale(qreal(0.8), qreal(0.8));
+    ui->treeGraph->setMinimumSize(300, 300);
+
+    Node *node1 = new Node(ui->treeGraph);
+    scene->addItem(node1);
+    //scene->addItem(node2);
+    //scene->addItem(new Edge(node1, node2));
+    node1->setPos(-50, -50);
+    //node2->setPos(0, -50);
 
 }
 
@@ -157,6 +179,10 @@ void MainWindow::on_actionRun_triggered()
       ui->sizePlot->graph(1)->clearData();
       ui->sizePlot->graph(2)->clearData();
       maxSize = 0;
+      Node *node2 = new Node(ui->treeGraph);
+      ui->treeGraph->scene()->addItem(node2);
+      //scene->addItem(node2);
+      //node2->setPos(0, -50);
       runGP();
     }
 }

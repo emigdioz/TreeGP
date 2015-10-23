@@ -11,6 +11,8 @@
 #include <QString>
 #include <QLabel>
 #include <QProgressBar>
+#include "node.h"
+#include "edge.h"
 
 //QT_BEGIN_NAMESPACE
 //class QTextEdit;
@@ -43,6 +45,7 @@ private:
     void setupPlots();
     double maxSize;
     double maxFitness;
+    QGraphicsScene *scene;
 
 private slots:
     void runGP();

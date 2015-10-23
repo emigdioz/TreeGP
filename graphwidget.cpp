@@ -50,60 +50,60 @@
 GraphWidget::GraphWidget(QWidget *parent)
     : QGraphicsView(parent), timerId(0)
 {
-    QGraphicsScene *scene = new QGraphicsScene(this);
-    scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-    scene->setSceneRect(-200, -200, 400, 400);
-    setScene(scene);
-    setCacheMode(CacheBackground);
-    setViewportUpdateMode(BoundingRectViewportUpdate);
-    setRenderHint(QPainter::Antialiasing);
-    setTransformationAnchor(AnchorUnderMouse);
-    scale(qreal(0.8), qreal(0.8));
-    setMinimumSize(400, 400);
-    setWindowTitle(tr("Elastic Nodes"));
+//    QGraphicsScene *scene = new QGraphicsScene(this);
+//    scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+//    scene->setSceneRect(-200, -200, 400, 400);
+//    setScene(scene);
+//    setCacheMode(CacheBackground);
+//    setViewportUpdateMode(BoundingRectViewportUpdate);
+//    setRenderHint(QPainter::Antialiasing);
+//    setTransformationAnchor(AnchorUnderMouse);
+//    scale(qreal(0.8), qreal(0.8));
+//    setMinimumSize(300, 300);
+//    setWindowTitle(tr("Elastic Nodes"));
 //! [0]
 
 //! [1]
-    Node *node1 = new Node(this);
-    Node *node2 = new Node(this);
-    Node *node3 = new Node(this);
-    Node *node4 = new Node(this);
-    centerNode = new Node(this);
-    Node *node6 = new Node(this);
-    Node *node7 = new Node(this);
-    Node *node8 = new Node(this);
-    Node *node9 = new Node(this);
-    scene->addItem(node1);
-    scene->addItem(node2);
-    scene->addItem(node3);
-    scene->addItem(node4);
-    scene->addItem(centerNode);
-    scene->addItem(node6);
-    scene->addItem(node7);
-    scene->addItem(node8);
-    scene->addItem(node9);
-    scene->addItem(new Edge(node1, node2));
-    scene->addItem(new Edge(node2, node3));
-    scene->addItem(new Edge(node2, centerNode));
-    scene->addItem(new Edge(node3, node6));
-    scene->addItem(new Edge(node4, node1));
-    scene->addItem(new Edge(node4, centerNode));
-    scene->addItem(new Edge(centerNode, node6));
-    scene->addItem(new Edge(centerNode, node8));
-    scene->addItem(new Edge(node6, node9));
-    scene->addItem(new Edge(node7, node4));
-    scene->addItem(new Edge(node8, node7));
-    scene->addItem(new Edge(node9, node8));
+//    Node *node1 = new Node(this);
+//    Node *node2 = new Node(this);
+//    Node *node3 = new Node(this);
+//    Node *node4 = new Node(this);
+//    centerNode = new Node(this);
+//    Node *node6 = new Node(this);
+//    Node *node7 = new Node(this);
+//    Node *node8 = new Node(this);
+//    Node *node9 = new Node(this);
+//    scene->addItem(node1);
+//    scene->addItem(node2);
+//    scene->addItem(node3);
+//    scene->addItem(node4);
+//    scene->addItem(centerNode);
+//    scene->addItem(node6);
+//    scene->addItem(node7);
+//    scene->addItem(node8);
+//    scene->addItem(node9);
+//    scene->addItem(new Edge(node1, node2));
+//    scene->addItem(new Edge(node2, node3));
+//    scene->addItem(new Edge(node2, centerNode));
+//    scene->addItem(new Edge(node3, node6));
+//    scene->addItem(new Edge(node4, node1));
+//    scene->addItem(new Edge(node4, centerNode));
+//    scene->addItem(new Edge(centerNode, node6));
+//    scene->addItem(new Edge(centerNode, node8));
+//    scene->addItem(new Edge(node6, node9));
+//    scene->addItem(new Edge(node7, node4));
+//    scene->addItem(new Edge(node8, node7));
+//    scene->addItem(new Edge(node9, node8));
 
-    node1->setPos(-50, -50);
-    node2->setPos(0, -50);
-    node3->setPos(50, -50);
-    node4->setPos(-50, 0);
-    centerNode->setPos(0, 0);
-    node6->setPos(50, 0);
-    node7->setPos(-50, 50);
-    node8->setPos(0, 50);
-    node9->setPos(50, 50);
+//    node1->setPos(-50, -50);
+//    node2->setPos(0, -50);
+//    node3->setPos(50, -50);
+//    node4->setPos(-50, 0);
+//    centerNode->setPos(0, 0);
+//    node6->setPos(50, 0);
+//    node7->setPos(-50, 50);
+//    node8->setPos(0, 50);
+//    node9->setPos(50, 50);
 }
 //! [1]
 
@@ -118,60 +118,60 @@ void GraphWidget::itemMoved()
 //! [3]
 void GraphWidget::keyPressEvent(QKeyEvent *event)
 {
-    switch (event->key()) {
-    case Qt::Key_Up:
-        centerNode->moveBy(0, -20);
-        break;
-    case Qt::Key_Down:
-        centerNode->moveBy(0, 20);
-        break;
-    case Qt::Key_Left:
-        centerNode->moveBy(-20, 0);
-        break;
-    case Qt::Key_Right:
-        centerNode->moveBy(20, 0);
-        break;
-    case Qt::Key_Plus:
-        zoomIn();
-        break;
-    case Qt::Key_Minus:
-        zoomOut();
-        break;
-    case Qt::Key_Space:
-    case Qt::Key_Enter:
-        shuffle();
-        break;
-    default:
-        QGraphicsView::keyPressEvent(event);
-    }
+//    switch (event->key()) {
+//    case Qt::Key_Up:
+//        centerNode->moveBy(0, -20);
+//        break;
+//    case Qt::Key_Down:
+//        centerNode->moveBy(0, 20);
+//        break;
+//    case Qt::Key_Left:
+//        centerNode->moveBy(-20, 0);
+//        break;
+//    case Qt::Key_Right:
+//        centerNode->moveBy(20, 0);
+//        break;
+//    case Qt::Key_Plus:
+//        zoomIn();
+//        break;
+//    case Qt::Key_Minus:
+//        zoomOut();
+//        break;
+//    case Qt::Key_Space:
+//    case Qt::Key_Enter:
+//        shuffle();
+//        break;
+//    default:
+//        QGraphicsView::keyPressEvent(event);
+//    }
 }
 //! [3]
 
 //! [4]
-void GraphWidget::timerEvent(QTimerEvent *event)
-{
-    Q_UNUSED(event);
+//void GraphWidget::timerEvent(QTimerEvent *event)
+//{
+//    Q_UNUSED(event);
 
-    QList<Node *> nodes;
-    foreach (QGraphicsItem *item, scene()->items()) {
-        if (Node *node = qgraphicsitem_cast<Node *>(item))
-            nodes << node;
-    }
+//    QList<Node *> nodes;
+//    foreach (QGraphicsItem *item, scene()->items()) {
+//        if (Node *node = qgraphicsitem_cast<Node *>(item))
+//            nodes << node;
+//    }
 
-    foreach (Node *node, nodes)
-        node->calculateForces();
+//    foreach (Node *node, nodes)
+//        node->calculateForces();
 
-    bool itemsMoved = false;
-    foreach (Node *node, nodes) {
-        if (node->advance())
-            itemsMoved = true;
-    }
+//    bool itemsMoved = false;
+//    foreach (Node *node, nodes) {
+//        if (node->advance())
+//            itemsMoved = true;
+//    }
 
-    if (!itemsMoved) {
-        killTimer(timerId);
-        timerId = 0;
-    }
-}
+//    if (!itemsMoved) {
+//        killTimer(timerId);
+//        timerId = 0;
+//    }
+//}
 //! [4]
 
 #ifndef QT_NO_WHEELEVENT

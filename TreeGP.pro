@@ -14,7 +14,10 @@ SOURCES += \
     worker.cpp \
     optionsdialog.cpp \
     qcustomplot.cpp \
-    infix.cpp
+    infix.cpp \
+    edge.cpp \
+    graphwidget.cpp \
+    node.cpp
 
 # Default rules for deployment.
 include(deployment.pri)
@@ -34,7 +37,10 @@ HEADERS += \
     optionsdialog.h \
     qcustomplot.h \
     matrix.h \
-    infix.h
+    infix.h \
+    edge.h \
+    graphwidget.h \
+    node.h
 
 FORMS += \
     mainwindow.ui \
