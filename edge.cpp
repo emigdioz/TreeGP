@@ -119,31 +119,7 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     QLineF line(sourcePoint, destPoint);
     if (qFuzzyCompare(line.length(), qreal(0.)))
         return;
-//! [4]
-
-//! [5]
     // Draw the line itself
-    painter->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter->setPen(QPen(QColor(0, 173, 250, 255), 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     painter->drawLine(line);
-//! [5]
-
-//! [6]
-    // Draw the arrows
-    double angle = ::acos(line.dx() / line.length());
-    if (line.dy() >= 0)
-        angle = TwoPi - angle;
-
-    QPointF sourceArrowP1 = sourcePoint + QPointF(sin(angle + Pi / 3) * arrowSize,
-                                                  cos(angle + Pi / 3) * arrowSize);
-    QPointF sourceArrowP2 = sourcePoint + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
-                                                  cos(angle + Pi - Pi / 3) * arrowSize);
-    QPointF destArrowP1 = destPoint + QPointF(sin(angle - Pi / 3) * arrowSize,
-                                              cos(angle - Pi / 3) * arrowSize);
-    QPointF destArrowP2 = destPoint + QPointF(sin(angle - Pi + Pi / 3) * arrowSize,
-                                              cos(angle - Pi + Pi / 3) * arrowSize);
-
-    painter->setBrush(Qt::black);
-    painter->drawPolygon(QPolygonF() << line.p1() << sourceArrowP1 << sourceArrowP2);
-    painter->drawPolygon(QPolygonF() << line.p2() << destArrowP1 << destArrowP2);
 }
-//! [6]
