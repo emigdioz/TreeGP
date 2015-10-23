@@ -5,6 +5,8 @@
 #include <QMutex>
 #include <iostream>
 #include <vector>
+#include <QVector>
+#include <QString>
 
 class Worker : public QObject
 {
@@ -53,6 +55,16 @@ public:
       double gen;
     } Stats;
 
+    typedef struct
+    {
+      QVector<QString> mName;
+      QVector<int> mNumberArguments;
+      QVector<int> mSubTreeSize;
+      QVector<float> posX;
+      QVector<float> posY;
+      QVector<int> index;
+    } TreeStruct;
+
 private:
     /**
      * @brief Process is aborted when @em true
@@ -80,6 +92,7 @@ signals:
      */
     void valueChanged(const QString &value);
     void send_stats(Worker::Stats data);
+    void send_tree(Worker::TreeStruct data);
     void sendSignal(int value);
     void progressChanged(const int value);
     void GPstarted(const QString value);
