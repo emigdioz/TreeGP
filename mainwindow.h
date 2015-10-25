@@ -46,8 +46,7 @@ private:
     double maxSize;
     double maxFitness;
     QGraphicsScene *scene;
-    void treenode(unsigned int inIndex, int posx, int posy);
-    int countLeaves(int depth, int count);
+    int countLeaves(int index, int count);
     void positionLeaves(int index,int depth);
     void positionParents(int index,int depth);
     int nLeaves;
