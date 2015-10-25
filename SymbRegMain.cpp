@@ -361,43 +361,56 @@ int Worker::start_main(void) {
     }
   }
 
-  chosenTree.mName.append("/");
-  chosenTree.mName.append("cos");
-  chosenTree.mName.append("X5");
-  chosenTree.mName.append("-");
-  chosenTree.mName.append("X1");
-  chosenTree.mName.append("X4");
-  chosenTree.mNumberArguments.append(2);
-  chosenTree.mNumberArguments.append(1);
-  chosenTree.mNumberArguments.append(0);
-  chosenTree.mNumberArguments.append(2);
-  chosenTree.mNumberArguments.append(0);
-  chosenTree.mNumberArguments.append(0);
-  chosenTree.mSubTreeSize.append(6);
-  chosenTree.mSubTreeSize.append(2);
-  chosenTree.mSubTreeSize.append(1);
-  chosenTree.mSubTreeSize.append(3);
-  chosenTree.mSubTreeSize.append(1);
-  chosenTree.mSubTreeSize.append(1);
-  chosenTree.posX.append(0);
-  chosenTree.posX.append(0);
-  chosenTree.posX.append(0);
-  chosenTree.posX.append(0);
-  chosenTree.posX.append(0);
-  chosenTree.posX.append(0);
-  chosenTree.posY.append(0);
-  chosenTree.posY.append(0);
-  chosenTree.posY.append(0);
-  chosenTree.posY.append(0);
-  chosenTree.posY.append(0);
-  chosenTree.posY.append(0);
-  chosenTree.index.append(-1);
-  chosenTree.index.append(-1);
-  chosenTree.index.append(-1);
-  chosenTree.index.append(-1);
-  chosenTree.index.append(-1);
-  chosenTree.index.append(-1);
-  emit Worker::send_tree(chosenTree);
+//  chosenTree.mName.append("/");
+//  chosenTree.mName.append("cos");
+//  chosenTree.mName.append("X5");
+//  chosenTree.mName.append("-");
+//  chosenTree.mName.append("X1");
+//  chosenTree.mName.append("*");
+//  chosenTree.mName.append("X2");
+//  chosenTree.mName.append("X6");
+
+//  chosenTree.mNumberArguments.append(2);
+//  chosenTree.mNumberArguments.append(1);
+//  chosenTree.mNumberArguments.append(0);
+//  chosenTree.mNumberArguments.append(2);
+//  chosenTree.mNumberArguments.append(0);
+//  chosenTree.mNumberArguments.append(2);
+//  chosenTree.mNumberArguments.append(0);
+//  chosenTree.mNumberArguments.append(0);
+//  chosenTree.mSubTreeSize.append(8);
+//  chosenTree.mSubTreeSize.append(2);
+//  chosenTree.mSubTreeSize.append(1);
+//  chosenTree.mSubTreeSize.append(5);
+//  chosenTree.mSubTreeSize.append(1);
+//  chosenTree.mSubTreeSize.append(3);
+//  chosenTree.mSubTreeSize.append(1);
+//  chosenTree.mSubTreeSize.append(1);
+//  chosenTree.posX.append(0);
+//  chosenTree.posX.append(0);
+//  chosenTree.posX.append(0);
+//  chosenTree.posX.append(0);
+//  chosenTree.posX.append(0);
+//  chosenTree.posX.append(0);
+//  chosenTree.posX.append(0);
+//  chosenTree.posX.append(0);
+//  chosenTree.posY.append(0);
+//  chosenTree.posY.append(0);
+//  chosenTree.posY.append(0);
+//  chosenTree.posY.append(0);
+//  chosenTree.posY.append(0);
+//  chosenTree.posY.append(0);
+//  chosenTree.posY.append(0);
+//  chosenTree.posY.append(0);
+//  chosenTree.index.append(-1);
+//  chosenTree.index.append(-1);
+//  chosenTree.index.append(-1);
+//  chosenTree.index.append(-1);
+//  chosenTree.index.append(-1);
+//  chosenTree.index.append(-1);
+//  chosenTree.index.append(-1);
+//  chosenTree.index.append(-1);
+//  emit Worker::send_tree(chosenTree);
 
   std::cout << "End of evolution" << std::endl;
 
@@ -405,6 +418,16 @@ int Worker::start_main(void) {
   std::vector<Tree>::const_iterator lBestIndividual = std::max_element(lPopulation.begin(), lPopulation.end());
   std::cout << "Best individual at generation " << (i-1) << " is: ";
 
+  // Visualize best tree
+  for(unsigned int i=0;i<lBestIndividual[0].size();i++) {
+    chosenTree.mName.append(QString::fromStdString(lBestIndividual[0][i].mPrimitive->getName()));
+    chosenTree.mNumberArguments.append(lBestIndividual[0][i].mPrimitive->getNumberArguments());
+    chosenTree.mSubTreeSize.append(lBestIndividual[0][i].mSubTreeSize);
+    chosenTree.posX.append(0);
+    chosenTree.posY.append(0);
+    chosenTree.index.append(-1);
+  }
+  emit Worker::send_tree(chosenTree);
 
   lBestIndividual[0].write_qstring(output);
   emit Worker::valueChanged("Best individual at generation " + QString::number(i-1) + " is: " + output + " with fitness: " + QString::number(lBestIndividual[0].mFitness));
