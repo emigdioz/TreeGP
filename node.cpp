@@ -142,7 +142,7 @@ bool Node::advance()
 QRectF Node::boundingRect() const
 {
     qreal adjust = 2;
-    return QRectF( -10 - adjust, -10 - adjust, 23 + adjust, 23 + adjust);
+    return QRectF( -20 - adjust, -20 - adjust, 43 + adjust, 43 + adjust);
 }
 //! [8]
 
@@ -150,7 +150,7 @@ QRectF Node::boundingRect() const
 QPainterPath Node::shape() const
 {
     QPainterPath path;
-    path.addEllipse(-10, -10, 20, 20);
+    path.addEllipse(-20, -20, 40, 40);
     return path;
 }
 //! [9]
@@ -164,15 +164,18 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
       painter->setBrush(QColor(0, 173, 250, 255));
     }
     painter->setPen(Qt::NoPen);
-    painter->drawEllipse(-10, -10, 20, 20);
+    painter->drawEllipse(-20, -20, 40, 40);
 
-//    QRectF textRect(-10, -10, 20, 20);
-//    QFont font = painter->font();
-//    font.setBold(false);
-//    font.setPointSize(14);
-//    painter->setFont(font);
-//    painter->setPen(Qt::white);
-//    painter->drawText(textRect, Qt::AlignCenter,GraphWidget::tr("+"));
+
+    if(!nameNode.isEmpty()) {
+      QRectF textRect(-20, -20, 40, 40);
+      QFont font = painter->font();
+      font.setBold(false);
+      font.setPointSize(14);
+      painter->setFont(font);
+      painter->setPen(Qt::white);
+      painter->drawText(textRect, Qt::AlignCenter,GraphWidget::tr(nameNode.toLatin1()));
+    }
 
 }
 //! [10]
