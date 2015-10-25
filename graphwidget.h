@@ -66,13 +66,22 @@ protected:
 #ifndef QT_NO_WHEELEVENT
     void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
 #endif
-    void drawBackground(QPainter *painter, const QRectF &rect) Q_DECL_OVERRIDE;
+    void drawBackground(QPainter *painter, const QRectF &rect) Q_DECL_OVERRIDE;    
 
     void scaleView(qreal scaleFactor);
+//    virtual void mouseMoveEvent(QMouseEvent *event);
+//    virtual void mousePressEvent(QMouseEvent *event);
+//    virtual void mouseReleaseEvent(QMouseEvent *event);
+    //Holds the current centerpoint for the view, used for panning and zooming
+    QPointF CurrentCenterPoint;
+    //From panning the view
+    QPoint LastPanPoint;
 
 private:
     int timerId;
     Node *centerNode;
+    bool _pan;
+    int _panStartX, _panStartY;
 };
 //! [0]
 
