@@ -43,6 +43,7 @@
 
 #include <QGraphicsItem>
 #include <QList>
+#include <QString>
 
 class Edge;
 class GraphWidget;
@@ -68,6 +69,8 @@ public:
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     QPainterPath shape() const Q_DECL_OVERRIDE;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) Q_DECL_OVERRIDE;
+
+    QString nameNode;
 
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) Q_DECL_OVERRIDE;
