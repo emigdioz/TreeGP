@@ -190,8 +190,8 @@ void GraphWidget::drawBackground(QPainter *painter, const QRectF &rect)
 
     QRectF sceneRect = this->sceneRect();
     // Text
-    QRectF textRect(sceneRect.left() + 4, sceneRect.top() + 4,
-                    sceneRect.width() - 4, sceneRect.height() - 4);
+    QRectF textRect(sceneRect.left(), sceneRect.top(),
+                    sceneRect.width(), sceneRect.height());
     QString message(tr("Click and drag the nodes around, and zoom with the mouse "
                        "wheel or the '+' and '-' keys"));
 
@@ -232,3 +232,47 @@ void GraphWidget::zoomOut()
 {
     scaleView(1 / qreal(1.2));
 }
+
+//void GraphWidget::mousePressEvent(QMouseEvent *event)
+//{
+//    if (event->button() == Qt::MiddleButton)
+//    {
+//        _pan = true;
+//        LastPanPoint = event->pos();
+//        setCursor(Qt::ClosedHandCursor);
+//        event->accept();
+//        return;
+//    }
+//    event->ignore();
+//}
+
+//void GraphWidget::mouseReleaseEvent(QMouseEvent *event)
+//{
+//    if (event->button() == Qt::MiddleButton)
+//    {
+//        _pan = false;
+//        setCursor(Qt::ArrowCursor);
+//        LastPanPoint = QPoint();
+//        event->accept();
+//        return;
+//    }
+//    event->ignore();
+//}
+
+//void GraphWidget::mouseMoveEvent(QMouseEvent *event)
+//{
+//    if (_pan)
+//    {
+//      if(!LastPanPoint.isNull()) {
+//        //Get how much we panned
+//        QPointF delta = mapToScene(LastPanPoint) - mapToScene(event->pos());
+//        LastPanPoint = event->pos();
+//        setTransformationAnchor(QGraphicsView::NoAnchor);
+//        translate(delta.x(),delta.y());
+//        setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+//        event->accept();
+//        return;
+//      }
+//    }
+//    event->ignore();
+//}
