@@ -51,22 +51,13 @@ MainWindow::MainWindow(QWidget *parent) :
     // Tree graph
     QGraphicsScene *scene = new QGraphicsScene(ui->treeGraph);
     scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-    scene->setSceneRect(-200, -200, 400, 400);
+    scene->setSceneRect(0, 0, 1000, 2000);
     ui->treeGraph->setScene(scene);
-    //ui->treeGraph->setCacheMode(QGraphicsView::CacheBackground);
     ui->treeGraph->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     ui->treeGraph->setRenderHint(QPainter::Antialiasing);
     ui->treeGraph->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-    ui->treeGraph->scale(qreal(0.8), qreal(0.8));
+    ui->treeGraph->scale(qreal(0.5), qreal(0.5));
     ui->treeGraph->setMinimumSize(300, 300);
-
-    Node *node1 = new Node(ui->treeGraph);
-    Node *node2 = new Node(ui->treeGraph);
-    scene->addItem(node1);
-    scene->addItem(node2);
-    scene->addItem(new Edge(node1, node2));
-    node1->setPos(-50, -50);
-    node2->setPos(50, 50);
 
 }
 
@@ -147,14 +138,11 @@ void MainWindow::setupPlots()
 
 void MainWindow::runGP()
 {
-    //ui->statusbar->showMessage("Progress");
-
     // To avoid having two threads running simultaneously, the previous thread is aborted.
     worker->abort();
     thread->wait(); // If the thread is not running, this will immediately return.
     worker->requestWork();
     GPthreadstarted = true;
-    //ui->statusbar->showMessage("");
 }
 
 MainWindow::~MainWindow()
@@ -184,10 +172,7 @@ void MainWindow::on_actionRun_triggered()
       ui->sizePlot->graph(2)->clearData();
       maxSize = 0;
       maxFitness = 1;
-      //Node *node2 = new Node(ui->treeGraph);
-      //ui->treeGraph->scene()->addItem(node2);
-      //scene->addItem(node2);
-      //node2->setPos(0, -50);
+      ui->treeGraph->scene()->clear();
       runGP();
     }
 }
@@ -199,12 +184,7 @@ void MainWindow::on_actionE_xit_triggered()
 
 void MainWindow::on_actionOptions_triggered()
 {
-    //oDialog->moveToThread();
-
-    //oDialog.setModal(false);
-    //oDialog.exec();
     oDialog->show();
-
 }
 
 void MainWindow::received_data(OptionsDialog::Options data)
@@ -270,42 +250,62 @@ void MainWindow::received_tree(Worker::TreeStruct data)
 {
   selectedTree = data;
   nLeaves = 0;
+  float spanx = 50;
+  float startx;
+  float spany = 80;
+  float starty = 100;
+  int maxDepth = 0;
   for(unsigned int i=0;i<selectedTree.mName.size();i++) {
     nLeaves = countLeaves(i,nLeaves);
   }
+  spanx = spanx * nLeaves;
+  startx = -(spanx/2) + 500;
+
   positionLeaves(0,0);
   positionParents(0,0);
-
-
-  qDebug()<<nLeaves;
-  //treenode(0,0,0);
-}
-
-void MainWindow::treenode(unsigned int inIndex, int posx, int posy)
-{
-  assert(inIndex < selectedTree.mName.size());
-  unsigned int lNbArgs = selectedTree.mNumberArguments[inIndex];
-
-  Node *node= new Node(ui->treeGraph);
-  ui->treeGraph->scene()->addItem(node);
-  node->setPos(posx, posy);
-
-  qDebug()<<selectedTree.mName[inIndex];
-  //ioOS.append(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
-
-  unsigned int j = inIndex + 1;
-  posx = posx - 30;
-  posy = -50 + (inIndex*30);
-  for(unsigned int i=0; i<lNbArgs; ++i) {
-    treenode(j,posx,posy);
-    j += selectedTree.mSubTreeSize[j];
+  // Draw nodes
+  for(unsigned int i=0;i<selectedTree.mName.size();i++) {
+    Node *node = new Node(ui->treeGraph);
+    node->nameNode = selectedTree.mName[i];
+    ui->treeGraph->scene()->addItem(node);
+    node->setPos((spanx*selectedTree.posX[i])+startx,(spany*selectedTree.posY[i])+starty);
+    if(selectedTree.posY[i]>maxDepth) maxDepth = selectedTree.posY[i];
+  }
+  // Draw connections
+  int counter,index;
+  QList<QGraphicsItem *> listnodes = ui->treeGraph->scene()->items();
+  index = 0;
+  for(unsigned int depth=0;depth<maxDepth;depth++) {
+    // Search all nodes with the same depth
+    do
+    {
+      if(selectedTree.posY[index] == depth) {
+        counter = 0;
+        Node *nodeParent = qgraphicsitem_cast<Node *>( listnodes.at( index ) );
+        for(unsigned int k=0;k<selectedTree.mNumberArguments[index];k++) {
+          do // Search for childrens
+          {
+            if(selectedTree.posY[index + counter] == (depth+1)) {
+              counter += 1;
+              break;
+            }
+            counter += 1;
+          }while((index + counter)<selectedTree.mName.size());
+          // Found children
+          Node *nodeChildren = qgraphicsitem_cast<Node *>( listnodes.at( (index+counter-1) ) );
+          ui->treeGraph->scene()->addItem(new Edge(nodeParent,nodeChildren));
+        }
+      }
+      index += 1;
+    }while(index<selectedTree.mName.size());
+    index = 0;
   }
 }
 
-int MainWindow::countLeaves(int depth, int count)
+int MainWindow::countLeaves(int index, int count)
 {
-  if(selectedTree.mSubTreeSize[depth] == 1) {
-    selectedTree.index[depth] = count;
+  if(selectedTree.mSubTreeSize[index] == 1) {
+    selectedTree.index[index] = count;
     count += 1;
   }
   return count;
@@ -326,16 +326,27 @@ void MainWindow::positionLeaves(int index, int depth)
 
 void MainWindow::positionParents(int index,int depth)
 {
-  if(selectedTree.mSubTreeSize[index]>1) {
-    for(unsigned int i=0;i<selectedTree.mNumberArguments[index];i++) {
-
-    }
-    selectedTree.posY[index] = depth;
-  }
   unsigned int j = index + 1;
   for(unsigned int i = 0;i<selectedTree.mNumberArguments[index];i++) {
     positionParents(j,depth+1);
     j += selectedTree.mSubTreeSize[j];
+  }
+  if(selectedTree.mSubTreeSize[index]>1) {
+    float x = 0;
+    int counter = 0;
+    for(unsigned int k=0;k<selectedTree.mNumberArguments[index];k++) {
+      do // Search for childrens
+      {
+        if(selectedTree.posY[index + counter] == (depth+1)) {
+          x += selectedTree.posX[index + counter];
+          counter += 1;
+          break;
+        }
+        counter += 1;
+      }while((index + counter)<selectedTree.mName.size());
+    }
+    selectedTree.posX[index] = x/selectedTree.mNumberArguments[index];
+    selectedTree.posY[index] = depth;
   }
 }
 
