@@ -13,6 +13,9 @@
 #include <QProgressBar>
 #include "node.h"
 #include "edge.h"
+#include "qwt3d_gridplot.h"
+#include "qwt3d_function.h"
+#include "qwt3d_plot3d.h"
 
 //QT_BEGIN_NAMESPACE
 //class QTextEdit;
@@ -27,7 +30,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 public:
     explicit MainWindow(QWidget *parent = 0);
-    //QTextEdit *textEdit;
+    Qwt3D::GridPlot* plot;
     ~MainWindow();
 
 private:
