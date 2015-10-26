@@ -410,6 +410,7 @@ unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
   unsigned int lNbrEval = 0,i,j,k;
   //qDebug()<<inX[100];
   //for(i=0;i<(cols*rows);i++) qDebug()<<i<<": "<<inX[i];
+
   for(i=0; i<ioPopulation.size();i++) {
     //if(ioPopulation[i].mValid) continue;
     lQuadErr = 0.0;
@@ -426,9 +427,9 @@ unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
       lErr = 0.0;
       ioPopulation[i].interpret(&lResult, ioContext);
       lErr = lResult - inF[j];
-      lQuadErr += (lErr * lErr);
-
+      lQuadErr += (lErr * lErr);                
     }
+
     lRMS = std::sqrt(lQuadErr / rows);
     ioPopulation[i].mFitness = 1. / (1. + lRMS);
     ioPopulation[i].rFitness = lRMS;
