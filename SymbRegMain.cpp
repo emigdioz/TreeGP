@@ -291,16 +291,6 @@ int Worker::start_main(void) {
   emit Worker::valueChanged("Training size = " + QString::number(size_training) + " x " + QString::number(Worker::dataset_cols-1));
   emit Worker::valueChanged("Testing size = " + QString::number(Worker::dataset_rows-size_training) + " x " + QString::number(Worker::dataset_cols-1));
 
-//  // Sample equation on 20 random points in [-1.0, 1.0].
-//  std::cout << "Sampling equation to regress" << std::endl;
-//  emit Worker::valueChanged("Sampling equation to regress");
-//  std::vector<double> lX(100);
-//  std::vector<double> lF(100);
-//  for(unsigned int i=0; i<lX.size(); ++i) {
-//    lX[i] = lContext.mRandom.rollUniform(-1.0, 1.0);
-//    lF[i] = lX[i]*(lX[i]*(lX[i]*(lX[i]+1.0)+1.0)+1.0);
-//  }
-
   // Initialize population.
   std::vector<Tree> lPopulation(lPopSize);
   std::cout << "Initializing population" << std::endl;
@@ -360,57 +350,6 @@ int Worker::start_main(void) {
       break;
     }
   }
-
-//  chosenTree.mName.append("/");
-//  chosenTree.mName.append("cos");
-//  chosenTree.mName.append("X5");
-//  chosenTree.mName.append("-");
-//  chosenTree.mName.append("X1");
-//  chosenTree.mName.append("*");
-//  chosenTree.mName.append("X2");
-//  chosenTree.mName.append("X6");
-
-//  chosenTree.mNumberArguments.append(2);
-//  chosenTree.mNumberArguments.append(1);
-//  chosenTree.mNumberArguments.append(0);
-//  chosenTree.mNumberArguments.append(2);
-//  chosenTree.mNumberArguments.append(0);
-//  chosenTree.mNumberArguments.append(2);
-//  chosenTree.mNumberArguments.append(0);
-//  chosenTree.mNumberArguments.append(0);
-//  chosenTree.mSubTreeSize.append(8);
-//  chosenTree.mSubTreeSize.append(2);
-//  chosenTree.mSubTreeSize.append(1);
-//  chosenTree.mSubTreeSize.append(5);
-//  chosenTree.mSubTreeSize.append(1);
-//  chosenTree.mSubTreeSize.append(3);
-//  chosenTree.mSubTreeSize.append(1);
-//  chosenTree.mSubTreeSize.append(1);
-//  chosenTree.posX.append(0);
-//  chosenTree.posX.append(0);
-//  chosenTree.posX.append(0);
-//  chosenTree.posX.append(0);
-//  chosenTree.posX.append(0);
-//  chosenTree.posX.append(0);
-//  chosenTree.posX.append(0);
-//  chosenTree.posX.append(0);
-//  chosenTree.posY.append(0);
-//  chosenTree.posY.append(0);
-//  chosenTree.posY.append(0);
-//  chosenTree.posY.append(0);
-//  chosenTree.posY.append(0);
-//  chosenTree.posY.append(0);
-//  chosenTree.posY.append(0);
-//  chosenTree.posY.append(0);
-//  chosenTree.index.append(-1);
-//  chosenTree.index.append(-1);
-//  chosenTree.index.append(-1);
-//  chosenTree.index.append(-1);
-//  chosenTree.index.append(-1);
-//  chosenTree.index.append(-1);
-//  chosenTree.index.append(-1);
-//  chosenTree.index.append(-1);
-//  emit Worker::send_tree(chosenTree);
 
   std::cout << "End of evolution" << std::endl;
 
