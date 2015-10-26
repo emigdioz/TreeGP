@@ -16,6 +16,7 @@
 #include "qwt3d_gridplot.h"
 #include "qwt3d_function.h"
 #include "qwt3d_plot3d.h"
+#include <qwt3d_scale.h>
 
 //QT_BEGIN_NAMESPACE
 //class QTextEdit;
@@ -54,6 +55,8 @@ private:
     void positionParents(int index,int depth);
     int nLeaves;
     Worker::TreeStruct selectedTree;
+    int plot3D_width1;
+    int plot3D_width2;
 
 private slots:
     void runGP();
@@ -68,6 +71,7 @@ private slots:
     void received_GPstarted(QString value);
     void thread_finished();
     void on_horizontalSlider_valueChanged(int value);
+    void plot3DUpdateData(Worker::fitnessdata data);
 };
 Q_DECLARE_METATYPE(OptionsDialog::Options)
 #endif // MAINWINDOW_H
