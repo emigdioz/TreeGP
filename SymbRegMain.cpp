@@ -311,6 +311,15 @@ int Worker::start_main(void) {
   QString output;
   infix q;
   TreeStruct chosenTree;
+  fitnessdata datafit;
+  datafit.data = new double*[lNbrGen];
+  // prefill population fitness data
+  for(i=0; i<lNbrGen; ++i) {
+    datafit.data[i] = new double[lPopSize];
+    for (int j = 0; j < lPopSize; j++) {
+      datafit.data[i][j] = 0;
+    }
+  }
 
   // Evolve population for the given number of generations
   std::cout << "Starting evolution" << std::endl;
@@ -340,6 +349,12 @@ int Worker::start_main(void) {
     progress_float = (i/(float)lNbrGen)*100;
     emit Worker::progressChanged((int)progress_float);
 
+    // fill population fitness data
+    //datafit.data[i-1] = new double[lPopSize];
+    for (int j = 0; j < lPopSize; j++) {
+      datafit.data[i-1][j] = lPopulation[j].mFitness;
+    }
+    emit Worker::plot3DSendData(datafit);
     // Checks if the process should be aborted
     mutex.lock();
     abort = _abort;
