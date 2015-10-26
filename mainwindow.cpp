@@ -10,13 +10,29 @@
 
 Q_DECLARE_METATYPE(Worker::Stats);  // Needed for MetaType recognize new data type
 Q_DECLARE_METATYPE(Worker::TreeStruct);
+Q_DECLARE_METATYPE(Worker::fitnessdata);
+
+class Rosenbrock : public Qwt3D::Function
+{
+public:
+
+  Rosenbrock(Qwt3D::GridPlot& pw)
+    :Qwt3D::Function(pw)
+  {
+  }
+
+  double operator()(double x, double y)
+  {
+    return log((1-x)*(1-x) + 100 * (y - x*x)*(y - x*x)) / 8;
+  }
+};
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    qRegisterMetaType<OptionsDialog::Options>();    
+    qRegisterMetaType<OptionsDialog::Options>();
 
     ui->progressBar->setMaximum(100);
     ui->progressBar->setMinimum(1);
@@ -27,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     qRegisterMetaType<Worker::Stats>();
     qRegisterMetaType<Worker::TreeStruct>();
+    qRegisterMetaType<Worker::fitnessdata>();
 
     worker->moveToThread(thread);
     connect(worker, SIGNAL(valueChanged(QString)), ui->textEdit, SLOT(append(QString)));
@@ -38,9 +55,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(worker, SIGNAL(send_stats(Worker::Stats)), this, SLOT(received_stats(Worker::Stats)));
     connect(worker, SIGNAL(send_tree(Worker::TreeStruct)), this, SLOT(received_tree(Worker::TreeStruct)));
     connect(worker, SIGNAL(progressChanged(int)), ui->progressBar, SLOT(setValue(int)));
-
+    connect(worker, SIGNAL(plot3DSendData(Worker::fitnessdata)), this, SLOT(plot3DUpdateData(Worker::fitnessdata)));
     oDialog = new OptionsDialog(this);
     connect(worker, SIGNAL(sendSignal(int)), oDialog, SLOT(write_gen(int)));
+    // 3d Plot
+    QGridLayout *grid = new QGridLayout(ui->frame);
+    plot = new Qwt3D::GridPlot(ui->frame);
+    grid->addWidget( plot, 0, 0 );
 
     connect(oDialog, SIGNAL(send_data(OptionsDialog::Options)), this, SLOT(received_data(OptionsDialog::Options)));
 
@@ -211,6 +232,65 @@ void MainWindow::received_data(OptionsDialog::Options data)
     ui->sizePlot->graph(1)->clearData();
     ui->sizePlot->graph(2)->clearData();
     ui->sizePlot->replot();
+
+    // Setup 3D plot
+    plot->setPlotStyle(Qwt3D::FILLED);
+    plot->setTitle("Fitness landscape");
+    QFont font;
+    plot->setTitleFont(font.family(), font.pointSize(), font.weight(), font.italic());
+    plot->coordinates()->setLabelFont(font);
+    plot->coordinates()->setNumberFont(font);
+    plot3D_width1 = worker->ngen;
+    plot3D_width2 = worker->popsize;
+
+    double *dataplot[plot3D_width1];
+    // fill initial data
+    for (int i = 0; i < plot3D_width1; i++)
+    {
+      dataplot[i] = new double[plot3D_width2];
+      for (int j = 0; j < plot3D_width2; j++) dataplot[i][j] = 0;
+    }
+    plot->createDataset(dataplot, plot3D_width1, plot3D_width2, 0,plot3D_width1, 0, plot3D_width2);
+    plot->setRotation(30,0,15);
+    plot->setScale(1,1,1);
+    plot->setShift(0.15,0,0);
+    plot->setZoom(0.6);
+    for (unsigned i=0; i!=plot->coordinates()->axes.size(); ++i)
+    {
+      plot->coordinates()->axes[i].setMajors(4);
+      plot->coordinates()->axes[i].setMinors(2);
+    }
+
+    plot->setCoordinateStyle(Qwt3D::FRAME);
+    plot->coordinates()->setAutoScale(false);
+    //plot->coordinates()->axes[Qwt3D::Z1];
+
+
+}
+void MainWindow::plot3DUpdateData(Worker::fitnessdata data)
+{
+  plot3D_width1 = worker->ngen;
+  plot3D_width2 = worker->popsize;
+  double *dataplot[plot3D_width1];
+  // fill initial data
+  for (int i = 0; i < plot3D_width1; i++)
+  {
+    dataplot[i] = new double[plot3D_width2];
+    for (int j = 0; j < plot3D_width2; j++) {
+      dataplot[i][j] = data.data[i][j];
+    }
+  }
+  plot->createDataset(dataplot, plot3D_width1, plot3D_width2, 0,plot3D_width1, 0, plot3D_width2);
+  plot->coordinates()->axes[Qwt3D::X1].setLabelString("Generations");
+  plot->coordinates()->axes[Qwt3D::X2].setLabelString("Generations");
+  plot->coordinates()->axes[Qwt3D::X3].setLabelString("Generations");
+  plot->coordinates()->axes[Qwt3D::X4].setLabelString("Generations");
+  plot->coordinates()->axes[Qwt3D::Y1].setLabelString("Population");
+  plot->coordinates()->axes[Qwt3D::Y2].setLabelString("Population");
+  plot->coordinates()->axes[Qwt3D::Y3].setLabelString("Population");
+  plot->coordinates()->axes[Qwt3D::Y4].setLabelString("Population");
+  plot->setScale(1,1,50);
+  plot->updateGL();
 }
 
 void MainWindow::received_stats(Worker::Stats data)
