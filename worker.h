@@ -65,6 +65,10 @@ public:
       QVector<int> index;
     } TreeStruct;
 
+    struct fitnessdata {
+      double **data;
+    };
+
 private:
     /**
      * @brief Process is aborted when @em true
@@ -96,6 +100,7 @@ signals:
     void sendSignal(int value);
     void progressChanged(const int value);
     void GPstarted(const QString value);
+    void plot3DSendData(Worker::fitnessdata data);
     /**
      * @brief This signal is emitted when process is finished (either by counting 60 sec or being aborted)
      */
