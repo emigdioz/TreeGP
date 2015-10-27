@@ -1,0 +1,22 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>icon.png</file>
+        <file>data_normal.png</file>
+        <file>data_selected.png</file>
+        <file>gp_normal.png</file>
+        <file>gp_selected.png</file>
+        <file>result_normal.png</file>
+        <file>result_selected.png</file>
+        <file>setup_normal.png</file>
+        <file>setup_selected.png</file>
+        <file>start_disabled.png</file>
+        <file>start_normal.png</file>
+        <file>start_selected.png</file>
+        <file>stop_disabled.png</file>
+        <file>stop_normal.png</file>
+        <file>stop_selected.png</file>
+        <file>pause_selected.png</file>
+        <file>pause_normal.png</file>
+        <file>pause_disabled.png</file>
+    </qresource>
+</RCC>
