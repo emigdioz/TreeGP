@@ -36,6 +36,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->progressBar->setMaximum(100);
     ui->progressBar->setMinimum(1);
+
+    connect(ui->listWidget, SIGNAL(currentRowChanged(int)), ui->stackedWidget, SLOT(setCurrentIndex(int)));
+    ui->listWidget->setCurrentRow(0);
     GPthreadstarted = false;
 
     thread = new QThread();
@@ -482,6 +485,7 @@ void MainWindow::on_actionLoad_file_triggered()
     worker->dataset_cols = iCols;
     worker->dataset_rows = iRows;
     ui->actionRun->setEnabled(true);
+    //ui->listWidget_2->item(0)->setFlags(Qt::ItemIsEnabled);
 }
 
 void MainWindow::checkString(QString &temp, QChar character)
@@ -516,4 +520,28 @@ void MainWindow::on_horizontalSlider_valueChanged(int value)
 void MainWindow::thread_finished()
 {
   GPthreadstarted = false;
+}
+
+void MainWindow::on_listWidget_2_itemClicked(QListWidgetItem *item)
+{
+  if(item == 0) {
+      if(GPthreadstarted) {
+        worker->abort();
+        thread->wait(); // If the thread is not running, this will immediately return.
+        ui->actionRun->setIconText("Run");
+        GPthreadstarted = false;
+      }
+      else {
+        ui->textEdit->clear();
+        ui->outputPlot->graph(0)->clearData();
+        ui->outputPlot->graph(1)->clearData();
+        ui->sizePlot->graph(0)->clearData();
+        ui->sizePlot->graph(1)->clearData();
+        ui->sizePlot->graph(2)->clearData();
+        maxSize = 0;
+        maxFitness = 1;
+        ui->treeGraph->scene()->clear();
+        runGP();
+      }
+   }
 }
