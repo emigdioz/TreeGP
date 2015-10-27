@@ -6,166 +6,588 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>956</width>
-    <height>783</height>
+    <width>966</width>
+    <height>596</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>TreeGP</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_4">
+   <layout class="QGridLayout" name="gridLayout_3">
     <item row="0" column="0">
-     <widget class="QSplitter" name="splitter_2">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <widget class="QWidget" name="verticalLayoutWidget_2">
-       <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QListWidget" name="listWidget">
+        <property name="maximumSize">
+         <size>
+          <width>75</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QListWidget 
+{ 
+background: rgba(240, 240, 240, 255);  
+}
+
+QListWidget::item:hover 
+{ 
+background: rgba(209, 241, 255, 255); 
+}
+
+QListWidget::item:selected 
+{ 
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.1, stop:0 rgba(0, 104, 151, 200), stop:1 rgba(0, 173, 250, 255)); 
+}
+
+QListWidget::item 
+{ 
+border-bottom: 2px gray; 
+padding: 10px; color: black; 
+}</string>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>48</width>
+          <height>48</height>
+         </size>
+        </property>
+        <property name="textElideMode">
+         <enum>Qt::ElideRight</enum>
+        </property>
+        <property name="movement">
+         <enum>QListView::Static</enum>
+        </property>
+        <property name="flow">
+         <enum>QListView::TopToBottom</enum>
+        </property>
+        <property name="viewMode">
+         <enum>QListView::IconMode</enum>
+        </property>
+        <property name="wordWrap">
+         <bool>false</bool>
+        </property>
+        <property name="selectionRectVisible">
+         <bool>false</bool>
+        </property>
         <item>
-         <widget class="QTextEdit" name="textEdit"/>
+         <property name="text">
+          <string>Data</string>
+         </property>
+         <property name="icon">
+          <iconset resource="images.qrc">
+           <normaloff>:/icons/data_normal.png</normaloff>
+           <selectedoff>:/icons/data_selected.png</selectedoff>:/icons/data_normal.png</iconset>
+         </property>
         </item>
         <item>
-         <layout class="QGridLayout" name="gridLayout">
+         <property name="text">
+          <string>GP setup</string>
+         </property>
+         <property name="icon">
+          <iconset resource="images.qrc">
+           <normaloff>:/icons/setup_normal.png</normaloff>
+           <selectedoff>:/icons/setup_selected.png</selectedoff>:/icons/setup_normal.png</iconset>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>GP run</string>
+         </property>
+         <property name="icon">
+          <iconset resource="images.qrc">
+           <normaloff>:/icons/gp_normal.png</normaloff>
+           <selectedoff>:/icons/gp_selected.png</selectedoff>:/icons/gp_normal.png</iconset>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Results</string>
+         </property>
+         <property name="icon">
+          <iconset resource="images.qrc">
+           <normaloff>:/icons/result_normal.png</normaloff>
+           <selectedoff>:/icons/result_selected.png</selectedoff>:/icons/result_normal.png</iconset>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QStackedWidget" name="stackedWidget">
+        <property name="currentIndex">
+         <number>2</number>
+        </property>
+        <widget class="QWidget" name="pageData">
+         <layout class="QGridLayout" name="gridLayout_6">
           <item row="0" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>Progress</string>
-            </property>
-           </widget>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Data</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QGridLayout" name="gridLayout_2">
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>Instances</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>Output variable column</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Input variables columns</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="lineEdit_3"/>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="lineEdit"/>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="lineEdit_2"/>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string>Training/Testing (75/30)</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QSlider" name="horizontalSlider">
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>100</number>
+                </property>
+                <property name="value">
+                 <number>70</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QTableView" name="tableView"/>
+            </item>
+           </layout>
           </item>
-          <item row="0" column="1">
-           <widget class="QProgressBar" name="progressBar">
-            <property name="value">
-             <number>0</number>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="pageSetup">
+         <widget class="QWidget" name="layoutWidget">
+          <property name="geometry">
+           <rect>
+            <x>30</x>
+            <y>20</y>
+            <width>574</width>
+            <height>328</height>
+           </rect>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <layout class="QGridLayout" name="gridLayout_7">
+             <item row="5" column="0">
+              <widget class="QLabel" name="label_7">
+               <property name="text">
+                <string>Maximum tree initialization depth</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLineEdit" name="lineEdit_4">
+               <property name="text">
+                <string>17</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1">
+              <widget class="QLineEdit" name="lineEdit_7">
+               <property name="text">
+                <string>0.9</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="lineEdit_5">
+               <property name="text">
+                <string>100</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_8">
+               <property name="text">
+                <string>Generations number</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_9">
+               <property name="text">
+                <string>Minimum tree initialization depth</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QLineEdit" name="lineEdit_6">
+               <property name="text">
+                <string>2</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QLineEdit" name="lineEdit_8">
+               <property name="text">
+                <string>5</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_10">
+               <property name="text">
+                <string>Tournament size</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLineEdit" name="lineEdit_9">
+               <property name="text">
+                <string>10</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="spinBox">
+               <property name="maximum">
+                <number>10000</number>
+               </property>
+               <property name="value">
+                <number>100</number>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="0">
+              <widget class="QLabel" name="label_11">
+               <property name="text">
+                <string>Mutation max regeneration depth</string>
+               </property>
+              </widget>
+             </item>
+             <item row="8" column="0">
+              <widget class="QLabel" name="label_12">
+               <property name="text">
+                <string>Mutation probability</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_13">
+               <property name="text">
+                <string>Population size</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_14">
+               <property name="text">
+                <string>Maximum tree depth</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <widget class="QLineEdit" name="lineEdit_10">
+               <property name="text">
+                <string>0.9</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="label_15">
+               <property name="text">
+                <string>Crossover probability</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="0">
+              <widget class="QLabel" name="label_16">
+               <property name="text">
+                <string>Crossover distribution probability</string>
+               </property>
+              </widget>
+             </item>
+             <item row="8" column="1">
+              <widget class="QLineEdit" name="lineEdit_11">
+               <property name="text">
+                <string>0.05</string>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="1">
+              <widget class="QLineEdit" name="lineEdit_12">
+               <property name="text">
+                <string>5</string>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="0">
+              <widget class="QLabel" name="label_17">
+               <property name="text">
+                <string>Random number generator seed value</string>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="1">
+              <widget class="QLineEdit" name="lineEdit_13">
+               <property name="text">
+                <string>0</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <item>
+              <widget class="QLabel" name="label_18">
+               <property name="text">
+                <string>Functions set</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QTableView" name="functionsView"/>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="pageGP">
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="0">
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item>
+               <widget class="QListWidget" name="listWidget_2">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>70</height>
+                 </size>
+                </property>
+                <property name="focusPolicy">
+                 <enum>Qt::NoFocus</enum>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QListWidget 
+{ 
+background: rgba(240, 240, 240, 255);  
+}
+
+QListWidget::item:hover 
+{ 
+background: rgba(209, 241, 255, 255); 
+}
+
+QListWidget::item:selected 
+{ 
+background: rgba(0, 173, 250, 255); 
+}
+
+QListWidget::item 
+{ 
+border-bottom: 2px gray; 
+padding: 10px; color: black; 
+}</string>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::NoFrame</enum>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>36</width>
+                  <height>36</height>
+                 </size>
+                </property>
+                <property name="flow">
+                 <enum>QListView::LeftToRight</enum>
+                </property>
+                <property name="viewMode">
+                 <enum>QListView::IconMode</enum>
+                </property>
+                <property name="selectionRectVisible">
+                 <bool>false</bool>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Start</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="images.qrc">
+                   <normaloff>:/icons/start_normal.png</normaloff>
+                   <disabledoff>:/icons/start_disabled.png</disabledoff>
+                   <activeoff>:/icons/start_selected.png</activeoff>
+                   <selectedoff>:/icons/start_selected.png</selectedoff>:/icons/start_normal.png</iconset>
+                 </property>
+                 <property name="flags">
+                  <set>ItemIsEnabled|ItemIsTristate</set>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Pause</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="images.qrc">
+                   <normaloff>:/icons/pause_normal.png</normaloff>
+                   <disabledoff>:/icons/pause_disabled.png</disabledoff>
+                   <selectedoff>:/icons/pause_selected.png</selectedoff>:/icons/pause_normal.png</iconset>
+                 </property>
+                 <property name="flags">
+                  <set>ItemIsSelectable|ItemIsDragEnabled|ItemIsUserCheckable</set>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Stop</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="images.qrc">
+                   <normaloff>:/icons/stop_normal.png</normaloff>
+                   <disabledoff>:/icons/stop_disabled.png</disabledoff>
+                   <selectedoff>:/icons/stop_selected.png</selectedoff>:/icons/stop_normal.png</iconset>
+                 </property>
+                 <property name="flags">
+                  <set>ItemIsSelectable|ItemIsDragEnabled|ItemIsUserCheckable</set>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QSplitter" name="splitter_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <widget class="QSplitter" name="splitter">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <widget class="QFrame" name="frame">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>200</height>
+                 </size>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+               </widget>
+               <widget class="QWidget" name="verticalLayoutWidget_2">
+                <layout class="QVBoxLayout" name="verticalLayout_2">
+                 <item>
+                  <widget class="QTextEdit" name="textEdit"/>
+                 </item>
+                 <item>
+                  <layout class="QGridLayout" name="gridLayout">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="label_6">
+                     <property name="text">
+                      <string>Progress</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QProgressBar" name="progressBar">
+                     <property name="value">
+                      <number>0</number>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+              <widget class="QWidget" name="verticalLayoutWidget_3">
+               <layout class="QVBoxLayout" name="verticalLayout_3">
+                <item>
+                 <widget class="QCustomPlot" name="outputPlot" native="true">
+                  <property name="minimumSize">
+                   <size>
+                    <width>350</width>
+                    <height>200</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCustomPlot" name="sizePlot" native="true">
+                  <property name="minimumSize">
+                   <size>
+                    <width>350</width>
+                    <height>200</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="pageResults">
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="0" column="0">
+           <widget class="GraphWidget" name="treeGraph" native="true">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
             </property>
            </widget>
           </item>
          </layout>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QSplitter" name="splitter">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QWidget" name="gridLayoutWidget">
-        <layout class="QGridLayout" name="gridLayout_3">
-         <item row="1" column="1">
-          <widget class="QCustomPlot" name="sizePlot" native="true">
-           <property name="minimumSize">
-            <size>
-             <width>350</width>
-             <height>200</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QCustomPlot" name="outputPlot" native="true">
-           <property name="minimumSize">
-            <size>
-             <width>350</width>
-             <height>200</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="GraphWidget" name="treeGraph" native="true">
-           <property name="maximumSize">
-            <size>
-             <width>500</width>
-             <height>16777215</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QFrame" name="frame">
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        </widget>
        </widget>
-       <widget class="QWidget" name="verticalLayoutWidget">
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Data</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_4">
-             <property name="text">
-              <string>Instances</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Output variable column</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label">
-             <property name="text">
-              <string>Input variables columns</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="lineEdit_3"/>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="lineEdit"/>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="lineEdit_2"/>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_5">
-             <property name="text">
-              <string>Training/Testing (75/30)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QSlider" name="horizontalSlider">
-             <property name="minimum">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <number>100</number>
-             </property>
-             <property name="value">
-              <number>70</number>
-             </property>
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="QTableView" name="tableView"/>
-         </item>
-        </layout>
-       </widget>
-      </widget>
-     </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -174,7 +596,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>956</width>
+     <width>966</width>
      <height>22</height>
     </rect>
    </property>
@@ -199,8 +621,15 @@
     </property>
     <addaction name="actionOptions"/>
    </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Tools"/>
+   <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -211,7 +640,7 @@
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>false</bool>
+    <bool>true</bool>
    </attribute>
    <addaction name="actionRun"/>
   </widget>
@@ -243,6 +672,11 @@
     <string>Benchmarks</string>
    </property>
   </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About...</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -258,6 +692,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections/>
 </ui>
