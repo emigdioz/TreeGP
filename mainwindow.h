@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 #include <QMainWindow>
 #include <QThread>
+#include <QListWidget>
 #include "worker.h"
 #include "optionsdialog.h"
 #include <QFile>
@@ -72,6 +73,7 @@ private slots:
     void thread_finished();
     void on_horizontalSlider_valueChanged(int value);
     void plot3DUpdateData(Worker::fitnessdata data);
+    void on_listWidget_2_itemClicked(QListWidgetItem *item);
 };
 Q_DECLARE_METATYPE(OptionsDialog::Options)
 #endif // MAINWINDOW_H
