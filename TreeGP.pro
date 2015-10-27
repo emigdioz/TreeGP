@@ -110,3 +110,6 @@ HEADERS += \
 FORMS += \
     mainwindow.ui \
     optionsdialog.ui
+
+RESOURCES += \
+    images.qrc
