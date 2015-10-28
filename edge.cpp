@@ -48,7 +48,6 @@
 static const double Pi = 3.14159265358979323846264338327950288419717;
 static double TwoPi = 2.0 * Pi;
 
-//! [0]
 Edge::Edge(Node *sourceNode, Node *destNode)
     : arrowSize(10)
 {
@@ -59,9 +58,7 @@ Edge::Edge(Node *sourceNode, Node *destNode)
     dest->addEdge(this);
     adjust();
 }
-//! [0]
 
-//! [1]
 Node *Edge::sourceNode() const
 {
     return source;
@@ -71,9 +68,7 @@ Node *Edge::destNode() const
 {
     return dest;
 }
-//! [1]
 
-//! [2]
 void Edge::adjust()
 {
     if (!source || !dest)
@@ -85,16 +80,14 @@ void Edge::adjust()
     prepareGeometryChange();
 
     if (length > qreal(20.)) {
-        QPointF edgeOffset((line.dx() * 10) / length, (line.dy() * 10) / length);
+        QPointF edgeOffset((line.dx() * 20) / length, (line.dy() * 20) / length);
         sourcePoint = line.p1() + edgeOffset;
         destPoint = line.p2() - edgeOffset;
     } else {
         sourcePoint = destPoint = line.p1();
     }
 }
-//! [2]
 
-//! [3]
 QRectF Edge::boundingRect() const
 {
     if (!source || !dest)
@@ -108,9 +101,7 @@ QRectF Edge::boundingRect() const
         .normalized()
         .adjusted(-extra, -extra, extra, extra);
 }
-//! [3]
 
-//! [4]
 void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     if (!source || !dest)
@@ -120,6 +111,6 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     if (qFuzzyCompare(line.length(), qreal(0.)))
         return;
     // Draw the line itself
-    painter->setPen(QPen(QColor(0, 173, 250, 255), 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter->setPen(QPen(QColor(0, 173, 250, 255), 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     painter->drawLine(line);
 }
