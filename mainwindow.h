@@ -4,7 +4,6 @@
 #include <QThread>
 #include <QListWidget>
 #include "worker.h"
-#include "optionsdialog.h"
 #include <QFile>
 #include <QFileDialog>
 #include <QTextStream>
@@ -42,7 +41,6 @@ private:
     QThread *thread;
     Worker *worker;
     Ui::MainWindow *ui;
-    OptionsDialog *oDialog;
     QList<QStringList> csv;
     QStandardItemModel *model;
     QList<QStandardItem*> standardItemList;
@@ -58,13 +56,12 @@ private:
     Worker::TreeStruct selectedTree;
     int plot3D_width1;
     int plot3D_width2;
+    void initializePlots();
 
 private slots:
     void runGP();
     void on_actionRun_triggered();
-    void on_actionE_xit_triggered();
-    void on_actionOptions_triggered();
-    void received_data(OptionsDialog::Options data);
+    void on_actionE_xit_triggered();   
     void received_stats(Worker::Stats data);
     void received_tree(Worker::TreeStruct data);
     void on_actionLoad_file_triggered();
@@ -73,7 +70,19 @@ private slots:
     void thread_finished();
     void on_horizontalSlider_valueChanged(int value);
     void plot3DUpdateData(Worker::fitnessdata data);
-    void on_listWidget_2_itemClicked(QListWidgetItem *item);
+    void on_ButtonStart_clicked();
+    void on_ButtonStop_clicked();
+    void on_listFunctions_itemSelectionChanged();
+    void on_spinBox_valueChanged(int arg1);
+    void on_lineEdit_5_textChanged(const QString &arg1);
+    void on_lineEdit_9_textChanged(const QString &arg1);
+    void on_lineEdit_4_textChanged(const QString &arg1);
+    void on_lineEdit_6_textChanged(const QString &arg1);
+    void on_lineEdit_8_textChanged(const QString &arg1);
+    void on_lineEdit_10_textChanged(const QString &arg1);
+    void on_lineEdit_7_textChanged(const QString &arg1);
+    void on_lineEdit_11_textChanged(const QString &arg1);
+    void on_lineEdit_12_textChanged(const QString &arg1);
+    void on_lineEdit_13_textChanged(const QString &arg1);
 };
-Q_DECLARE_METATYPE(OptionsDialog::Options)
 #endif // MAINWINDOW_H
