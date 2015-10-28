@@ -9,14 +9,30 @@
         <file>result_selected.png</file>
         <file>setup_normal.png</file>
         <file>setup_selected.png</file>
+        <file>pause_disabled.png</file>
+        <file>pause_normal.png</file>
+        <file>pause_selected.png</file>
         <file>start_disabled.png</file>
         <file>start_normal.png</file>
         <file>start_selected.png</file>
         <file>stop_disabled.png</file>
         <file>stop_normal.png</file>
         <file>stop_selected.png</file>
-        <file>pause_selected.png</file>
-        <file>pause_normal.png</file>
-        <file>pause_disabled.png</file>
+        <file>add_normal.png</file>
+        <file>add_selected.png</file>
+        <file>cos_normal.png</file>
+        <file>cos_selected.png</file>
+        <file>divide_normal.png</file>
+        <file>divide_selected.png</file>
+        <file>exp_normal.png</file>
+        <file>exp_selected.png</file>
+        <file>log_normal.png</file>
+        <file>log_selected.png</file>
+        <file>multiply_normal.png</file>
+        <file>multiply_selected.png</file>
+        <file>sin_normal.png</file>
+        <file>sin_selected.png</file>
+        <file>substract_normal.png</file>
+        <file>substract_selected.png</file>
     </qresource>
 </RCC>
