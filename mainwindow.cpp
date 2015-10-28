@@ -1,6 +1,5 @@
 #include "ui_mainwindow.h"
 #include "mainwindow.h"
-#include "optionsdialog.h"
 #include <QDebug>
 #include "SymbRegPrimits.hpp"
 #include "worker.h"
@@ -32,10 +31,21 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    qRegisterMetaType<OptionsDialog::Options>();
-
     ui->progressBar->setMaximum(100);
     ui->progressBar->setMinimum(1);
+    // Limit numeric values for parameter inputs
+    QRegExp Integer("^[0-9]{1,5}$");
+    QRegExp Floating("^[0-9]\.?[0-9]{1,5}$");
+    ui->lineEdit_5->setValidator(new QRegExpValidator(Integer, ui->lineEdit_5));
+    ui->lineEdit_9->setValidator(new QRegExpValidator(Integer, ui->lineEdit_9));
+    ui->lineEdit_4->setValidator(new QRegExpValidator(Integer, ui->lineEdit_4));
+    ui->lineEdit_6->setValidator(new QRegExpValidator(Integer, ui->lineEdit_6));
+    ui->lineEdit_8->setValidator(new QRegExpValidator(Integer, ui->lineEdit_8));
+    ui->lineEdit_12->setValidator(new QRegExpValidator(Integer, ui->lineEdit_12));
+    ui->lineEdit_13->setValidator(new QRegExpValidator(Integer, ui->lineEdit_13));
+    ui->lineEdit_10->setValidator(new QRegExpValidator(Floating, ui->lineEdit_10));
+    ui->lineEdit_7->setValidator(new QRegExpValidator(Floating, ui->lineEdit_7));
+    ui->lineEdit_11->setValidator(new QRegExpValidator(Floating, ui->lineEdit_11));
 
     connect(ui->listWidget, SIGNAL(currentRowChanged(int)), ui->stackedWidget, SLOT(setCurrentIndex(int)));
     ui->listWidget->setCurrentRow(0);
@@ -59,17 +69,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(worker, SIGNAL(send_tree(Worker::TreeStruct)), this, SLOT(received_tree(Worker::TreeStruct)));
     connect(worker, SIGNAL(progressChanged(int)), ui->progressBar, SLOT(setValue(int)));
     connect(worker, SIGNAL(plot3DSendData(Worker::fitnessdata)), this, SLOT(plot3DUpdateData(Worker::fitnessdata)));
-    oDialog = new OptionsDialog(this);
-    connect(worker, SIGNAL(sendSignal(int)), oDialog, SLOT(write_gen(int)));
+
     // 3d Plot
     QGridLayout *grid = new QGridLayout(ui->frame);
     plot = new Qwt3D::GridPlot(ui->frame);
     grid->addWidget( plot, 0, 0 );
 
-    connect(oDialog, SIGNAL(send_data(OptionsDialog::Options)), this, SLOT(received_data(OptionsDialog::Options)));
-
-    setupPlots();
-    oDialog->accept(); // Send default data from options dialog
     worker->trainingP = ui->horizontalSlider->value(); // Training size in percentage
 
     // Tree graph
@@ -83,6 +88,30 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->treeGraph->scale(qreal(0.5), qreal(0.5));
     ui->treeGraph->setMinimumSize(300, 300);
 
+    // Preselect +,-,/,* as function set
+    ui->listFunctions->item(0)->setSelected(true);
+    ui->listFunctions->item(1)->setSelected(true);
+    ui->listFunctions->item(2)->setSelected(true);
+    ui->listFunctions->item(3)->setSelected(true);
+
+    // Preselct fitness function
+    ui->listFitFunctions->item(0)->setSelected(true);
+
+    // Default GP parameters
+    worker->ngen = 100;
+    worker->popsize = 100;
+    worker->tournamentsize = 10;
+    worker->maxdepth = 17;
+    worker->mininitdepth = 2;
+    worker->maxinitdepth = 5;
+    worker->crossoverp = 0.9;
+    worker->crossoverdp = 0.9;
+    worker->mutationp = 0.05;
+    worker->mutationmaxr = 5;
+    worker->randomseed = 0;
+
+    setupPlots();
+    initializePlots();
 }
 
 void MainWindow::setupPlots()
@@ -206,70 +235,52 @@ void MainWindow::on_actionE_xit_triggered()
     qApp->exit();
 }
 
-void MainWindow::on_actionOptions_triggered()
+void MainWindow::initializePlots()
 {
-    oDialog->show();
+  ui->outputPlot->xAxis->setRange(1, worker->ngen);
+  ui->outputPlot->graph(0)->clearData();
+  ui->outputPlot->graph(1)->clearData();
+  //ui->outputPlot->yAxis->setRange(0, 1);
+  ui->outputPlot->replot();
+  ui->sizePlot->xAxis->setRange(1, worker->ngen);
+  ui->sizePlot->graph(0)->clearData();
+  ui->sizePlot->graph(1)->clearData();
+  ui->sizePlot->graph(2)->clearData();
+  ui->sizePlot->replot();
+
+  // Setup 3D plot
+  plot->setPlotStyle(Qwt3D::FILLED);
+  plot->setTitle("Fitness landscape");
+  QFont font;
+  plot->setTitleFont(font.family(), font.pointSize(), font.weight(), font.italic());
+  plot->coordinates()->setLabelFont(font);
+  plot->coordinates()->setNumberFont(font);
+  plot3D_width1 = worker->ngen;
+  plot3D_width2 = worker->popsize;
+
+  double *dataplot[plot3D_width1];
+  // fill initial data
+  for (int i = 0; i < plot3D_width1; i++)
+  {
+    dataplot[i] = new double[plot3D_width2];
+    for (int j = 0; j < plot3D_width2; j++) dataplot[i][j] = 0;
+  }
+  plot->createDataset(dataplot, plot3D_width1, plot3D_width2, 0,plot3D_width1, 0, plot3D_width2);
+  plot->setRotation(30,0,15);
+  plot->setScale(1,1,1);
+  plot->setShift(0.15,0,0);
+  plot->setZoom(0.6);
+  for (unsigned i=0; i!=plot->coordinates()->axes.size(); ++i)
+  {
+    plot->coordinates()->axes[i].setMajors(4);
+    plot->coordinates()->axes[i].setMinors(2);
+  }
+
+  plot->setCoordinateStyle(Qwt3D::FRAME);
+  plot->coordinates()->setAutoScale(false);
 }
 
-void MainWindow::received_data(OptionsDialog::Options data)
-{
-    worker->ngen = data.ngen;
-    worker->popsize = data.popsize;
-    worker->tournamentsize = data.tournamentsize;
-    worker->maxdepth = data.maxdepth;
-    worker->mininitdepth = data.mininitdepth;
-    worker->maxinitdepth = data.maxinitdepth;
-    worker->crossoverp = data.crossoverp;
-    worker->crossoverdp = data.crossoverdp;
-    worker->mutationp = data.mutationp;
-    worker->mutationmaxr = data.mutationmaxr;
-    worker->randomseed = data.randomseed;
-    worker->functionselection = data.functionselection;
-    ui->outputPlot->xAxis->setRange(1, worker->ngen);
-    ui->outputPlot->graph(0)->clearData();
-    ui->outputPlot->graph(1)->clearData();
-    //ui->outputPlot->yAxis->setRange(0, 1);
-    ui->outputPlot->replot();
-    ui->sizePlot->xAxis->setRange(1, worker->ngen);
-    ui->sizePlot->graph(0)->clearData();
-    ui->sizePlot->graph(1)->clearData();
-    ui->sizePlot->graph(2)->clearData();
-    ui->sizePlot->replot();
 
-    // Setup 3D plot
-    plot->setPlotStyle(Qwt3D::FILLED);
-    plot->setTitle("Fitness landscape");
-    QFont font;
-    plot->setTitleFont(font.family(), font.pointSize(), font.weight(), font.italic());
-    plot->coordinates()->setLabelFont(font);
-    plot->coordinates()->setNumberFont(font);
-    plot3D_width1 = worker->ngen;
-    plot3D_width2 = worker->popsize;
-
-    double *dataplot[plot3D_width1];
-    // fill initial data
-    for (int i = 0; i < plot3D_width1; i++)
-    {
-      dataplot[i] = new double[plot3D_width2];
-      for (int j = 0; j < plot3D_width2; j++) dataplot[i][j] = 0;
-    }
-    plot->createDataset(dataplot, plot3D_width1, plot3D_width2, 0,plot3D_width1, 0, plot3D_width2);
-    plot->setRotation(30,0,15);
-    plot->setScale(1,1,1);
-    plot->setShift(0.15,0,0);
-    plot->setZoom(0.6);
-    for (unsigned i=0; i!=plot->coordinates()->axes.size(); ++i)
-    {
-      plot->coordinates()->axes[i].setMajors(4);
-      plot->coordinates()->axes[i].setMinors(2);
-    }
-
-    plot->setCoordinateStyle(Qwt3D::FRAME);
-    plot->coordinates()->setAutoScale(false);
-    //plot->coordinates()->axes[Qwt3D::Z1];
-
-
-}
 void MainWindow::plot3DUpdateData(Worker::fitnessdata data)
 {
   plot3D_width1 = worker->ngen;
@@ -435,7 +446,16 @@ void MainWindow::positionParents(int index,int depth)
 
 void MainWindow::received_GPstarted(QString value)
 {
+  if(QString::compare(value, "Stop", Qt::CaseInsensitive) == 0) {
     ui->actionRun->setIconText(value);
+    ui->ButtonStop->setEnabled(true);
+    ui->ButtonStart->setEnabled(false);
+  }
+  else
+  {
+    ui->ButtonStop->setEnabled(false);
+    ui->ButtonStart->setEnabled(true);
+  }
 }
 
 void MainWindow::on_actionLoad_file_triggered()
@@ -485,7 +505,7 @@ void MainWindow::on_actionLoad_file_triggered()
     worker->dataset_cols = iCols;
     worker->dataset_rows = iRows;
     ui->actionRun->setEnabled(true);
-    //ui->listWidget_2->item(0)->setFlags(Qt::ItemIsEnabled);
+    ui->ButtonStart->setEnabled(true);
 }
 
 void MainWindow::checkString(QString &temp, QChar character)
@@ -522,26 +542,94 @@ void MainWindow::thread_finished()
   GPthreadstarted = false;
 }
 
-void MainWindow::on_listWidget_2_itemClicked(QListWidgetItem *item)
+void MainWindow::on_ButtonStart_clicked()
 {
-  if(item == 0) {
-      if(GPthreadstarted) {
-        worker->abort();
-        thread->wait(); // If the thread is not running, this will immediately return.
-        ui->actionRun->setIconText("Run");
-        GPthreadstarted = false;
-      }
-      else {
-        ui->textEdit->clear();
-        ui->outputPlot->graph(0)->clearData();
-        ui->outputPlot->graph(1)->clearData();
-        ui->sizePlot->graph(0)->clearData();
-        ui->sizePlot->graph(1)->clearData();
-        ui->sizePlot->graph(2)->clearData();
-        maxSize = 0;
-        maxFitness = 1;
-        ui->treeGraph->scene()->clear();
-        runGP();
-      }
-   }
+  if(!GPthreadstarted) {
+    ui->textEdit->clear();
+    ui->outputPlot->graph(0)->clearData();
+    ui->outputPlot->graph(1)->clearData();
+    ui->sizePlot->graph(0)->clearData();
+    ui->sizePlot->graph(1)->clearData();
+    ui->sizePlot->graph(2)->clearData();
+    maxSize = 0;
+    maxFitness = 1;
+    ui->treeGraph->scene()->clear();
+    runGP();
+  }
+}
+
+void MainWindow::on_ButtonStop_clicked()
+{
+  if(GPthreadstarted) {
+    worker->abort();
+    thread->wait(); // If the thread is not running, this will immediately return.
+    ui->ButtonStart->setEnabled(true);
+    ui->ButtonStop->setEnabled(false);
+    GPthreadstarted = false;
+  }
+}
+
+void MainWindow::on_listFunctions_itemSelectionChanged()
+{
+  std::vector<bool> funSelection;
+  for(unsigned int i=0;i<ui->listFunctions->count();i++) {
+    if(ui->listFunctions->item(i)->isSelected()) funSelection.push_back(true); else funSelection.push_back(false);
+  }
+  worker->functionselection = funSelection;
+}
+
+void MainWindow::on_spinBox_valueChanged(int arg1)
+{
+    worker->ngen = arg1;
+}
+
+
+void MainWindow::on_lineEdit_5_textChanged(const QString &arg1)
+{
+    worker->popsize = arg1.toInt();
+}
+
+void MainWindow::on_lineEdit_9_textChanged(const QString &arg1)
+{
+    worker->tournamentsize = arg1.toInt();
+}
+
+void MainWindow::on_lineEdit_4_textChanged(const QString &arg1)
+{
+    worker->maxdepth = arg1.toInt();
+}
+
+void MainWindow::on_lineEdit_6_textChanged(const QString &arg1)
+{
+    worker->mininitdepth = arg1.toInt();
+}
+
+void MainWindow::on_lineEdit_8_textChanged(const QString &arg1)
+{
+    worker->maxinitdepth = arg1.toInt();
+}
+
+void MainWindow::on_lineEdit_10_textChanged(const QString &arg1)
+{
+    worker->crossoverp = arg1.toFloat();
+}
+
+void MainWindow::on_lineEdit_7_textChanged(const QString &arg1)
+{
+    worker->crossoverdp = arg1.toFloat();
+}
+
+void MainWindow::on_lineEdit_11_textChanged(const QString &arg1)
+{
+    worker->mutationp = arg1.toFloat();
+}
+
+void MainWindow::on_lineEdit_12_textChanged(const QString &arg1)
+{
+    worker->mutationmaxr = arg1.toInt();
+}
+
+void MainWindow::on_lineEdit_13_textChanged(const QString &arg1)
+{
+    worker->randomseed = arg1.toInt();
 }
