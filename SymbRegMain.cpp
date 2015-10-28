@@ -84,7 +84,6 @@
 #include "Puppy.hpp"
 #include "SymbRegPrimits.hpp"
 #include "mainwindow.h"
-#include "optionsdialog.h"
 #include "worker.h"
 #include "matrix.h"
 #include "infix.h"
