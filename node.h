@@ -51,7 +51,6 @@ QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
 QT_END_NAMESPACE
 
-//! [0]
 class Node : public QGraphicsItem
 {
 public:
@@ -63,7 +62,6 @@ public:
     enum { Type = UserType + 1 };
     int type() const Q_DECL_OVERRIDE { return Type; }
 
-    void calculateForces();
     bool advance();
 
     QRectF boundingRect() const Q_DECL_OVERRIDE;
@@ -83,6 +81,5 @@ private:
     QPointF newPos;
     GraphWidget *graph;
 };
-//! [0]
 
 #endif // NODE_H
