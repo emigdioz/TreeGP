@@ -20,7 +20,6 @@ SOURCES += \
     SymbRegMain.cpp \
     SymbRegPrimits.cpp \
     worker.cpp \
-    optionsdialog.cpp \
     qcustomplot.cpp \
     infix.cpp \
     edge.cpp \
@@ -67,7 +66,6 @@ HEADERS += \
     Tree.hpp \
     SymbRegPrimits.hpp \
     worker.h \
-    optionsdialog.h \
     qcustomplot.h \
     matrix.h \
     infix.h \
@@ -108,8 +106,7 @@ HEADERS += \
     qwtplot3d/include/qwt3d_volumeplot.h
 
 FORMS += \
-    mainwindow.ui \
-    optionsdialog.ui
+    mainwindow.ui
 
 RESOURCES += \
     images.qrc
