@@ -41,7 +41,8 @@ public:
     double *dataset;
     int dataset_cols;
     int dataset_rows;
-    int trainingP;
+    int trainingP;    
+    std::vector<bool> terminalselection;
     std::vector<bool> functionselection;
 
     void subsetData(double *input, double *training, double *testing, int cols, int rows, int trainsize, int *index);
@@ -96,6 +97,7 @@ signals:
      */
     void valueChanged(const QString &value);
     void send_stats(Worker::Stats data);
+    void send_stats_end(Worker::Stats data);
     void send_tree(Worker::TreeStruct data);
     void progressChanged(const int value);
     void GPstarted(const QString value);
