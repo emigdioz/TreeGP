@@ -110,17 +110,17 @@ using namespace Puppy;
 unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
                              Context& ioContext,
                              double* inX,
-                             double* inF,int cols, int rows);
+                             double* inF,int cols, int rows, std::vector<bool> &terSelection);
 
 unsigned int evaluateFitnessTesting(Tree &individual,
                              Context& ioContext,
                              double* inX,
-                             double* inF,int cols, int rows);
+                             double* inF,int cols, int rows, std::vector<bool> &terSelection);
 
 unsigned int evaluateFitnessTraining(Tree &individual,
                              Context& ioContext,
                              double* inX,
-                             double* inF,int cols, int rows);
+                             double* inF,int cols, int rows, std::vector<bool> &terSelection);
 
 void passTree(Tree &individual,Worker::TreeStruct& tree);
 
@@ -239,10 +239,14 @@ int Worker::start_main(void) {
   // Add terminals
   std::stringstream str;
   for(unsigned int i=0; i<Worker::dataset_cols-1;i++) {
-    str<<"X"<<(i+1);
-    lContext.insert(new TokenT<double>(str.str(), 0.0));
-    str.str(std::string());
+    if(Worker::terminalselection.at(i)) {  // Check selected variables
+      str<<"X"<<(i+1);
+      lContext.insert(new TokenT<double>(str.str(), 0.0));
+      str.str(std::string());
+    }
   }
+  // Check for ERC
+  if(Worker::terminalselection.at(Worker::dataset_cols-1)) lContext.insert(new Ephemeral);
 
   // Prepare data, separating input and output variables
   std::vector<int> index;
@@ -296,7 +300,7 @@ int Worker::start_main(void) {
   emit Worker::valueChanged("Initializing population");
   initializePopulation(lPopulation, lContext, lInitGrowProba, lMinInitDepth, lMaxInitDepth);
   //evaluateSymbReg(lPopulation, lContext, lX, lF);
-  evaluateFitness(lPopulation, lContext, trainingIn, trainingOut,Worker::dataset_cols-1,size_training);
+  evaluateFitness(lPopulation, lContext, trainingIn, trainingOut,Worker::dataset_cols-1,size_training,Worker::terminalselection);
 
   Stats GPthis;
   QString message;
@@ -311,8 +315,9 @@ int Worker::start_main(void) {
   infix q;
   TreeStruct chosenTree;
   fitnessdata datafit;
+
   datafit.data = new double*[lNbrGen];
-  // prefill population fitness data
+  // prefill population empty fitness data
   for(i=0; i<lNbrGen; ++i) {
     datafit.data[i] = new double[lPopSize];
     for (int j = 0; j < lPopSize; j++) {
@@ -330,9 +335,9 @@ int Worker::start_main(void) {
     applyMutationStandard(lPopulation, lContext, lMutStdProba, lMutMaxRegenDepth, lMaxDepth);
     applyMutationSwap(lPopulation, lContext, lMutSwapProba, lMutSwapDistribProba);    
 
-    nEvalFunc += evaluateFitness(lPopulation, lContext, trainingIn, trainingOut,Worker::dataset_cols-1,size_training);
+    nEvalFunc += evaluateFitness(lPopulation, lContext, trainingIn, trainingOut,Worker::dataset_cols-1,size_training,Worker::terminalselection);
     calculateStats(lPopulation, i, message, GPthis.train, bindex, GPthis.avgsize, GPthis.maxsize, GPthis.minsize);
-    nEvalFunc += evaluateFitnessTesting(lPopulation[bindex],lContext,testingIn,testingOut,Worker::dataset_cols-1,(Worker::dataset_rows-size_training));
+    nEvalFunc += evaluateFitnessTesting(lPopulation[bindex],lContext,testingIn,testingOut,Worker::dataset_cols-1,(Worker::dataset_rows-size_training),Worker::terminalselection);
 
     GPthis.test = lPopulation[bindex].rFitnessTest;
     GPthis.gen = i;
@@ -384,6 +389,7 @@ int Worker::start_main(void) {
   emit Worker::valueChanged("Best individual at generation " + QString::number(i-1) + " is: " + output + " with fitness: " + QString::number(lBestIndividual[0].mFitness));
   emit Worker::send_tree_string(output);
   std::cout << *lBestIndividual << std:: endl;
+  emit Worker::send_stats_end(GPthis);
 
   //std::cout << lBestIndividual[0].mFitness << std:: endl;
 
@@ -401,7 +407,7 @@ int Worker::start_main(void) {
 unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
                              Context& ioContext,
                              double* inX,
-                             double* inF,int cols, int rows)
+                             double* inF, int cols, int rows, std::vector<bool> &terSelection)
 {
   //assert(inX.size() == inF.size());
   std::stringstream var;
@@ -416,10 +422,12 @@ unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
     for(j=0; j<rows; j++) {
       // Copy col wise data for variable usage
       for(k=0; k<cols;k++) {
-        rowV =  inX[(k*rows)+j];
-        var<<"X"<<(k+1);
-        ioContext.mPrimitiveMap[var.str()]->setValue(&rowV);
-        var.str(std::string());
+        if(terSelection.at(k)) {
+          rowV =  inX[(k*rows)+j];
+          var<<"X"<<(k+1);
+          ioContext.mPrimitiveMap[var.str()]->setValue(&rowV);
+          var.str(std::string());
+        }
         //qDebug()<<k<<": "<<rowV;
       }
       lResult = 0.0;
@@ -442,7 +450,7 @@ unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
 unsigned int evaluateFitnessTesting(Tree &individual,
                              Context& ioContext,
                              double* inX,
-                             double* inF,int cols, int rows)
+                             double* inF, int cols, int rows, std::vector<bool> &terSelection)
 {
   std::stringstream var;
   double rowV;
@@ -453,10 +461,12 @@ unsigned int evaluateFitnessTesting(Tree &individual,
   for(j=0; j<rows; j++) {
     // Copy col wise data for variable usage
     for(k=0; k<cols;k++) {
-      rowV =  inX[(k*rows)+j];
-      var<<"X"<<(k+1);
-      ioContext.mPrimitiveMap[var.str()]->setValue(&rowV);
-      var.str(std::string());
+      if(terSelection.at(k)) {
+        rowV =  inX[(k*rows)+j];
+        var<<"X"<<(k+1);
+        ioContext.mPrimitiveMap[var.str()]->setValue(&rowV);
+        var.str(std::string());
+      }
     }
     lResult = 0.0;
     individual.interpret(&lResult, ioContext);
@@ -476,7 +486,7 @@ unsigned int evaluateFitnessTesting(Tree &individual,
 unsigned int evaluateFitnessTraining(Tree &individual,
                              Context& ioContext,
                              double* inX,
-                             double* inF,int cols, int rows)
+                             double* inF, int cols, int rows, std::vector<bool> &terSelection)
 {
   std::stringstream var;
   double rowV;
@@ -486,11 +496,13 @@ unsigned int evaluateFitnessTraining(Tree &individual,
 
   for(j=0; j<rows; j++) {
     // Copy col wise data for variable usage
-    for(k=0; k<cols;k++) {
-      rowV =  inX[(k*rows)+j];
-      var<<"X"<<(k+1);
-      ioContext.mPrimitiveMap[var.str()]->setValue(&rowV);
-      var.str(std::string());
+    for(k=0; k<cols;k++) {        
+      if(terSelection.at(k)) {
+        rowV =  inX[(k*rows)+j];
+        var<<"X"<<(k+1);
+        ioContext.mPrimitiveMap[var.str()]->setValue(&rowV);
+        var.str(std::string());
+      }
     }
     lResult = 0.0;
     individual.interpret(&lResult, ioContext);
