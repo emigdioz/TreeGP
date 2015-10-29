@@ -97,10 +97,11 @@ signals:
     void valueChanged(const QString &value);
     void send_stats(Worker::Stats data);
     void send_tree(Worker::TreeStruct data);
-    void sendSignal(int value);
     void progressChanged(const int value);
     void GPstarted(const QString value);
     void plot3DSendData(Worker::fitnessdata data);
+    void sendEvalFunc(unsigned long value);
+    void send_tree_string(const QString data);
     /**
      * @brief This signal is emitted when process is finished (either by counting 60 sec or being aborted)
      */
