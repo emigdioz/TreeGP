@@ -107,7 +107,13 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
       font.setPointSize(14);
       painter->setFont(font);
       painter->setPen(Qt::white);
-      painter->drawText(textRect, Qt::AlignCenter,GraphWidget::tr(nameNode.toLatin1()));
+      bool ok;
+      double number = nameNode.toDouble(&ok);
+      if(!ok)
+        painter->drawText(textRect, Qt::AlignCenter,GraphWidget::tr(nameNode.toLatin1()));
+      else { // is a number
+        painter->drawText(textRect, Qt::AlignCenter,GraphWidget::tr(QString::number(number,'g',2).toLatin1()));
+      }
     }
 
 }
