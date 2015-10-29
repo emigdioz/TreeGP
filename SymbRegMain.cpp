@@ -319,6 +319,7 @@ int Worker::start_main(void) {
       datafit.data[i][j] = 0;
     }
   }
+  unsigned long nEvalFunc = 0;
 
   // Evolve population for the given number of generations
   std::cout << "Starting evolution" << std::endl;
@@ -328,26 +329,23 @@ int Worker::start_main(void) {
     applyCrossover(lPopulation, lContext, lCrossoverProba, lCrossDistribProba, lMaxDepth);
     applyMutationStandard(lPopulation, lContext, lMutStdProba, lMutMaxRegenDepth, lMaxDepth);
     applyMutationSwap(lPopulation, lContext, lMutSwapProba, lMutSwapDistribProba);    
-    //evaluateSymbReg(lPopulation, lContext, lX, lF);
-    evaluateFitness(lPopulation, lContext, trainingIn, trainingOut,Worker::dataset_cols-1,size_training);
+
+    nEvalFunc += evaluateFitness(lPopulation, lContext, trainingIn, trainingOut,Worker::dataset_cols-1,size_training);
     calculateStats(lPopulation, i, message, GPthis.train, bindex, GPthis.avgsize, GPthis.maxsize, GPthis.minsize);
-    evaluateFitnessTesting(lPopulation[bindex],lContext,testingIn,testingOut,Worker::dataset_cols-1,(Worker::dataset_rows-size_training));
-    //evaluateFitnessTesting(lPopulation[bindex],lContext,trainingIn,trainingOut,Worker::dataset_cols-1,size_training);
-    //GPthis.test = lPopulation[bindex].mFitnessTest;
+    nEvalFunc += evaluateFitnessTesting(lPopulation[bindex],lContext,testingIn,testingOut,Worker::dataset_cols-1,(Worker::dataset_rows-size_training));
+
     GPthis.test = lPopulation[bindex].rFitnessTest;
     GPthis.gen = i;
 
     lPopulation[bindex].write_qstring(output);
     qDebug()<<i<<" Train: "<<lPopulation[bindex].mFitness<<" Test: "<<lPopulation[bindex].mFitnessTest<<" "<<output;
-    //evaluateFitnessTraining(lPopulation[bindex],lContext,trainingIn,trainingOut,Worker::dataset_cols-1,size_training);
-    //qDebug()<<i<<" Train: "<<lPopulation[bindex].mFitness;
     output.clear();
 
     emit Worker::valueChanged(message);
     emit Worker::send_stats(GPthis);
     progress_float = (i/(float)lNbrGen)*100;
     emit Worker::progressChanged((int)progress_float);
-
+    emit Worker::sendEvalFunc(nEvalFunc);
     // fill population fitness data
     //datafit.data[i-1] = new double[lPopSize];
     for (int j = 0; j < lPopSize; j++) {
@@ -384,7 +382,9 @@ int Worker::start_main(void) {
 
   lBestIndividual[0].write_qstring(output);
   emit Worker::valueChanged("Best individual at generation " + QString::number(i-1) + " is: " + output + " with fitness: " + QString::number(lBestIndividual[0].mFitness));
+  emit Worker::send_tree_string(output);
   std::cout << *lBestIndividual << std:: endl;
+
   //std::cout << lBestIndividual[0].mFitness << std:: endl;
 
   //std::cout << "Exiting program" << std::endl << std::flush;
