@@ -780,6 +780,27 @@ image: url(&quot;:/icons/stop_disabled.png&quot;);
                   </property>
                  </widget>
                 </item>
+                <item row="1" column="2">
+                 <widget class="QLabel" name="labelElapsedTime">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2">
+                 <widget class="QLabel" name="labelStartedTime">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="2">
+                 <widget class="QLabel" name="labelEvalFunc">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
                 <item row="1" column="0">
                  <widget class="QLabel" name="label_22">
                   <property name="sizePolicy">
@@ -802,28 +823,14 @@ image: url(&quot;:/icons/stop_disabled.png&quot;);
                    </sizepolicy>
                   </property>
                   <property name="text">
-                   <string>Started time:</string>
+                   <string>Started date and time:</string>
                   </property>
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QLabel" name="label_24">
+                 <widget class="QLabel" name="labelStartedDate">
                   <property name="text">
-                   <string>0</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QLabel" name="label_25">
-                  <property name="text">
-                   <string>0</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLabel" name="label_26">
-                  <property name="text">
-                   <string>0</string>
+                   <string/>
                   </property>
                  </widget>
                 </item>
@@ -941,7 +948,14 @@ image: url(&quot;:/icons/stop_disabled.png&quot;);
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_14"/>
+             <widget class="QTextEdit" name="textEditTree">
+              <property name="acceptRichText">
+               <bool>false</bool>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="GraphWidget" name="treeGraph" native="true">
@@ -997,18 +1011,6 @@ image: url(&quot;:/icons/stop_disabled.png&quot;);
    <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionRun"/>
-  </widget>
   <action name="actionE_xit">
    <property name="text">
     <string>E&amp;xit</string>
