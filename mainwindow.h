@@ -18,6 +18,7 @@
 #include "qwt3d_plot3d.h"
 #include <qwt3d_scale.h>
 #include <QDateTime>
+#include <qcustomplot.h>
 
 //QT_BEGIN_NAMESPACE
 //class QTextEdit;
@@ -34,6 +35,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     Qwt3D::GridPlot* plot;
     ~MainWindow();
+    void calculateQuartiles(std::vector<double> data, double &Q1, double &Q2, double &Q3, double &min, double &max);
+    int runCount;
 
 private:
     /**
@@ -55,6 +58,9 @@ private:
     void positionParents(int index,int depth);
     int nLeaves;
     Worker::TreeStruct selectedTree;
+    std::vector<Worker::TreeStruct> runTree;
+    std::vector<Worker::Stats> runStats;
+
     int plot3D_width1;
     int plot3D_width2;
     void initializePlots();
@@ -63,12 +69,15 @@ private:
     void showStartedTime();
     void showStartedDate();
     QString seconds_to_DHMS(qint64 duration);
+    void view_single_tree(Worker::TreeStruct data);
+    QCPStatisticalBox *trainBox;
+    QCPStatisticalBox *testBox;
 
 private slots:
     void runGP();
-    void on_actionRun_triggered();
     void on_actionE_xit_triggered();   
     void received_stats(Worker::Stats data);
+    void received_stats_end(Worker::Stats data);
     void received_tree(Worker::TreeStruct data);
     void on_actionLoad_file_triggered();
     void checkString(QString &temp, QChar character = 0);
@@ -94,5 +103,7 @@ private slots:
     void received_tree_string(const QString data);
 
     void showElapsedTime();
+    void on_listTerminals_itemSelectionChanged();
+    void on_tableRuns_itemSelectionChanged();
 };
 #endif // MAINWINDOW_H
