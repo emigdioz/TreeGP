@@ -53,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     thread = new QThread();
     worker = new Worker();
+    timerGP = new QTimer();
 
     qRegisterMetaType<Worker::Stats>();
     qRegisterMetaType<Worker::TreeStruct>();
@@ -69,6 +70,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(worker, SIGNAL(send_tree(Worker::TreeStruct)), this, SLOT(received_tree(Worker::TreeStruct)));
     connect(worker, SIGNAL(progressChanged(int)), ui->progressBar, SLOT(setValue(int)));
     connect(worker, SIGNAL(plot3DSendData(Worker::fitnessdata)), this, SLOT(plot3DUpdateData(Worker::fitnessdata)));
+    connect(worker, SIGNAL(sendEvalFunc(unsigned long)), this, SLOT(receivedEvalFunc(unsigned long)));
+    connect(worker, SIGNAL(send_tree_string(QString)), this, SLOT(received_tree_string(QString)));
+    // Timer for running time
+    connect(timerGP, SIGNAL(timeout()), this, SLOT(showElapsedTime()));
 
     // 3d Plot
     QGridLayout *grid = new QGridLayout(ui->frame);
@@ -196,6 +201,11 @@ void MainWindow::runGP()
     thread->wait(); // If the thread is not running, this will immediately return.
     worker->requestWork();
     GPthreadstarted = true;
+    ui->labelElapsedTime->setText("0");
+    showStartedTime();
+    showStartedDate();
+    startedDateTime = QDateTime::currentDateTime();
+    timerGP->start(1000);
 }
 
 MainWindow::~MainWindow()
@@ -455,6 +465,7 @@ void MainWindow::received_GPstarted(QString value)
   {
     ui->ButtonStop->setEnabled(false);
     ui->ButtonStart->setEnabled(true);
+    timerGP->stop();
   }
 }
 
@@ -632,4 +643,56 @@ void MainWindow::on_lineEdit_12_textChanged(const QString &arg1)
 void MainWindow::on_lineEdit_13_textChanged(const QString &arg1)
 {
     worker->randomseed = arg1.toInt();
+}
+
+void MainWindow::receivedEvalFunc(unsigned long value)
+{
+  ui->labelEvalFunc->setText(QString::number(value));
+}
+
+QString MainWindow::seconds_to_DHMS(qint64 duration)
+{
+  QString res;
+  int seconds = (int) (duration % 60);
+  duration /= 60;
+  int minutes = (int) (duration % 60);
+  duration /= 60;
+  int hours = (int) (duration % 24);
+  int days = (int) (duration / 24);
+  if((hours == 0)&&(days == 0)&&(minutes == 0))
+    return res.sprintf("%02d secs", seconds);
+  if((hours == 0)&&(days == 0))
+    return res.sprintf("%02d mins %02d secs", minutes, seconds);
+  if (days == 0)
+    return res.sprintf("%02d hrs %02d mins %02d secs", hours, minutes, seconds);
+  return res.sprintf("%dd days %02d hrs %02d mins %02d secs", days, hours, minutes, seconds);
+}
+
+void MainWindow::showElapsedTime()
+{
+  QDateTime currentDateTime = QDateTime::currentDateTime();
+
+  qint64 seconds = startedDateTime.secsTo(currentDateTime);
+
+  ui->labelElapsedTime->setText(seconds_to_DHMS(seconds));
+  ui->labelElapsedTime->update();
+}
+
+void MainWindow::showStartedTime()
+{
+  QTime time = QTime::currentTime();
+  QString text = time.toString("hh:mm");
+  ui->labelStartedTime->setText(text);
+}
+
+void MainWindow::showStartedDate()
+{
+  QDate date = QDate::currentDate();
+  QString text = date.toString("ddd MMM d yyyy");
+  ui->labelStartedDate->setText(text);
+}
+
+void MainWindow::received_tree_string(const QString data)
+{
+  ui->textEditTree->setText(data);
 }
