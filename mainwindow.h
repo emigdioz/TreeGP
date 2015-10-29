@@ -17,6 +17,7 @@
 #include "qwt3d_function.h"
 #include "qwt3d_plot3d.h"
 #include <qwt3d_scale.h>
+#include <QDateTime>
 
 //QT_BEGIN_NAMESPACE
 //class QTextEdit;
@@ -57,6 +58,11 @@ private:
     int plot3D_width1;
     int plot3D_width2;
     void initializePlots();
+    QTimer *timerGP;
+    QDateTime startedDateTime;
+    void showStartedTime();
+    void showStartedDate();
+    QString seconds_to_DHMS(qint64 duration);
 
 private slots:
     void runGP();
@@ -70,6 +76,7 @@ private slots:
     void thread_finished();
     void on_horizontalSlider_valueChanged(int value);
     void plot3DUpdateData(Worker::fitnessdata data);
+    void receivedEvalFunc(unsigned long value);
     void on_ButtonStart_clicked();
     void on_ButtonStop_clicked();
     void on_listFunctions_itemSelectionChanged();
@@ -84,5 +91,8 @@ private slots:
     void on_lineEdit_11_textChanged(const QString &arg1);
     void on_lineEdit_12_textChanged(const QString &arg1);
     void on_lineEdit_13_textChanged(const QString &arg1);
+    void received_tree_string(const QString data);
+
+    void showElapsedTime();
 };
 #endif // MAINWINDOW_H
