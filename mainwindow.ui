@@ -1046,7 +1046,7 @@ background: rgba(209, 241, 255, 255);
 
 QTabBar:tab:selected
 {
-background:rgba(0, 173, 250, 255); 
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.2, stop:0 rgba(0, 104, 151, 200), stop:1 rgba(0, 173, 250, 255)); 
 }</string>
           </property>
           <property name="tabPosition">
