@@ -35,4 +35,7 @@
         <file>substract_normal.png</file>
         <file>substract_selected.png</file>
     </qresource>
+    <qresource prefix="/fonts">
+        <file>Dosis-Medium.ttf</file>
+    </qresource>
 </RCC>
