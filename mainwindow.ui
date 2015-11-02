@@ -14,12 +14,36 @@
    <string>TreeGP</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <layout class="QGridLayout" name="gridLayout_10">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <property name="horizontalSpacing">
+     <number>0</number>
+    </property>
     <item row="0" column="0">
      <widget class="QListWidget" name="listWidget">
+      <property name="minimumSize">
+       <size>
+        <width>80</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="maximumSize">
        <size>
-        <width>75</width>
+        <width>80</width>
         <height>16777215</height>
        </size>
       </property>
@@ -32,23 +56,31 @@
       <property name="styleSheet">
        <string notr="true">QListWidget 
 { 
-background: rgba(240, 240, 240, 255);  
+background: rgba(53, 64, 82, 255);
+border: none;
+font-family: Dosis;
+font-weight: bold;
+font-size:15px;
 }
 
 QListWidget::item:hover 
 { 
-background: rgba(209, 241, 255, 255); 
+background: rgb(47,57, 73); 
 }
 
-QListWidget::item:selected 
+QListWidget::item:selected
 { 
-background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.1, stop:0 rgba(0, 104, 151, 200), stop:1 rgba(0, 173, 250, 255)); 
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.1, stop:0 rgb(94, 13, 13) , stop:1 rgb(224,34,34));
+color: white; 
 }
 
 QListWidget::item 
 { 
 border-bottom: 2px gray; 
-padding: 10px; color: black; 
+padding-bottom: 10px;
+padding-top: 10px;
+color: rgb(160,171,190);
+width: 80px;
 }</string>
       </property>
       <property name="iconSize">
@@ -77,52 +109,155 @@ padding: 10px; color: black;
       </property>
       <item>
        <property name="text">
-        <string>Data</string>
+        <string>DATA</string>
+       </property>
+       <property name="foreground">
+        <brush brushstyle="NoBrush">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
        </property>
        <property name="icon">
         <iconset resource="images.qrc">
-         <normaloff>:/icons/data_normal.png</normaloff>
-         <selectedoff>:/icons/data_selected.png</selectedoff>:/icons/data_normal.png</iconset>
+         <normaloff>:/icons/data_selected.png</normaloff>
+         <selectedoff>:/icons/data_selected.png</selectedoff>:/icons/data_selected.png</iconset>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>GP setup</string>
+        <string>GP SETUP</string>
        </property>
        <property name="icon">
         <iconset resource="images.qrc">
-         <normaloff>:/icons/setup_normal.png</normaloff>
-         <selectedoff>:/icons/setup_selected.png</selectedoff>:/icons/setup_normal.png</iconset>
+         <normaloff>:/icons/setup_selected.png</normaloff>
+         <selectedoff>:/icons/setup_selected.png</selectedoff>:/icons/setup_selected.png</iconset>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>GP run</string>
+        <string>GP RUN</string>
        </property>
        <property name="icon">
         <iconset resource="images.qrc">
-         <normaloff>:/icons/gp_normal.png</normaloff>
-         <selectedoff>:/icons/gp_selected.png</selectedoff>:/icons/gp_normal.png</iconset>
+         <normaloff>:/icons/gp_selected.png</normaloff>
+         <selectedoff>:/icons/gp_selected.png</selectedoff>:/icons/gp_selected.png</iconset>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>Results</string>
+        <string>RESULTS</string>
        </property>
        <property name="icon">
         <iconset resource="images.qrc">
-         <normaloff>:/icons/result_normal.png</normaloff>
-         <selectedoff>:/icons/result_selected.png</selectedoff>:/icons/result_normal.png</iconset>
+         <normaloff>:/icons/result_selected.png</normaloff>
+         <selectedoff>:/icons/result_selected.png</selectedoff>:/icons/result_selected.png</iconset>
        </property>
       </item>
      </widget>
     </item>
     <item row="0" column="1">
      <widget class="QStackedWidget" name="stackedWidget">
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="pageData">
+       <property name="styleSheet">
+        <string notr="true">QWidget#pageData
+{
+background: rgb(255, 255, 255);
+}
+
+QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}
+
+QLineEdit
+{
+background: rgb(235,241,245);
+border-top: 2px solid #d9e4eb;
+padding: 2px;
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}
+
+QSlider::groove:horizontal {
+background: rgb(235,241,245);
+height: 12px;
+}
+
+QSlider::handle:horizontal {
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(0, 172, 239, 255), stop:1 rgba(16, 148, 232, 255));
+width: 25px;
+border-radius: 3px;
+}
+
+QHeaderView::section
+{
+background: rgb(111,125,149);
+color: rgb(255,255,255);
+border: 1px solid #bdc3ce;
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}
+
+QTableView
+{
+selection-background-color: rgb(40,126,185);
+}
+
+QTableView::item:selected
+{
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(133, 43, 153, 255), stop:1 rgba(116, 29, 136, 255));
+}
+
+QScrollBar
+{
+background: rgb(244, 244, 244);
+}
+QScrollBar::handle:vertical {
+background: rgb(138, 149, 165);
+min-height: 0px;
+}
+
+QScrollBar::add-line:vertical {
+height: 0px;
+subcontrol-position: bottom;
+subcontrol-origin: margin;
+}
+QScrollBar::sub-line:vertical {
+height: 0px;
+subcontrol-position: top;
+subcontrol-origin: margin;
+}
+
+QScrollBar::handle:horizontal {
+background: rgb(138, 149, 165);
+min-height: 0px;
+}
+
+QScrollBar::add-line:horizontal {
+height: 0px;
+subcontrol-position: bottom;
+subcontrol-origin: margin;
+}
+QScrollBar::sub-line:horizontal {
+height: 0px;
+subcontrol-position: top;
+subcontrol-origin: margin;
+}</string>
+       </property>
        <layout class="QGridLayout" name="gridLayout_6">
         <item row="0" column="0">
          <layout class="QVBoxLayout" name="verticalLayout">
@@ -151,6 +286,12 @@ padding: 10px; color: black;
             </item>
             <item row="1" column="0">
              <widget class="QLabel" name="label">
+              <property name="minimumSize">
+               <size>
+                <width>200</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="text">
                <string>Input variables columns</string>
               </property>
@@ -198,6 +339,91 @@ padding: 10px; color: black;
        </layout>
       </widget>
       <widget class="QWidget" name="pageSetup">
+       <property name="styleSheet">
+        <string notr="true">QWidget#pageSetup
+{
+background: rgb(255, 255, 255);
+}
+QListWidget
+{
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+color: rgb(138,149,165);
+}
+
+QListWidget::item:hover 
+{ 
+background: rgb(235,241,245);
+}
+
+QListWidget::item:selected 
+{ 
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgb(40, 183, 121), stop:1 rgb(23, 166, 104)); 
+}
+
+QListWidget::item 
+{ 
+border-bottom: 2px gray; 
+padding: 10px; 
+}
+
+
+QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}
+
+QLineEdit
+{
+background: rgb(235,241,245);
+border-top: 2px solid #d9e4eb;
+padding: 2px;
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}
+
+QSpinBox
+{
+background: rgb(235,241,245);
+border-top: 2px solid #d9e4eb;
+padding: 2px;
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}
+
+QSpinBox::up-button {
+    subcontrol-origin: border;
+    subcontrol-position: top right; /* position at the top right corner */
+	background: #d9e4eb;
+    border-width: 1px;
+}
+QSpinBox::up-button:hover {
+background: #00acef;
+}
+
+QSpinBox::up-button:pressed {
+background: #1094e8;
+}
+QSpinBox::down-button {
+    subcontrol-origin: border;
+    subcontrol-position: bottom right; /* position at bottom right corner */
+	background: #d9e4eb;
+    border-width: 1px;
+}
+
+QSpinBox::down-button:hover {
+background: #00acef;
+}
+QSpinBox::down-button:pressed {
+background: #1094e8;
+}</string>
+       </property>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
          <widget class="QSplitter" name="splitter_3">
@@ -208,6 +434,15 @@ padding: 10px; color: black;
            <layout class="QGridLayout" name="gridLayout_7">
             <item row="8" column="0">
              <widget class="QLabel" name="label_12">
+              <property name="styleSheet">
+               <string notr="true">QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}</string>
+              </property>
               <property name="text">
                <string>Mutation probability</string>
               </property>
@@ -288,6 +523,15 @@ padding: 10px; color: black;
             </item>
             <item row="9" column="0">
              <widget class="QLabel" name="label_11">
+              <property name="styleSheet">
+               <string notr="true">QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}</string>
+              </property>
               <property name="text">
                <string>Mutation max regeneration depth</string>
               </property>
@@ -354,6 +598,15 @@ padding: 10px; color: black;
             </item>
             <item row="10" column="0">
              <widget class="QLabel" name="label_17">
+              <property name="styleSheet">
+               <string notr="true">QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}</string>
+              </property>
               <property name="text">
                <string>Random number generator seed value</string>
               </property>
@@ -431,26 +684,7 @@ padding: 10px; color: black;
                  <bool>false</bool>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">QListWidget 
-{ 
-background: rgba(255, 255, 255, 255);  
-}
-
-QListWidget::item:hover 
-{ 
-background: rgba(209, 241, 255, 255); 
-}
-
-QListWidget::item:selected 
-{ 
-background: rgba(0, 173, 250, 255); 
-}
-
-QListWidget::item 
-{ 
-border-bottom: 2px gray; 
-padding: 10px; color: black; 
-}</string>
+                 <string notr="true"/>
                 </property>
                 <property name="sizeAdjustPolicy">
                  <enum>QAbstractScrollArea::AdjustToContents</enum>
@@ -609,24 +843,7 @@ padding: 10px; color: black;
                  <string>Please note that selecting multiple measures will slow down runs</string>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">QListWidget 
-{ 
-background: rgba(255, 255, 255, 255);  
-}
-
-QListWidget::item:hover 
-{ 
-background: rgba(209, 241, 255, 255); 
-}
-QListWidget::item:selected 
-{ 
-background: rgba(0, 173, 250, 255); 
-}
-
-QListWidget::item 
-{ 
-color: black; 
-}</string>
+                 <string notr="true"/>
                 </property>
                 <property name="selectionMode">
                  <enum>QAbstractItemView::MultiSelection</enum>
@@ -657,35 +874,72 @@ color: black;
        </layout>
       </widget>
       <widget class="QWidget" name="pageGP">
+       <property name="styleSheet">
+        <string notr="true">QWidget#pageGP
+{
+background: rgb(255, 255, 255);
+}</string>
+       </property>
        <layout class="QGridLayout" name="gridLayout_4">
         <item row="0" column="0">
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <widget class="QToolButton" name="ButtonStart">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>68</height>
-               </size>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QToolButton
+           <widget class="QFrame" name="frame_2">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>100</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QFrame#frame_2
+{
+background-color: rgb(235,241,245);
+border: none;
+border-top-left-radius: 4px;
+border-top-right-radius: 4px;
+border-bottom-right-radius: 4px;
+border-bottom-left-radius: 4px;
+}</string>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_12">
+             <item row="0" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <item>
+                <widget class="QToolButton" name="ButtonStart">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>68</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QToolButton
 { 
-background: rgba(240, 240, 240, 255); 
+background: rgb(235,241,245);
 image: url(&quot;:/icons/start_normal.png&quot;);
 image-position:bottom;
 border: none; 
 padding-top: -20px;
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: bold;
+font-size:15px;
 }
 
 QToolButton:hover 
 { 
-background: rgba(209, 241, 255, 255); 
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(40, 183, 121, 255), stop:1 rgba(23, 166, 104, 255));
+color: white;
 }
 
 QToolButton:pressed
@@ -696,61 +950,66 @@ image: url(&quot;:/icons/start_selected.png&quot;);
 
 QToolButton:disabled
 { 
-background: rgba(240, 240, 240, 255); 
+background:rgb(235,241,245);
 image: url(&quot;:/icons/start_disabled.png&quot;);
 }</string>
-              </property>
-              <property name="text">
-               <string>Start</string>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>48</width>
-                <height>48</height>
-               </size>
-              </property>
-              <property name="checkable">
-               <bool>false</bool>
-              </property>
-              <property name="checked">
-               <bool>false</bool>
-              </property>
-              <property name="toolButtonStyle">
-               <enum>Qt::ToolButtonTextUnderIcon</enum>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="ButtonPause">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>68</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>68</height>
-               </size>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QToolButton
+                 </property>
+                 <property name="text">
+                  <string>Start</string>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>48</width>
+                   <height>48</height>
+                  </size>
+                 </property>
+                 <property name="checkable">
+                  <bool>false</bool>
+                 </property>
+                 <property name="checked">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolButtonStyle">
+                  <enum>Qt::ToolButtonTextUnderIcon</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="ButtonPause">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>68</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>68</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QToolButton
 { 
-background: rgba(240, 240, 240, 255); 
+background: rgb(235,241,245);
 image: url(&quot;:/icons/pause_normal.png&quot;);
 image-position: bottom;
 border: none; 
 padding-bottom: -3px;
 padding-top: -23px;
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: bold;
+font-size:15px;
 }
 
 QToolButton:hover 
 { 
-background: rgba(209, 241, 255, 255); 
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 184, 72, 255), stop:1 rgba(218, 150, 39, 255));
+color: white;
 }
 
 QToolButton:pressed
@@ -761,48 +1020,53 @@ image: url(&quot;:/icons/pause_selected.png&quot;);
 
 QToolButton:disabled
 { 
-background: rgba(240, 240, 240, 255); 
+background: rgb(235,241,245);
 image: url(&quot;:/icons/pause_disabled.png&quot;);
 }</string>
-              </property>
-              <property name="text">
-               <string>Pause</string>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>48</width>
-                <height>48</height>
-               </size>
-              </property>
-              <property name="toolButtonStyle">
-               <enum>Qt::ToolButtonTextUnderIcon</enum>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="ButtonStop">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>68</height>
-               </size>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QToolButton
+                 </property>
+                 <property name="text">
+                  <string>Pause</string>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>48</width>
+                   <height>48</height>
+                  </size>
+                 </property>
+                 <property name="toolButtonStyle">
+                  <enum>Qt::ToolButtonTextUnderIcon</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="ButtonStop">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>68</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QToolButton
 { 
-background: rgba(240, 240, 240, 255); 
+background: rgb(235,241,245);
 image: url(&quot;:/icons/stop_normal.png&quot;);
 image-position:bottom;
 border: none; 
 padding-top: -20px;
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: bold;
+font-size:15px;
 }
 
 QToolButton:hover 
 { 
-background: rgba(209, 241, 255, 255); 
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(224, 34, 34, 255), stop:1 rgba(167, 24, 24, 255));
+color: white;
 }
 
 QToolButton:pressed
@@ -813,129 +1077,213 @@ image: url(&quot;:/icons/stop_selected.png&quot;);
 
 QToolButton:disabled
 { 
-background: rgba(240, 240, 240, 255); 
+background: rgb(235,241,245);
 image: url(&quot;:/icons/stop_disabled.png&quot;);
 }</string>
-              </property>
-              <property name="text">
-               <string>Stop</string>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>48</width>
-                <height>48</height>
-               </size>
-              </property>
-              <property name="toolButtonStyle">
-               <enum>Qt::ToolButtonTextUnderIcon</enum>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QGridLayout" name="gridLayout_9">
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_23">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Objective function evaluations</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="2">
-               <widget class="QLabel" name="labelElapsedTime">
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2">
-               <widget class="QLabel" name="labelStartedTime">
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="2">
-               <widget class="QLabel" name="labelEvalFunc">
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_22">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Elapsed time:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLabel" name="labelStartedDate">
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_21">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Started date and time:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_28">
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Current run</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2">
-               <widget class="QLabel" name="labelRun">
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
+                 </property>
+                 <property name="text">
+                  <string>Stop</string>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>48</width>
+                   <height>48</height>
+                  </size>
+                 </property>
+                 <property name="toolButtonStyle">
+                  <enum>Qt::ToolButtonTextUnderIcon</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QGridLayout" name="gridLayout_9">
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="label_23">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Objective function evaluations</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="2">
+                  <widget class="QLabel" name="labelElapsedTime">
+                   <property name="styleSheet">
+                    <string notr="true">QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QLabel" name="labelStartedTime">
+                   <property name="styleSheet">
+                    <string notr="true">QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="2">
+                  <widget class="QLabel" name="labelEvalFunc">
+                   <property name="styleSheet">
+                    <string notr="true">QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_22">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Elapsed time:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLabel" name="labelStartedDate">
+                   <property name="styleSheet">
+                    <string notr="true">QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_21">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Started date and time:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_28">
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Current run</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="2">
+                  <widget class="QLabel" name="labelRun">
+                   <property name="styleSheet">
+                    <string notr="true">QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item>
            <widget class="QSplitter" name="splitter_2">
@@ -950,7 +1298,7 @@ image: url(&quot;:/icons/stop_disabled.png&quot;);
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>200</height>
+                <height>250</height>
                </size>
               </property>
               <property name="frameShape">
@@ -963,12 +1311,59 @@ image: url(&quot;:/icons/stop_disabled.png&quot;);
              <widget class="QWidget" name="verticalLayoutWidget_2">
               <layout class="QVBoxLayout" name="verticalLayout_2">
                <item>
-                <widget class="QTextEdit" name="textEdit"/>
+                <widget class="QTextEdit" name="textEdit">
+                 <property name="styleSheet">
+                  <string notr="true">QScrollBar
+{
+background: rgb(244, 244, 244);
+}
+QScrollBar::handle:vertical {
+background: rgb(138, 149, 165);
+min-height: 0px;
+}
+
+QScrollBar::add-line:vertical {
+height: 0px;
+subcontrol-position: bottom;
+subcontrol-origin: margin;
+}
+QScrollBar::sub-line:vertical {
+height: 0px;
+subcontrol-position: top;
+subcontrol-origin: margin;
+}
+
+QScrollBar::handle:horizontal {
+background: rgb(138, 149, 165);
+min-height: 0px;
+}
+
+QScrollBar::add-line:horizontal {
+height: 0px;
+subcontrol-position: bottom;
+subcontrol-origin: margin;
+}
+QScrollBar::sub-line:horizontal {
+height: 0px;
+subcontrol-position: top;
+subcontrol-origin: margin;
+}</string>
+                 </property>
+                </widget>
                </item>
                <item>
                 <layout class="QGridLayout" name="gridLayout">
                  <item row="0" column="0">
                   <widget class="QLabel" name="label_6">
+                   <property name="styleSheet">
+                    <string notr="true">QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}</string>
+                   </property>
                    <property name="text">
                     <string>Progress</string>
                    </property>
@@ -976,8 +1371,27 @@ image: url(&quot;:/icons/stop_disabled.png&quot;);
                  </item>
                  <item row="0" column="1">
                   <widget class="QProgressBar" name="progressBar">
+                   <property name="styleSheet">
+                    <string notr="true">QProgressBar
+{
+border: 2px solid white;
+border-radius: 5px;
+background: rgb(206,241,255);
+}
+
+QProgressBar::chunk
+{
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(0, 172, 239, 255), stop:1 rgba(16, 148, 232, 255));
+}</string>
+                   </property>
                    <property name="value">
                     <number>0</number>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
                    </property>
                   </widget>
                  </item>
@@ -1017,36 +1431,54 @@ image: url(&quot;:/icons/stop_disabled.png&quot;);
        </layout>
       </widget>
       <widget class="QWidget" name="pageResults">
+       <property name="styleSheet">
+        <string notr="true">QWidget#pageResults
+{
+background: rgb(255, 255, 255);
+}</string>
+       </property>
        <layout class="QGridLayout" name="gridLayout_8">
+        <property name="leftMargin">
+         <number>9</number>
+        </property>
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabWidget">
           <property name="styleSheet">
            <string notr="true">QTabWidget
 {
-border: none;
+background: rgb(255, 255, 255); 
 }
 
-QTabWidget:pane
+QTabWidget::pane
 {
 border: none;
+background: rgb(235, 241, 245); 
 }
 
 QTabBar:tab
 {
-background: rgba(240, 240, 240, 255); 
+background: rgb(255, 255, 255); 
+color: rgb(138,149,165);
 padding: 10px;
-border-left: 1px gray;
-border-right: 1px gray;
-border-style: solid;
+font-family: Dosis;
+font-weight: bold;
+font-size:15px;
+width: 100px;
 }
 QTabBar:tab:hover
 {
-background: rgba(209, 241, 255, 255); 
+background: rgb(235, 241, 245); 
 }
 
 QTabBar:tab:selected
 {
-background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.2, stop:0 rgba(0, 104, 151, 200), stop:1 rgba(0, 173, 250, 255)); 
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgb(40, 183, 121), stop:1 rgb(23, 166, 104)); 
+border-top: 1px solid rgb(70, 215, 151);
+border-left: 1px solid rgb(70, 215, 151);
+border-right: 1px solid rgb(70, 215, 151);
+border-top-left-radius: 4px;
+border-top-right-radius: 4px;
+color: rgb(255,255,255);
 }</string>
           </property>
           <property name="tabPosition">
@@ -1082,6 +1514,15 @@ background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.2, stop:0 rgba(0,
                   <height>25</height>
                  </size>
                 </property>
+                <property name="styleSheet">
+                 <string notr="true">QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}</string>
+                </property>
                 <property name="text">
                  <string>Best found solution</string>
                 </property>
@@ -1105,6 +1546,47 @@ background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.2, stop:0 rgba(0,
                   <height>16777215</height>
                  </size>
                 </property>
+                <property name="styleSheet">
+                 <string notr="true">GraphWidget
+{
+	background-color: rgb(255, 255, 255);
+}
+QScrollBar
+{
+background: rgb(244, 244, 244);
+}
+QScrollBar::handle:vertical {
+background: rgb(138, 149, 165);
+min-height: 0px;
+}
+
+QScrollBar::add-line:vertical {
+height: 0px;
+subcontrol-position: bottom;
+subcontrol-origin: margin;
+}
+QScrollBar::sub-line:vertical {
+height: 0px;
+subcontrol-position: top;
+subcontrol-origin: margin;
+}
+
+QScrollBar::handle:horizontal {
+background: rgb(138, 149, 165);
+min-height: 0px;
+}
+
+QScrollBar::add-line:horizontal {
+height: 0px;
+subcontrol-position: bottom;
+subcontrol-origin: margin;
+}
+QScrollBar::sub-line:horizontal {
+height: 0px;
+subcontrol-position: top;
+subcontrol-origin: margin;
+}</string>
+                </property>
                </widget>
               </item>
              </layout>
@@ -1124,6 +1606,63 @@ background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.2, stop:0 rgba(0,
                  <enum>Qt::Horizontal</enum>
                 </property>
                 <widget class="QTableWidget" name="tableRuns">
+                 <property name="styleSheet">
+                  <string notr="true">QHeaderView::section
+{
+background: rgb(111,125,149);
+color: rgb(255,255,255);
+border: 1px solid #bdc3ce;
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}
+
+QTableView
+{
+selection-background-color: rgb(40,126,185);
+}
+
+QTableView::item:selected
+{
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(133, 43, 153, 255), stop:1 rgba(116, 29, 136, 255));
+}
+
+QScrollBar
+{
+background: rgb(244, 244, 244);
+}
+QScrollBar::handle:vertical {
+background: rgb(138, 149, 165);
+min-height: 0px;
+}
+
+QScrollBar::add-line:vertical {
+height: 0px;
+subcontrol-position: bottom;
+subcontrol-origin: margin;
+}
+QScrollBar::sub-line:vertical {
+height: 0px;
+subcontrol-position: top;
+subcontrol-origin: margin;
+}
+
+QScrollBar::handle:horizontal {
+background: rgb(138, 149, 165);
+min-height: 0px;
+}
+
+QScrollBar::add-line:horizontal {
+height: 0px;
+subcontrol-position: bottom;
+subcontrol-origin: margin;
+}
+QScrollBar::sub-line:horizontal {
+height: 0px;
+subcontrol-position: top;
+subcontrol-origin: margin;
+}</string>
+                 </property>
                  <property name="selectionMode">
                   <enum>QAbstractItemView::SingleSelection</enum>
                  </property>
@@ -1171,6 +1710,15 @@ background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.2, stop:0 rgba(0,
                       <height>20</height>
                      </size>
                     </property>
+                    <property name="styleSheet">
+                     <string notr="true">QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}</string>
+                    </property>
                     <property name="text">
                      <string>Statistic</string>
                     </property>
@@ -1194,13 +1742,60 @@ background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.2, stop:0 rgba(0,
                       <height>20</height>
                      </size>
                     </property>
+                    <property name="styleSheet">
+                     <string notr="true">QLabel
+{
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: medium;
+font-size:14px;
+}</string>
+                    </property>
                     <property name="text">
                      <string>Tree view</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="GraphWidget" name="singletreeGraph" native="true"/>
+                   <widget class="GraphWidget" name="singletreeGraph" native="true">
+                    <property name="styleSheet">
+                     <string notr="true">QScrollBar
+{
+background: rgb(244, 244, 244);
+}
+QScrollBar::handle:vertical {
+background: rgb(138, 149, 165);
+min-height: 0px;
+}
+
+QScrollBar::add-line:vertical {
+height: 0px;
+subcontrol-position: bottom;
+subcontrol-origin: margin;
+}
+QScrollBar::sub-line:vertical {
+height: 0px;
+subcontrol-position: top;
+subcontrol-origin: margin;
+}
+
+QScrollBar::handle:horizontal {
+background: rgb(138, 149, 165);
+min-height: 0px;
+}
+
+QScrollBar::add-line:horizontal {
+height: 0px;
+subcontrol-position: bottom;
+subcontrol-origin: margin;
+}
+QScrollBar::sub-line:horizontal {
+height: 0px;
+subcontrol-position: top;
+subcontrol-origin: margin;
+}</string>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </widget>
@@ -1234,7 +1829,7 @@ background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.2, stop:0 rgba(0,
      <x>0</x>
      <y>0</y>
      <width>966</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
