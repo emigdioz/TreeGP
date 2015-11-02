@@ -6,6 +6,7 @@
 #include "node.h"
 #include "edge.h"
 #include <QGraphicsView>
+#include <QFontDatabase>
 
 Q_DECLARE_METATYPE(Worker::Stats);  // Needed for MetaType recognize new data type
 Q_DECLARE_METATYPE(Worker::TreeStruct);
@@ -29,7 +30,8 @@ public:
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
-{
+{    
+    int id = QFontDatabase::addApplicationFont(":/fonts/Dosis-Medium.ttf");
     ui->setupUi(this);
     ui->progressBar->setMaximum(100);
     ui->progressBar->setMinimum(1);
