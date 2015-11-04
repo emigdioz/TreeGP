@@ -44,6 +44,7 @@
 #include <QGraphicsItem>
 #include <QList>
 #include <QString>
+#include <QGraphicsView>
 
 class Edge;
 class GraphWidget;
@@ -73,13 +74,17 @@ public:
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) Q_DECL_OVERRIDE;
 
-    void mousePressEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
+    //void mousePressEvent(QMouseEvent *event);
+    //void mouseReleaseEvent(QMouseEvent *event);
 
 private:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     QList<Edge *> edgeList;
     QPointF newPos;
     GraphWidget *graph;
+    bool _pan;
+    int _panStartX, _panStartY;
 };
 
 #endif // NODE_H
