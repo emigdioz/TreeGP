@@ -37,6 +37,7 @@ public:
     ~MainWindow();
     void calculateQuartiles(std::vector<double> data, double &Q1, double &Q2, double &Q3, double &min, double &max);
     int runCount;
+    int batchRun;
 
 private:
     /**
@@ -60,6 +61,7 @@ private:
     Worker::TreeStruct selectedTree;
     std::vector<Worker::TreeStruct> runTree;
     std::vector<Worker::Stats> runStats;
+    QVector<QString> TreeString;
 
     int plot3D_width1;
     int plot3D_width2;
@@ -72,6 +74,8 @@ private:
     void view_single_tree(Worker::TreeStruct data);
     QCPStatisticalBox *trainBox;
     QCPStatisticalBox *testBox;
+    bool run_batch;
+    bool openColorMap(Qwt3D::ColorVector& cv, QString fname);
 
 private slots:
     void runGP();
@@ -105,5 +109,7 @@ private slots:
     void showElapsedTime();
     void on_listTerminals_itemSelectionChanged();
     void on_tableRuns_itemSelectionChanged();
+    void on_ButtonBatch_clicked();
+    void on_spinBoxRuns_valueChanged(int arg1);
 };
 #endif // MAINWINDOW_H
