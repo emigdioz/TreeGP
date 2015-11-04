@@ -228,7 +228,7 @@ background: rgb(244, 244, 244);
 }
 QScrollBar::handle:vertical {
 background: rgb(138, 149, 165);
-min-height: 0px;
+min-height: 20px;
 }
 
 QScrollBar::add-line:vertical {
@@ -244,7 +244,7 @@ subcontrol-origin: margin;
 
 QScrollBar::handle:horizontal {
 background: rgb(138, 149, 165);
-min-height: 0px;
+min-width: 20px;
 }
 
 QScrollBar::add-line:horizontal {
@@ -402,6 +402,17 @@ QSpinBox::up-button {
     subcontrol-position: top right; /* position at the top right corner */
 	background: #d9e4eb;
     border-width: 1px;
+}
+QSpinBox::up-arrow {
+    image: url(:/icons/up_arrow.png);
+    width: 7px;
+    height: 7px;
+}
+
+QSpinBox::down-arrow {
+    image: url(:/icons/down_arrow.png);
+    width: 7px;
+    height: 7px;
 }
 QSpinBox::up-button:hover {
 background: #00acef;
@@ -955,7 +966,7 @@ image: url(&quot;:/icons/start_disabled.png&quot;);
 }</string>
                  </property>
                  <property name="text">
-                  <string>Start</string>
+                  <string>Single</string>
                  </property>
                  <property name="iconSize">
                   <size>
@@ -971,6 +982,54 @@ image: url(&quot;:/icons/start_disabled.png&quot;);
                  </property>
                  <property name="toolButtonStyle">
                   <enum>Qt::ToolButtonTextUnderIcon</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="ButtonBatch">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>68</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QToolButton
+{ 
+background: rgb(235,241,245);
+image: url(&quot;:/icons/start_normal.png&quot;);
+image-position:bottom;
+border: none; 
+padding-top: -20px;
+color: rgb(138,149,165);
+font-family: Dosis;
+font-weight: bold;
+font-size:15px;
+}
+
+QToolButton:hover 
+{ 
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(40, 183, 121, 255), stop:1 rgba(23, 166, 104, 255));
+color: white;
+}
+
+QToolButton:pressed
+{ 
+background: rgba(0, 173, 250, 255); 
+image: url(&quot;:/icons/start_selected.png&quot;);
+}
+
+QToolButton:disabled
+{ 
+background:rgb(235,241,245);
+image: url(&quot;:/icons/start_disabled.png&quot;);
+}</string>
+                 </property>
+                 <property name="text">
+                  <string>Batch</string>
                  </property>
                 </widget>
                </item>
@@ -1606,6 +1665,12 @@ subcontrol-origin: margin;
                  <enum>Qt::Horizontal</enum>
                 </property>
                 <widget class="QTableWidget" name="tableRuns">
+                 <property name="minimumSize">
+                  <size>
+                   <width>200</width>
+                   <height>0</height>
+                  </size>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QHeaderView::section
 {
@@ -1802,7 +1867,7 @@ subcontrol-origin: margin;
                </widget>
               </item>
               <item>
-               <widget class="QTextEdit" name="textEdit_2">
+               <widget class="QTextEdit" name="textEditTree2">
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
@@ -1829,7 +1894,7 @@ subcontrol-origin: margin;
      <x>0</x>
      <y>0</y>
      <width>966</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
