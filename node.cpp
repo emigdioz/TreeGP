@@ -135,12 +135,18 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 
 void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    update();
-    QGraphicsItem::mousePressEvent(event);
+    if (event->button() == Qt::LeftButton)
+    {
+      update();
+      QGraphicsItem::mousePressEvent(event);
+    }
 }
 
 void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+  if (event->button() == Qt::LeftButton)
+  {
     update();
     QGraphicsItem::mouseReleaseEvent(event);
+  }
 }
