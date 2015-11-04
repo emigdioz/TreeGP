@@ -34,6 +34,8 @@
         <file>sin_selected.png</file>
         <file>substract_normal.png</file>
         <file>substract_selected.png</file>
+        <file>down_arrow.png</file>
+        <file>up_arrow.png</file>
     </qresource>
     <qresource prefix="/fonts">
         <file>Dosis-Medium.ttf</file>
