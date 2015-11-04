@@ -7,6 +7,7 @@
 #include "edge.h"
 #include <QGraphicsView>
 #include <QFontDatabase>
+#include <fstream>
 
 Q_DECLARE_METATYPE(Worker::Stats);  // Needed for MetaType recognize new data type
 Q_DECLARE_METATYPE(Worker::TreeStruct);
@@ -36,6 +37,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->progressBar->setMaximum(100);
     ui->progressBar->setMinimum(1);
     runCount = 0;
+    batchRun = 0;
+    model = new QStandardItemModel(this);
+    ui->tableView->setModel(model);
     // Limit numeric values for parameter inputs
     QRegExp Integer("^[0-9]{1,5}$");
     QRegExp Floating("^[0-9]\.?[0-9]{1,5}$");
@@ -80,16 +84,22 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(timerGP, SIGNAL(timeout()), this, SLOT(showElapsedTime()));
 
     // 3d Plot
+    Qwt3D::ColorVector cv;
+    Qwt3D::StandardColor col_;
+    openColorMap(cv, "ROYAL.MAP");
+    col_.setColorVector(cv);
     QGridLayout *grid = new QGridLayout(ui->frame);
     plot = new Qwt3D::GridPlot(ui->frame);
     grid->addWidget( plot, 0, 0 );
+    plot->setDataColor(col_);
+
 
     worker->trainingP = ui->horizontalSlider->value(); // Training size in percentage
 
     // Tree graph
     QGraphicsScene *scene = new QGraphicsScene(ui->treeGraph);
     scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-    scene->setSceneRect(0, 0, 1000, 2000);
+    scene->setSceneRect(0, 0, 6000, 2000);
     ui->treeGraph->setScene(scene);
     ui->treeGraph->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     ui->treeGraph->setRenderHint(QPainter::Antialiasing);
@@ -99,7 +109,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QGraphicsScene *sceneSingle = new QGraphicsScene(ui->singletreeGraph);
     sceneSingle->setItemIndexMethod(QGraphicsScene::NoIndex);
-    sceneSingle->setSceneRect(0, 0, 1000, 2000);
+    sceneSingle->setSceneRect(0, 0, 6000, 2000);
     ui->singletreeGraph->setScene(sceneSingle);
     ui->singletreeGraph->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     ui->singletreeGraph->setRenderHint(QPainter::Antialiasing);
@@ -264,20 +274,6 @@ void MainWindow::setupPlots()
   ui->boxPlot->xAxis->setSubTickPen(QColor(127, 127, 127, 255));
   ui->boxPlot->yAxis->setTickPen(QColor(127, 127, 127, 255));
   ui->boxPlot->yAxis->setSubTickPen(QColor(127, 127, 127, 255));
-}
-
-void MainWindow::runGP()
-{
-    // To avoid having two threads running simultaneously, the previous thread is aborted.
-    worker->abort();
-    thread->wait(); // If the thread is not running, this will immediately return.
-    worker->requestWork();
-    GPthreadstarted = true;
-    ui->labelElapsedTime->setText("0");
-    showStartedTime();
-    showStartedDate();
-    startedDateTime = QDateTime::currentDateTime();
-    timerGP->start(1000);
 }
 
 MainWindow::~MainWindow()
@@ -542,7 +538,7 @@ void MainWindow::received_tree(Worker::TreeStruct data)
     nLeaves = countLeaves(i,nLeaves);
   }
   spanx = spanx * nLeaves;
-  startx = -(spanx/2) + 500;
+  startx = -(spanx/2) + 3000;
 
   positionLeaves(0,0);
   positionParents(0,0);
@@ -600,7 +596,7 @@ void MainWindow::view_single_tree(Worker::TreeStruct data)
     nLeaves = countLeaves(i,nLeaves);
   }
   spanx = spanx * nLeaves;
-  startx = -(spanx/2) + 500;
+  startx = -(spanx/2) + 3000;
 
   positionLeaves(0,0);
   positionParents(0,0);
@@ -692,22 +688,109 @@ void MainWindow::positionParents(int index,int depth)
   }
 }
 
+void MainWindow::runGP()
+{
+    // To avoid having two threads running simultaneously, the previous thread is aborted.
+    worker->abort();
+    thread->wait(); // If the thread is not running, this will immediately return.
+    worker->requestWork();
+    GPthreadstarted = true;
+}
+
+void MainWindow::on_ButtonStart_clicked()
+{
+  if(!GPthreadstarted) {
+      ui->textEdit->clear();
+      ui->outputPlot->graph(0)->clearData();
+      ui->outputPlot->graph(1)->clearData();
+      ui->sizePlot->graph(0)->clearData();
+      ui->sizePlot->graph(1)->clearData();
+      ui->sizePlot->graph(2)->clearData();
+      maxSize = 0;
+      maxFitness = 1;
+      ui->treeGraph->scene()->clear();
+      runCount += 1;
+      ui->labelRun->setText(QString::number(runCount));
+      ui->ButtonBatch->setEnabled(false);
+      run_batch = false;
+      ui->labelElapsedTime->setText("0");
+      showStartedTime();
+      showStartedDate();
+      startedDateTime = QDateTime::currentDateTime();
+      timerGP->start(1000);
+      runGP();
+  }
+}
+
+void MainWindow::on_ButtonBatch_clicked()
+{
+  if(!GPthreadstarted) {
+      ui->textEdit->clear();
+      ui->outputPlot->graph(0)->clearData();
+      ui->outputPlot->graph(1)->clearData();
+      ui->sizePlot->graph(0)->clearData();
+      ui->sizePlot->graph(1)->clearData();
+      ui->sizePlot->graph(2)->clearData();
+      maxSize = 0;
+      maxFitness = 1;
+      ui->treeGraph->scene()->clear();
+      if(batchRun == 0) {
+        ui->labelElapsedTime->setText("0");
+        showStartedTime();
+        showStartedDate();
+        startedDateTime = QDateTime::currentDateTime();
+        timerGP->start(1000);
+      }
+      batchRun += 1;
+      runCount += 1;
+      ui->labelRun->setText(QString::number(runCount));
+      ui->ButtonStart->setEnabled(false);
+      run_batch = true;
+      runGP();
+  }
+}
+
+void MainWindow::on_ButtonStop_clicked()
+{
+  if(GPthreadstarted) {
+    worker->abort();
+    thread->wait(); // If the thread is not running, this will immediately return.
+    ui->ButtonStart->setEnabled(true);
+    if(ui->spinBoxRuns->text().toInt() > 1) ui->ButtonBatch->setEnabled(true);
+    ui->ButtonStop->setEnabled(false);
+    GPthreadstarted = false;
+    timerGP->stop();
+  }
+}
+
 void MainWindow::received_GPstarted(QString value)
 {
   int count = ui->spinBoxRuns->text().toInt();
 
   if(QString::compare(value, "Stop", Qt::CaseInsensitive) == 0) {
-    ui->actionRun->setIconText(value);
     ui->ButtonStop->setEnabled(true);
     ui->ButtonStart->setEnabled(false);
+    ui->ButtonBatch->setEnabled(false);
   }
   else
   {
-    ui->ButtonStop->setEnabled(false);
-    ui->ButtonStart->setEnabled(true);
-    timerGP->stop();
-    if(runCount < count) { // Continue following runs
-      on_ButtonStart_clicked();
+    if(run_batch) {
+      if(batchRun < count) { // Continue following runs
+        on_ButtonBatch_clicked();
+      }
+      else {
+        batchRun = 0;
+        timerGP->stop();
+      }
+      ui->ButtonStop->setEnabled(false);
+      ui->ButtonStart->setEnabled(true);
+      if(ui->spinBoxRuns->text().toInt() > 1) ui->ButtonBatch->setEnabled(true);
+    }
+    else {
+      ui->ButtonStop->setEnabled(false);
+      ui->ButtonStart->setEnabled(true);
+      if(ui->spinBoxRuns->text().toInt() > 1) ui->ButtonBatch->setEnabled(true);
+      timerGP->stop();
     }
   }
 }
@@ -759,6 +842,7 @@ void MainWindow::on_actionLoad_file_triggered()
     worker->dataset_cols = iCols;
     worker->dataset_rows = iRows;
     ui->ButtonStart->setEnabled(true);
+    if(ui->spinBoxRuns->text().toInt() > 1) ui->ButtonBatch->setEnabled(true); else ui->ButtonBatch->setEnabled(false);
 
     // Populate variables as terminals
     std::vector<bool> terSelection;
@@ -807,34 +891,6 @@ void MainWindow::thread_finished()
   GPthreadstarted = false;
 }
 
-void MainWindow::on_ButtonStart_clicked()
-{
-  if(!GPthreadstarted) {    
-      ui->textEdit->clear();
-      ui->outputPlot->graph(0)->clearData();
-      ui->outputPlot->graph(1)->clearData();
-      ui->sizePlot->graph(0)->clearData();
-      ui->sizePlot->graph(1)->clearData();
-      ui->sizePlot->graph(2)->clearData();
-      maxSize = 0;
-      maxFitness = 1;
-      ui->treeGraph->scene()->clear();
-      runCount += 1;
-      ui->labelRun->setText(QString::number(runCount));
-      runGP();
-  }
-}
-
-void MainWindow::on_ButtonStop_clicked()
-{
-  if(GPthreadstarted) {
-    worker->abort();
-    thread->wait(); // If the thread is not running, this will immediately return.
-    ui->ButtonStart->setEnabled(true);
-    ui->ButtonStop->setEnabled(false);
-    GPthreadstarted = false;
-  }
-}
 
 void MainWindow::on_listFunctions_itemSelectionChanged()
 {
@@ -951,6 +1007,7 @@ void MainWindow::showStartedDate()
 void MainWindow::received_tree_string(const QString data)
 {
   ui->textEditTree->setText(data);
+  TreeString.push_back(data);
 }
 
 void MainWindow::on_listTerminals_itemSelectionChanged()
@@ -961,7 +1018,14 @@ void MainWindow::on_listTerminals_itemSelectionChanged()
       if(ui->listTerminals->item(i)->isSelected()) terSelection.push_back(true); else terSelection.push_back(false);
       if((ui->listTerminals->item(i)->isSelected()) && (i<ui->listTerminals->count())) count += 1; // Ignore ERC terminal
     }
-    if(count<1) ui->ButtonStart->setEnabled(false); else ui->ButtonStart->setEnabled(true);
+    if(count<1) {
+        ui->ButtonStart->setEnabled(false);
+        if(ui->spinBoxRuns->text().toInt() > 1) ui->ButtonBatch->setEnabled(false);
+    }
+    else {
+        ui->ButtonStart->setEnabled(true);
+        if(ui->spinBoxRuns->text().toInt() > 1) ui->ButtonBatch->setEnabled(true);
+    }
     worker->terminalselection = terSelection;
 
 }
@@ -976,5 +1040,44 @@ void MainWindow::on_tableRuns_itemSelectionChanged()
       }
       ui->singletreeGraph->scene()->clear();
       view_single_tree(runTree.at(row));
+      ui->textEditTree2->setText(TreeString.at(row));
     }
+}
+
+bool MainWindow::openColorMap(Qwt3D::ColorVector& cv, QString fname)
+{
+  if (fname.isEmpty())
+    return false;
+
+  std::ifstream file(QWT3DLOCAL8BIT(fname));
+
+	if (!file)
+		return false;
+
+	Qwt3D::RGBA rgb;
+	cv.clear();
+
+	while ( file )
+	{
+		file >> rgb.r >> rgb.g >> rgb.b;
+		file.ignore(1000,'\n');
+		if (!file.good())
+			break;
+		else
+		{
+			rgb.a = 1;
+			rgb.r /= 255;
+			rgb.g /= 255;
+			rgb.b /= 255;
+			cv.push_back(rgb);
+		}
+	}
+
+	return true;
+}
+
+void MainWindow::on_spinBoxRuns_valueChanged(int arg1)
+{
+  if((ui->tableView->model()->rowCount() != 0) && (arg1 > 1)) ui->ButtonBatch->setEnabled(true);
+  else ui->ButtonBatch->setEnabled(false);
 }
