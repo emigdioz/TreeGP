@@ -11,8 +11,7 @@
 namespace Qwt3D
 {
 
-  #define QWT3DLOCAL8BIT(qstring) \
-  ((const char*)(qstring.toLocal8Bit()))
+  #define QWT3DLOCAL8BIT(qstring) ((const char*)(qstring.toLocal8Bit()))
   
   const Qt::TextFlag SingleLine = Qt::TextSingleLine;
   
