@@ -386,11 +386,15 @@ int Worker::start_main(void) {
   emit Worker::send_tree(chosenTree);
 
   lBestIndividual[0].write_qstring(output);
+
   emit Worker::valueChanged("Best individual at generation " + QString::number(i-1) + " is: " + output + " with fitness: " + QString::number(lBestIndividual[0].mFitness));
   emit Worker::send_tree_string(output);
   std::cout << *lBestIndividual << std:: endl;
   emit Worker::send_stats_end(GPthis);
 
+  //output.clear();
+  //lBestIndividual[0].write_qstring_infix(output);
+  //qDebug()<<"Infix :"<<output;
   //std::cout << lBestIndividual[0].mFitness << std:: endl;
 
   //std::cout << "Exiting program" << std::endl << std::flush;
