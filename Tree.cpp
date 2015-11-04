@@ -149,3 +149,27 @@ void Puppy::Tree::write_qstring(QString& ioOS, unsigned int inIndex) const
   }
   if(lNbArgs > 0) ioOS.append(")");
 }
+
+void Puppy::Tree::write_qstring_infix(QString& ioOS, unsigned int inIndex) const
+{
+  assert(inIndex < size());
+  QVector<QString> args;
+  QString output;
+  unsigned int lNbArgs = (*this)[inIndex].mPrimitive->getNumberArguments();
+  //output.append(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
+  unsigned int j = inIndex + 1;
+  for(unsigned int i=0; i<lNbArgs; ++i) {
+    write_qstring_infix(ioOS, j);
+    args.push_back(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
+    j += (*this)[j].mSubTreeSize;
+  }
+  if(lNbArgs == 2) {
+    ioOS.append("(");
+    ioOS.append(args.at(0));
+    ioOS.append(" ");
+    ioOS.append(output);
+    ioOS.append(" ");
+    ioOS.append(args.at(1));
+    ioOS.append(")");
+  }
+}
