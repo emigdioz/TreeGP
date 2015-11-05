@@ -35,7 +35,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     Qwt3D::GridPlot* plot;
     ~MainWindow();
-    void calculateQuartiles(std::vector<double> data, double &Q1, double &Q2, double &Q3, double &min, double &max);
+    void calculateQuartiles(std::vector<double> data, double &Q1, double &Q2, double &Q3, double &min, double &max, QVector<double> &outliers);
     int runCount;
     int batchRun;
 
