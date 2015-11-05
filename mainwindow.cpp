@@ -337,12 +337,14 @@ void MainWindow::initializePlots()
 
 }
 
-void MainWindow::calculateQuartiles(std::vector<double> data, double &Q1, double &Q2, double &Q3, double &min, double &max)
+void MainWindow::calculateQuartiles(std::vector<double> data, double &Q1, double &Q2, double &Q3, double &min, double &max, QVector<double> &outliers)
 {
   typedef std::vector<double>::size_type vecSize;
   vecSize N = data.size();
   if(N == 0) return; // No data!
   else sort(data.begin(),data.end()); // Sort vector
+
+  double IQR;
 
   // declare new variables
   vecSize NMod4 = (N % 4);  // identification of 1 of the 4 known datum distribution profiles
@@ -410,8 +412,26 @@ void MainWindow::calculateQuartiles(std::vector<double> data, double &Q1, double
   Q1 = ml;
   Q2 = m;
   Q3 = mu;
-  min = *min_element(data.begin(),data.end());
-  max = *max_element(data.begin(),data.end());
+  IQR = Q3-Q1;
+  int lcount = 0;
+  int ucount = N-1;
+  unsigned int i;
+  for(i=0;i<N;i++)
+  {
+    if(data[i] < (Q1-(1.5*IQR))) {
+      outliers.push_back(data[i]); // lower data
+      lcount = i + 1;
+    }
+  }
+  for(i=N;i>0;i--)
+  {
+    if(data[i-1] > (Q3+(1.5*IQR))) {
+      outliers.push_back(data[i-1]); // upper data
+      ucount = i - 2;
+    }
+  }
+  min = data[lcount];
+  max = data[ucount];
 }
 
 void MainWindow::plot3DUpdateData(Worker::fitnessdata data)
@@ -477,6 +497,8 @@ void MainWindow::received_stats_end(Worker::Stats data)
 {
   // Populate stats for current run
   runStats.push_back(data);
+  QVector<double> outliersTrain;
+  QVector<double> outliersTest;
   int nrows = ui->tableRuns->rowCount();
   ui->tableRuns->insertRow(nrows);
   QTableWidgetItem *item1 = new QTableWidgetItem (tr(QString::number(nrows+1).toLatin1()));
@@ -492,6 +514,7 @@ void MainWindow::received_stats_end(Worker::Stats data)
   ui->tableRuns->setItem(nrows,4,item5);
   ui->tableRuns->setItem(nrows,5,item6);
 
+  nrows = ui->tableRuns->rowCount();
   // Start boxplot data gathering
   if(nrows > 1) {
     double min,max;
@@ -502,8 +525,8 @@ void MainWindow::received_stats_end(Worker::Stats data)
        train.push_back(ui->tableRuns->item(i,1)->text().toDouble());
        test.push_back(ui->tableRuns->item(i,2)->text().toDouble());
     }
-    calculateQuartiles(train,Q1train,Q2train,Q3train,mintrain,maxtrain);
-    calculateQuartiles(test,Q1test,Q2test,Q3test,mintest,maxtest);
+    calculateQuartiles(train,Q1train,Q2train,Q3train,mintrain,maxtrain,outliersTrain);
+    calculateQuartiles(test,Q1test,Q2test,Q3test,mintest,maxtest,outliersTest);
     if(mintrain < mintest) min = mintrain; else min = mintest;
     if(maxtrain > maxtest) max = maxtrain; else max = maxtest;
     trainBox->setKey(1);
@@ -512,14 +535,17 @@ void MainWindow::received_stats_end(Worker::Stats data)
     trainBox->setMedian(Q2train);
     trainBox->setUpperQuartile(Q3train);
     trainBox->setMaximum(maxtrain);
+    trainBox->setOutliers(outliersTrain);
+
     testBox->setKey(2);
     testBox->setMinimum(mintest);
     testBox->setLowerQuartile(Q1test);
     testBox->setMedian(Q2test);
     testBox->setUpperQuartile(Q3test);
     testBox->setMaximum(maxtest);
+    testBox->setOutliers(outliersTest);
     ui->boxPlot->yAxis->setRange(min-((max-min)*0.2),max+((max-min)*0.2));
-    //testBox->setOutliers(QVector<double>() << 0.7 << 0.39 << 0.45 << 6.2 << 5.84);
+
     ui->boxPlot->replot();
   }
 
