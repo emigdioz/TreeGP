@@ -105,9 +105,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->treeGraph->setScene(scene);
     ui->treeGraph->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     ui->treeGraph->setRenderHint(QPainter::Antialiasing);
-    ui->treeGraph->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    ui->treeGraph->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
     ui->treeGraph->scale(qreal(0.5), qreal(0.5));
     ui->treeGraph->setMinimumSize(300, 300);
+    ui->treeGraph->verticalScrollBar()->setSliderPosition(0);
 
     QGraphicsScene *sceneSingle = new QGraphicsScene(ui->singletreeGraph);
     sceneSingle->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -115,9 +116,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->singletreeGraph->setScene(sceneSingle);
     ui->singletreeGraph->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     ui->singletreeGraph->setRenderHint(QPainter::Antialiasing);
-    ui->singletreeGraph->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    ui->singletreeGraph->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
     ui->singletreeGraph->scale(qreal(0.5), qreal(0.5));
     ui->singletreeGraph->setMinimumSize(300, 300);
+    ui->singletreeGraph->verticalScrollBar()->setSliderPosition(0);
 
     // Preselect +,-,/,* as function set
     ui->listFunctions->item(0)->setSelected(true);
@@ -143,6 +145,59 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setupPlots();
     initializePlots();
+
+    QString result;
+    name.push_back("+");
+    name.push_back("X5");
+    name.push_back("/");
+    name.push_back("X7");
+    name.push_back("-");
+    name.push_back("X10");
+    name.push_back("X9");
+    arity.push_back(2);
+    arity.push_back(0);
+    arity.push_back(2);
+    arity.push_back(0);
+    arity.push_back(2);
+    arity.push_back(0);
+    arity.push_back(0);
+    depth.push_back(0);
+    depth.push_back(1);
+    depth.push_back(1);
+    depth.push_back(2);
+    depth.push_back(2);
+    depth.push_back(3);
+    depth.push_back(3);
+    subtreesize.push_back(7);
+    subtreesize.push_back(1);
+    subtreesize.push_back(5);
+    subtreesize.push_back(1);
+    subtreesize.push_back(3);
+    subtreesize.push_back(1);
+    subtreesize.push_back(1);
+    tree2infix(result);
+    qDebug()<<result;
+}
+
+void MainWindow::tree2infix(QString& output, int index) const
+{
+  //output.clear();
+  QString parent;
+  assert(index < name.size());
+  int lNbArgs = arity.at(index);
+  if(lNbArgs > 0) {
+    output.append("(");
+    output.append(name.at(index));
+  }
+
+  unsigned int j = index + 1;
+  for(unsigned int i=0;i<lNbArgs;++i) {
+    output.append(" ");
+    tree2infix(output,j);
+    j += subtreesize.at(j);
+  }
+
+  if(lNbArgs > 0) output.append(")");
 }
 
 void MainWindow::setupPlots()
@@ -570,13 +625,17 @@ void MainWindow::received_tree(Worker::TreeStruct data)
 
   positionLeaves(0,0);
   positionParents(0,0);
+  for(unsigned int i=0;i<selectedTree.mName.size();i++) {
+    if(selectedTree.posY[i]>maxDepth) maxDepth = selectedTree.posY[i];
+  }
+
   // Draw nodes
   for(unsigned int i=0;i<selectedTree.mName.size();i++) {
     Node *node = new Node(ui->treeGraph);
     node->nameNode = selectedTree.mName[i];
     ui->treeGraph->scene()->addItem(node);
     node->setPos((spanx*selectedTree.posX[i])+startx,(spany*selectedTree.posY[i])+starty);
-    if(selectedTree.posY[i]>maxDepth) maxDepth = selectedTree.posY[i];
+    //if(selectedTree.posY[i]>maxDepth) maxDepth = selectedTree.posY[i];
   }
   // Draw connections
   int counter,index;
@@ -609,6 +668,21 @@ void MainWindow::received_tree(Worker::TreeStruct data)
   }
   // Populate tree for current run
   runTree.push_back(data);
+
+  // Draw levels
+  int nitems = ui->treeGraph->scene()->items().size();
+  QFont font;
+  font.setBold(false);
+  font.setPointSize(14);
+
+  for(unsigned int i=0;i<(maxDepth+1);i++) {
+    QPen pen(QColor(240, 240, 240, 255), 30, Qt::SolidLine);
+    QLineF line(startx-100,(spany*i)+starty,spanx+startx,(spany*i)+starty);
+    ui->treeGraph->scene()->addLine(line,pen);
+    ui->treeGraph->scene()->items().at(nitems+(2*i))->setZValue(-2);
+    ui->treeGraph->scene()->addText("Depth "+QString::number(i),font)->setPos(startx-100,(spany*i)+starty-15);
+  }
+  ui->treeGraph->update();
 }
 
 void MainWindow::view_single_tree(Worker::TreeStruct data)

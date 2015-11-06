@@ -77,6 +77,12 @@ private:
     bool run_batch;
     bool openColorMap(Qwt3D::ColorVector& cv, QString fname);
 
+    QVector<int>arity;
+    QVector<int>depth;
+    QVector<QString>name;
+    QVector<int>subtreesize;
+
+    void tree2infix(QString& output, int index=0) const;
 private slots:
     void runGP();
     void on_actionE_xit_triggered();   

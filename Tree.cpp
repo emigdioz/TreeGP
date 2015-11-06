@@ -173,16 +173,46 @@ void Puppy::Tree::write_qstring_infix(QString& ioOS, unsigned int inIndex) const
 //    ioOS.append(")");
 //  }
 
+
+  QString output;
   std::vector<unsigned int> depthv (size(),0);
   extractleavesdepth(depthv);
   extractparentsdepth(depthv);
-
+  //tree2infix(output,depthv);
 }
 
-void Puppy::Tree::tree2infix(QString& ioOS, std::vector<unsigned int> depth, unsigned int inIndex) const
+void Puppy::Tree::tree2infix(QString& ioOS, std::vector<unsigned int> depthV, int index) const
 {
   QVector<QString> args;
+  ioOS.clear();
+  ioOS.append(QString::fromStdString((*this)[index].mPrimitive->getName()));
+  args.clear();
+  unsigned int lNbArgs = (*this)[index].mPrimitive->getNumberArguments();
+  int counter = 0;
+  for(unsigned int i=0;i<lNbArgs;i++) {
+    int currentdepth = depthV.at(index);
+    //find its childrens
+    do {
+      if(depthV.at(counter+index) == (currentdepth+1)) {
+         counter += 1;
+         break;
+      }
+      counter += 1;
+    }while((index + counter)<size());
+    QString children = QString::fromStdString((*this)[index+counter-1].mPrimitive->getName());
+    args.push_back(children);
+    QString text = args.at(i);
+    index += 1;
+    tree2infix(text,depthV,index);
+  }
 
+
+  if(!args.isEmpty()) {
+    unsigned int lNbArgs = (*this)[index].mPrimitive->getNumberArguments();
+    if(lNbArgs==2) {
+      ioOS.append("(" + args.at(0) + ioOS + args.at(1) + ")");
+    }
+  }
 }
 
 void Puppy::Tree::extractparentsdepth(std::vector<unsigned int>& depthV, int index, int depth) const
