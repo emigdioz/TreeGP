@@ -1093,10 +1093,20 @@ bool MainWindow::openColorMap(Qwt3D::ColorVector& cv, QString fname)
   Qwt3D::RGBA rgb;
   cv.clear();
   foreach( QString line, lines ) {
-    QStringList chosenline = line.split(QRegExp("\\s"));
-    QString red = chosenline.at(0);
-    QString green = chosenline.at(1);
-    QString blue = chosenline.at(2);
+    QStringList chosenline = line.split(QRegExp("\\W+"));
+    QString red;
+    QString green;
+    QString blue;
+    if(chosenline.at(0).isEmpty()) {
+      red = chosenline.at(1);
+      green = chosenline.at(2);
+      blue = chosenline.at(3);
+    }
+    else {
+      red = chosenline.at(0);
+      green = chosenline.at(1);
+      blue = chosenline.at(2);
+    }
     rgb.r = red.toDouble();
     rgb.g = green.toDouble();
     rgb.b = blue.toDouble();
