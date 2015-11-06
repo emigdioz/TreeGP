@@ -82,6 +82,9 @@ struct Node {
  */
 class Tree : public std::vector<Node> {
 
+private:
+  void tree2infix(QString& ioOS, std::vector<unsigned int> depth, unsigned int inIndex) const;
+  void extractdepth(std::vector<unsigned int> &depth, int counter=0) const;
 public:
 
   explicit Tree(float inFitness=-1.0, bool inValid=false);
