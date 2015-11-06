@@ -40,7 +40,7 @@
 #include "Context.hpp"
 #include "Tree.hpp"
 #include "TokenT.hpp"
-
+#include <QDebug>
 
 /*!
  *  \brief Construct a new tree, with given fitness and validity flag.
@@ -152,24 +152,45 @@ void Puppy::Tree::write_qstring(QString& ioOS, unsigned int inIndex) const
 
 void Puppy::Tree::write_qstring_infix(QString& ioOS, unsigned int inIndex) const
 {
-  assert(inIndex < size());
+//  assert(inIndex < size());
+//  QVector<QString> args;
+//  QString output;
+//  unsigned int lNbArgs = (*this)[inIndex].mPrimitive->getNumberArguments();
+//  //output.append(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
+//  unsigned int j = inIndex + 1;
+//  for(unsigned int i=0; i<lNbArgs; ++i) {
+//    write_qstring_infix(ioOS, j);
+//    args.push_back(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
+//    j += (*this)[j].mSubTreeSize;
+//  }
+//  if(lNbArgs == 2) {
+//    ioOS.append("(");
+//    ioOS.append(args.at(0));
+//    ioOS.append(" ");
+//    ioOS.append(output);
+//    ioOS.append(" ");
+//    ioOS.append(args.at(1));
+//    ioOS.append(")");
+//  }
+
+  std::vector<unsigned int> depthv;
+  extractdepth(depthv);
+}
+
+void Puppy::Tree::tree2infix(QString& ioOS, std::vector<unsigned int> depth, unsigned int inIndex) const
+{
   QVector<QString> args;
-  QString output;
-  unsigned int lNbArgs = (*this)[inIndex].mPrimitive->getNumberArguments();
-  //output.append(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
-  unsigned int j = inIndex + 1;
-  for(unsigned int i=0; i<lNbArgs; ++i) {
-    write_qstring_infix(ioOS, j);
-    args.push_back(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
+
+}
+
+void Puppy::Tree::extractdepth(std::vector<unsigned int>& depth, int counter) const
+{
+  unsigned int lNbArgs = (*this)[counter].mPrimitive->getNumberArguments();
+  unsigned int j = counter + 1;
+  for(unsigned int i=0;i<lNbArgs;i++) {
+    //depth.push_back(j);
+    qDebug()<<QString::fromStdString((*this)[counter].mPrimitive->getName())<<": "<<j;
+    extractdepth(depth,j);
     j += (*this)[j].mSubTreeSize;
-  }
-  if(lNbArgs == 2) {
-    ioOS.append("(");
-    ioOS.append(args.at(0));
-    ioOS.append(" ");
-    ioOS.append(output);
-    ioOS.append(" ");
-    ioOS.append(args.at(1));
-    ioOS.append(")");
   }
 }
