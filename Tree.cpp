@@ -173,8 +173,10 @@ void Puppy::Tree::write_qstring_infix(QString& ioOS, unsigned int inIndex) const
 //    ioOS.append(")");
 //  }
 
-  std::vector<unsigned int> depthv;
-  extractdepth(depthv);
+  std::vector<unsigned int> depthv (size(),0);
+  extractleavesdepth(depthv);
+  extractparentsdepth(depthv);
+
 }
 
 void Puppy::Tree::tree2infix(QString& ioOS, std::vector<unsigned int> depth, unsigned int inIndex) const
@@ -183,14 +185,40 @@ void Puppy::Tree::tree2infix(QString& ioOS, std::vector<unsigned int> depth, uns
 
 }
 
-void Puppy::Tree::extractdepth(std::vector<unsigned int>& depth, int counter) const
+void Puppy::Tree::extractparentsdepth(std::vector<unsigned int>& depthV, int index, int depth) const
 {
-  unsigned int lNbArgs = (*this)[counter].mPrimitive->getNumberArguments();
-  unsigned int j = counter + 1;
-  for(unsigned int i=0;i<lNbArgs;i++) {
-    //depth.push_back(j);
-    qDebug()<<QString::fromStdString((*this)[counter].mPrimitive->getName())<<": "<<j;
-    extractdepth(depth,j);
+  unsigned int j = index + 1;
+  unsigned int lNbArgs = (*this)[index].mPrimitive->getNumberArguments();
+  for(unsigned int i = 0;i<lNbArgs;i++) {
+    extractparentsdepth(depthV,j,depth+1);
+    j += (*this)[j].mSubTreeSize;
+  }
+  if((*this)[index].mSubTreeSize>1) {
+    int counter = 0;
+    unsigned int lNbArgs = (*this)[index].mPrimitive->getNumberArguments();
+    for(unsigned int k=0;k<lNbArgs;k++) {
+      do // Search for childrens
+      {
+        if(depthV.at(index + counter) == (depth + 1)) {
+          counter += 1;
+          break;
+        }
+        counter += 1;
+      }while((index + counter) < size());
+    }
+    depthV.at(index) = depth;
+  }
+}
+
+void Puppy::Tree::extractleavesdepth(std::vector<unsigned int> &depthV, int index, int depth) const
+{
+  if((*this)[index].mSubTreeSize == 1) {
+    depthV.at(index) = depth;
+  }
+  unsigned int j = index + 1;
+  unsigned int lNbArgs = (*this)[index].mPrimitive->getNumberArguments();
+  for(unsigned int i = 0;i<lNbArgs;i++) {
+    extractleavesdepth(depthV,j,depth+1);
     j += (*this)[j].mSubTreeSize;
   }
 }
