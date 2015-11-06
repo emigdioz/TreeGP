@@ -393,7 +393,7 @@ int Worker::start_main(void) {
   emit Worker::send_stats_end(GPthis);
 
   //output.clear();
-  //lBestIndividual[0].write_qstring_infix(output);
+  lBestIndividual[0].write_qstring_infix(output);
   //qDebug()<<"Infix :"<<output;
   //std::cout << lBestIndividual[0].mFitness << std:: endl;
 
