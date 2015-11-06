@@ -8,6 +8,8 @@
 #include <QGraphicsView>
 #include <QFontDatabase>
 #include <fstream>
+#include <iostream>
+#include <cstdio>
 
 Q_DECLARE_METATYPE(Worker::Stats);  // Needed for MetaType recognize new data type
 Q_DECLARE_METATYPE(Worker::TreeStruct);
@@ -86,7 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // 3d Plot
     Qwt3D::ColorVector cv;
     Qwt3D::StandardColor col_;
-    openColorMap(cv, "ROYAL.MAP");
+    openColorMap(cv, ":/others/ROYAL.MAP");
     col_.setColorVector(cv);
     QGridLayout *grid = new QGridLayout(ui->frame);
     plot = new Qwt3D::GridPlot(ui->frame);
@@ -1070,36 +1072,41 @@ void MainWindow::on_tableRuns_itemSelectionChanged()
     }
 }
 
+
 bool MainWindow::openColorMap(Qwt3D::ColorVector& cv, QString fname)
 {
   if (fname.isEmpty())
     return false;
 
-  std::ifstream file(QWT3DLOCAL8BIT(fname));
+  //std::ifstream file(QWT3DLOCAL8BIT(fname));
+  QResource common(fname);
 
-	if (!file)
-		return false;
-
-	Qwt3D::RGBA rgb;
-	cv.clear();
-
-	while ( file )
-	{
-		file >> rgb.r >> rgb.g >> rgb.b;
-		file.ignore(1000,'\n');
-		if (!file.good())
-			break;
-		else
-		{
-			rgb.a = 1;
-			rgb.r /= 255;
-			rgb.g /= 255;
-			rgb.b /= 255;
-			cv.push_back(rgb);
-		}
-	}
-
-	return true;
+  QFile commonFile(common.absoluteFilePath());
+  if (!commonFile.open(QIODevice::ReadOnly | QIODevice::Text))
+  {
+      qDebug() << "Unable to open file: " << commonFile.fileName() << " besause of error " << commonFile.errorString() << endl;
+      return false;
+  }
+  QTextStream in(&commonFile);
+  QString allfile = in.readAll();
+  QStringList lines = allfile.split( "\n", QString::SkipEmptyParts );
+  Qwt3D::RGBA rgb;
+  cv.clear();
+  foreach( QString line, lines ) {
+    QStringList chosenline = line.split(QRegExp("\\s"));
+    QString red = chosenline.at(0);
+    QString green = chosenline.at(1);
+    QString blue = chosenline.at(2);
+    rgb.r = red.toDouble();
+    rgb.g = green.toDouble();
+    rgb.b = blue.toDouble();
+    rgb.a = 1;
+    rgb.r /= 255;
+    rgb.g /= 255;
+    rgb.b /= 255;
+    cv.push_back(rgb);
+  }
+  return true;
 }
 
 void MainWindow::on_spinBoxRuns_valueChanged(int arg1)
