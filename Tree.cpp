@@ -152,32 +152,41 @@ void Puppy::Tree::write_qstring(QString& ioOS, unsigned int inIndex) const
 
 void Puppy::Tree::write_qstring_infix(QString& ioOS, unsigned int inIndex) const
 {
-//  assert(inIndex < size());
-//  QVector<QString> args;
+
+  assert(inIndex < size());
+  unsigned int lNbArgs = (*this)[inIndex].mPrimitive->getNumberArguments();
+  if(lNbArgs > 0) {
+    ioOS.append("(");
+  }
+  if(lNbArgs == 0) ioOS.append(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
+
+  unsigned int j = inIndex + 1;
+  bool unarity = false;
+  for(unsigned int i=0;i<lNbArgs;++i) {
+    //output.append(" ");
+    if((i==0) && (lNbArgs==1)) {
+      ioOS.append(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
+      if((*this)[inIndex+1].mPrimitive->getNumberArguments()==0) {
+        ioOS.append("(");
+        unarity = true;
+      }
+    }
+    if((i==1) && (lNbArgs==2)) ioOS.append(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
+    write_qstring_infix(ioOS,j);
+    j += (*this)[j].mSubTreeSize;
+  }
+
+  if(unarity) {
+    ioOS.append(")");
+    unarity = false;
+  }
+  if(lNbArgs > 0) ioOS.append(")");
+
+
 //  QString output;
-//  unsigned int lNbArgs = (*this)[inIndex].mPrimitive->getNumberArguments();
-//  //output.append(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
-//  unsigned int j = inIndex + 1;
-//  for(unsigned int i=0; i<lNbArgs; ++i) {
-//    write_qstring_infix(ioOS, j);
-//    args.push_back(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
-//    j += (*this)[j].mSubTreeSize;
-//  }
-//  if(lNbArgs == 2) {
-//    ioOS.append("(");
-//    ioOS.append(args.at(0));
-//    ioOS.append(" ");
-//    ioOS.append(output);
-//    ioOS.append(" ");
-//    ioOS.append(args.at(1));
-//    ioOS.append(")");
-//  }
-
-
-  QString output;
-  std::vector<unsigned int> depthv (size(),0);
-  extractleavesdepth(depthv);
-  extractparentsdepth(depthv);
+//  std::vector<unsigned int> depthv (size(),0);
+//  extractleavesdepth(depthv);
+//  extractparentsdepth(depthv);
   //tree2infix(output,depthv);
 }
 
