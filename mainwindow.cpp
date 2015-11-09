@@ -147,32 +147,33 @@ MainWindow::MainWindow(QWidget *parent) :
     initializePlots();
 
     QString result;
-    name.push_back("+");
-    name.push_back("X5");
-    name.push_back("/");
-    name.push_back("X7");
+    name.push_back("*");
     name.push_back("-");
-    name.push_back("X10");
-    name.push_back("X9");
+    name.push_back("X2");
+    name.push_back("cos");
+    name.push_back("/");
+    name.push_back("X4");
+    name.push_back("sin");
+    name.push_back("X6");
+    name.push_back("3.14");
+
+    arity.push_back(2);
     arity.push_back(2);
     arity.push_back(0);
+    arity.push_back(1);
     arity.push_back(2);
     arity.push_back(0);
-    arity.push_back(2);
+    arity.push_back(1);
     arity.push_back(0);
     arity.push_back(0);
-    depth.push_back(0);
-    depth.push_back(1);
-    depth.push_back(1);
-    depth.push_back(2);
-    depth.push_back(2);
-    depth.push_back(3);
-    depth.push_back(3);
+
+    subtreesize.push_back(9);
     subtreesize.push_back(7);
     subtreesize.push_back(1);
     subtreesize.push_back(5);
+    subtreesize.push_back(4);
     subtreesize.push_back(1);
-    subtreesize.push_back(3);
+    subtreesize.push_back(2);
     subtreesize.push_back(1);
     subtreesize.push_back(1);
     tree2infix(result);
@@ -181,22 +182,33 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::tree2infix(QString& output, int index) const
 {
-  //output.clear();
-  QString parent;
   assert(index < name.size());
   int lNbArgs = arity.at(index);
   if(lNbArgs > 0) {
     output.append("(");
-    output.append(name.at(index));
   }
+  if(lNbArgs == 0) output.append(name.at(index));
 
   unsigned int j = index + 1;
+  bool unarity = false;
   for(unsigned int i=0;i<lNbArgs;++i) {
-    output.append(" ");
+    //output.append(" ");
+    if((i==0) && (lNbArgs==1)) {
+      output.append(name.at(index));
+      if(arity.at(index+1)==0) {
+        output.append("(");
+        unarity = true;
+      }
+    }
+    if((i==1) && (lNbArgs==2)) output.append(name.at(index));
     tree2infix(output,j);
     j += subtreesize.at(j);
   }
 
+  if(unarity) {
+    output.append(")");
+    unarity = false;
+  }
   if(lNbArgs > 0) output.append(")");
 }
 
