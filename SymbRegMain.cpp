@@ -392,9 +392,9 @@ int Worker::start_main(void) {
   std::cout << *lBestIndividual << std:: endl;
   emit Worker::send_stats_end(GPthis);
 
-  //output.clear();
+  output.clear();
   lBestIndividual[0].write_qstring_infix(output);
-  //qDebug()<<"Infix :"<<output;
+  qDebug()<<"Infix :"<<output;
   //std::cout << lBestIndividual[0].mFitness << std:: endl;
 
   //std::cout << "Exiting program" << std::endl << std::flush;
