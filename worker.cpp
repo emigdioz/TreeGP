@@ -46,26 +46,6 @@ void Worker::doWork()
         qDebug()<<"Aborting worker process in Thread "<<thread()->currentThreadId();
     }
     start_main();
-//    for (int i = 0; i < 60; i ++) {
-
-//        // Checks if the process should be aborted
-//        mutex.lock();
-//        bool abort = _abort;
-//        mutex.unlock();
-
-//        if (abort) {
-//            qDebug()<<"Aborting worker process in Thread "<<thread()->currentThreadId();
-//            break;
-//        }
-
-//        // This will stupidly wait 1 sec doing nothing...
-//        QEventLoop loop;
-//        QTimer::singleShot(10, &loop, SLOT(quit()));
-//        loop.exec();
-
-//        // Once we're done waiting, value is updated
-//        emit valueChanged(QString::number(i));
-//    }
 
     // Set _working to false, meaning the process can't be aborted anymore.
     mutex.lock();
