@@ -1337,11 +1337,11 @@ void MainWindow::showRealTimePreview(const QImage& preview, bool latexerror)
     if (!latexerror) {
       pixmap = QPixmap::fromImage(preview);
       QGraphicsScene *sceneEquation = new QGraphicsScene(ui->equationView);
-      sceneEquation->setSceneRect(0,0,4000,200);
+      sceneEquation->setSceneRect(0,0,4000,400);
       QGraphicsPixmapItem* item = sceneEquation->addPixmap(pixmap);
       item->setPos(0, 0);
       ui->equationView->setScene(sceneEquation);
-      ui->equationView->setFixedHeight(100);
+      ui->equationView->setFixedHeight(preview.height()+20);
       ui->equationView->centerOn(0,0);
     }
 }
