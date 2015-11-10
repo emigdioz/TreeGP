@@ -280,13 +280,10 @@ int Worker::start_main(void) {
       }
 
   }
-
-  //qDebug()<<"Training";
   for(unsigned int i = 0;i < size_training;i++) {
     trainingOut[i] = trainingSet[((Worker::dataset_cols-1)*size_training)+i];
     //qDebug()<<i<<": "<<trainingOut[i];
   }
-  //qDebug()<<"Testing";
   for(unsigned int i = 0;i < (Worker::dataset_rows-size_training);i++) {
     testingOut[i] = testingSet[((Worker::dataset_cols-1)*(Worker::dataset_rows-size_training))+i];
     //qDebug()<<i<<": "<<testingOut[i];
@@ -388,16 +385,17 @@ int Worker::start_main(void) {
   lBestIndividual[0].write_qstring(output);
 
   emit Worker::valueChanged("Best individual at generation " + QString::number(i-1) + " is: " + output + " with fitness: " + QString::number(lBestIndividual[0].mFitness));
-  emit Worker::send_tree_string(output);
-  std::cout << *lBestIndividual << std:: endl;
-  emit Worker::send_stats_end(GPthis);
-
+  emit Worker::send_tree_string(output);  // Prefix syntax
   output.clear();
   lBestIndividual[0].write_qstring_infix(output);
-  qDebug()<<"Infix :"<<output;
-  //std::cout << lBestIndividual[0].mFitness << std:: endl;
+  emit Worker::send_tree_infix_string(output); // Infix syntax
+  output.clear();
+  lBestIndividual[0].write_qstring_latex(output);
+  emit Worker::send_tree_latex_string(output); // Latex syntax
+  qDebug()<<output;
 
-  //std::cout << "Exiting program" << std::endl << std::flush;
+  std::cout << *lBestIndividual << std:: endl;
+  emit Worker::send_stats_end(GPthis);
 
   // Clean up data
   delete inputV;
@@ -413,15 +411,10 @@ unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
                              double* inX,
                              double* inF, int cols, int rows, std::vector<bool> &terSelection)
 {
-  //assert(inX.size() == inF.size());
   std::stringstream var;
   double rowV,lQuadErr,lResult,lErr,lRMS;
   unsigned int lNbrEval = 0,i,j,k;
-  //qDebug()<<inX[100];
-  //for(i=0;i<(cols*rows);i++) qDebug()<<i<<": "<<inX[i];
-
   for(i=0; i<ioPopulation.size();i++) {
-    //if(ioPopulation[i].mValid) continue;
     lQuadErr = 0.0;
     for(j=0; j<rows; j++) {
       // Copy col wise data for variable usage
@@ -432,7 +425,6 @@ unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
           ioContext.mPrimitiveMap[var.str()]->setValue(&rowV);
           var.str(std::string());
         }
-        //qDebug()<<k<<": "<<rowV;
       }
       lResult = 0.0;
       lErr = 0.0;
@@ -444,7 +436,6 @@ unsigned int evaluateFitness(std::vector<Tree>& ioPopulation,
     lRMS = std::sqrt(lQuadErr / rows);
     ioPopulation[i].mFitness = 1. / (1. + lRMS);
     ioPopulation[i].rFitness = lRMS;
-    //ioPopulation[i].mFitness = lRMS;
     ioPopulation[i].mValid = true;
     ++lNbrEval;
   }
@@ -481,7 +472,6 @@ unsigned int evaluateFitnessTesting(Tree &individual,
   lRMS = std::sqrt(lQuadErr / rows);
   individual.mFitnessTest = 1. / (1. + lRMS);
   individual.rFitnessTest = lRMS;
-  //individual.mFitnessTest = lRMS;
   individual.mValid = true;
   ++lNbrEval;
   return lNbrEval;
@@ -496,8 +486,6 @@ unsigned int evaluateFitnessTraining(Tree &individual,
   double rowV;
   unsigned int lNbrEval = 0,j,k;
   double lQuadErr = 0.0,lResult,lErr,lRMS;
-  //for(j=0;j<(cols*rows);j++) qDebug()<<j<<": "<<inX[j];
-
   for(j=0; j<rows; j++) {
     // Copy col wise data for variable usage
     for(k=0; k<cols;k++) {        
@@ -516,8 +504,7 @@ unsigned int evaluateFitnessTraining(Tree &individual,
   }
   lRMS = std::sqrt(lQuadErr / rows);
   individual.mFitness = 1. / (1. + lRMS);
-  //individual.mFitness = lRMS;
-  //individual.mValid = true;
+  individual.rFitness = lRMS;
   ++lNbrEval;
   return lNbrEval;
 }
