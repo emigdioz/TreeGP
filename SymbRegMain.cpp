@@ -392,7 +392,7 @@ int Worker::start_main(void) {
   output.clear();
   lBestIndividual[0].write_qstring_latex(output);
   emit Worker::send_tree_latex_string(output); // Latex syntax
-  qDebug()<<output;
+  //qDebug()<<output;
 
   std::cout << *lBestIndividual << std:: endl;
   emit Worker::send_stats_end(GPthis);

@@ -1604,6 +1604,13 @@ font-size:14px;
                </widget>
               </item>
               <item>
+               <widget class="QGraphicsView" name="equationView">
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="GraphWidget" name="treeGraph" native="true">
                 <property name="maximumSize">
                  <size>

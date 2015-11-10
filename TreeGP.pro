@@ -9,7 +9,13 @@ macx: LIBS += -L../../lib -framework OpenGL
 
 linux-g++:QMAKE_CXXFLAGS += -fno-exceptions
 
-INCLUDEPATH    += ./qwtplot3d/include .
+INCLUDEPATH    += ./qwtplot3d/include ./klfbackend/
+
+# KLF backend versions
+KLF_BACKEND_VERSION = 3.2.8
+
+DEFINES +=KLF_VERSION_STRING=\\\"$$KLF_BACKEND_VERSION\\\" \
+        KLF_SRC_BUILD
 
 SOURCES += \
     main.cpp \
@@ -50,7 +56,12 @@ SOURCES += \
     qwtplot3d/qwt3d_surfaceplot.cpp \
     qwtplot3d/qwt3d_types.cpp \
     qwtplot3d/qwt3d_volumeplot.cpp \
-    benchmark.cpp
+    benchmark.cpp \
+    klfbackend/klfbackend.cpp \
+    klfbackend/klfblockprocess.cpp \
+    klfbackend/klfdebug.cpp \
+    klfbackend/klfdefs.cpp \
+    klfbackend/klfpreviewbuilderthread.cpp
 
 # Default rules for deployment.
 include(deployment.pri)
@@ -104,7 +115,13 @@ HEADERS += \
     qwtplot3d/include/qwt3d_surfaceplot.h \
     qwtplot3d/include/qwt3d_types.h \
     qwtplot3d/include/qwt3d_valueptr.h \
-    qwtplot3d/include/qwt3d_volumeplot.h
+    qwtplot3d/include/qwt3d_volumeplot.h \
+    klfbackend/klfbackend.h \
+    klfbackend/klfblockprocess.h \
+    klfbackend/klfdebug.h \
+    klfbackend/klfdefs.h \
+    klfbackend/klfpreviewbuilderthread.h \
+    klfbackend/klfqt34common.h
 
 FORMS += \
     mainwindow.ui

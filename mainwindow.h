@@ -19,6 +19,9 @@
 #include <qwt3d_scale.h>
 #include <QDateTime>
 #include <qcustomplot.h>
+#include "klfbackend.h"
+#include "klfpreviewbuilderthread.h"
+
 
 //QT_BEGIN_NAMESPACE
 //class QTextEdit;
@@ -86,8 +89,14 @@ private:
     QVector<int>depth;
     QVector<QString>name;
     QVector<int>subtreesize;
-
     void tree2infix(QString& output, int index=0) const;
+
+    KLFPreviewBuilderThread *mPreviewBuilderThread;
+    KLFBackend::klfInput input;
+    KLFBackend::klfSettings settings;
+    KLFBackend::klfOutput output;
+    QPixmap pixmap;
+
 private slots:
     void runGP();
     void on_actionE_xit_triggered();   
@@ -131,5 +140,6 @@ private slots:
     void on_actionKoza_2_triggered();
     void on_actionKoza_3_triggered();
     void on_actionLatex_Syntax_triggered();
+    void showRealTimePreview(const QImage& preview, bool latexerror);
 };
 #endif // MAINWINDOW_H

@@ -190,14 +190,20 @@ void Puppy::Tree::write_qstring_latex(QString& ioOS, unsigned int inIndex) const
   if(lNbArgs > 0) {
     ioOS.append("(");
   }
-  if(lNbArgs == 0) ioOS.append(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
-
+  if(lNbArgs == 0) {
+    QString temp = QString::fromStdString((*this)[inIndex].mPrimitive->getName());
+    if(temp.at(0)=='X') {
+      temp.insert(1,"_{");
+      temp.append("}");
+      ioOS.append(temp);
+    } else ioOS.append(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
+  }
   if((*this)[inIndex].mPrimitive->getName()=="/") ioOS.append("\\frac{");
 
   unsigned int j = inIndex + 1;
   bool unarity = false;
   for(unsigned int i=0;i<lNbArgs;++i) {
-    //output.append(" ");
+
     if((i==0) && (lNbArgs==1)) {
       ioOS.append(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
       if((*this)[inIndex+1].mPrimitive->getNumberArguments()==0) {
@@ -209,7 +215,7 @@ void Puppy::Tree::write_qstring_latex(QString& ioOS, unsigned int inIndex) const
       if((*this)[inIndex].mPrimitive->getName()=="/") ioOS.append("}{");
       else ioOS.append(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
     }
-    write_qstring_infix(ioOS,j);
+    write_qstring_latex(ioOS,j);
     j += (*this)[j].mSubTreeSize;
   }
 

@@ -5,6 +5,7 @@
 #include "worker.h"
 #include "node.h"
 #include "edge.h"
+#include "klfbackend.h"
 #include <QGraphicsView>
 #include <QFontDatabase>
 #include <fstream>
@@ -57,7 +58,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEdit_7->setValidator(new QRegExpValidator(Floating, ui->lineEdit_7));
     ui->lineEdit_11->setValidator(new QRegExpValidator(Floating, ui->lineEdit_11));
 
-
+    // Latex renderer
+    input.mathmode = "\\[ ... \\]";
+    input.dpi = 120;
+    //ui->labelLatex->setMinimumHeight(input.dpi/2);
+    input.preamble = QString("\\usepackage{amssymb,amsmath,mathrsfs}");
+    if(!KLFBackend::detectSettings(&settings)) {
+        qDebug() << "unable to find LaTeX in default directories.";
+    } else {
+        qDebug() << "default settings working!";
+    }
+    mPreviewBuilderThread = new KLFPreviewBuilderThread(this, input, settings);
 
     connect(ui->listWidget, SIGNAL(currentRowChanged(int)), ui->stackedWidget, SLOT(setCurrentIndex(int)));
     ui->listWidget->setCurrentRow(0);
@@ -89,6 +100,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(worker, SIGNAL(send_tree_string(QString)), this, SLOT(received_tree_string(QString)));
     connect(worker, SIGNAL(send_tree_infix_string(QString)), this, SLOT(received_tree_infix_string(QString)));
     connect(worker, SIGNAL(send_tree_latex_string(QString)), this, SLOT(received_tree_latex_string(QString)));
+    connect(mPreviewBuilderThread, SIGNAL(previewAvailable(const QImage&, bool)),this, SLOT(showRealTimePreview(const QImage&, bool)), Qt::QueuedConnection);
     // Timer for running time
     connect(timerGP, SIGNAL(timeout()), this, SLOT(showElapsedTime()));
 
@@ -365,6 +377,7 @@ MainWindow::~MainWindow()
     worker->abort();
     thread->wait();
     qDebug()<<"Deleting thread and worker in Thread "<<this->QObject::thread()->currentThreadId();
+    delete mPreviewBuilderThread;
     delete thread;
     delete worker;
     delete ui;
@@ -709,6 +722,7 @@ void MainWindow::received_tree(Worker::TreeStruct data)
     ui->treeGraph->scene()->items().at(nitems+(2*i))->setZValue(-2);
     ui->treeGraph->scene()->addText("Depth "+QString::number(i),font)->setPos(startx-100,(spany*i)+starty-15);
   }
+  //ui->treeGraph->centerOn(startx-100,0);
   ui->treeGraph->update();
 }
 
@@ -1146,7 +1160,15 @@ void MainWindow::received_tree_infix_string(const QString data)
 
 void MainWindow::received_tree_latex_string(const QString data)
 {
+  QString latexString = "Y=";
+  latexString.append(data);
   TreeStringLatex.push_back(data);
+  input.preamble = QString("\\usepackage{amssymb,amsmath}");
+  input.latex = latexString;
+  if(mPreviewBuilderThread->inputChanged(input)) {
+      qDebug() << "input changed. Render...";
+      mPreviewBuilderThread->start();
+  }
 }
 
 void MainWindow::on_listTerminals_itemSelectionChanged()
@@ -1182,7 +1204,6 @@ void MainWindow::on_tableRuns_itemSelectionChanged()
       ui->textEditTree2->setText(TreeString.at(row));
     }
 }
-
 
 bool MainWindow::openColorMap(Qwt3D::ColorVector& cv, QString fname)
 {
@@ -1305,4 +1326,18 @@ void MainWindow::populateTable()
 void MainWindow::on_actionLatex_Syntax_triggered()
 {
   ui->textEditTree->setText(TreeStringLatex.last());
+}
+
+void MainWindow::showRealTimePreview(const QImage& preview, bool latexerror)
+{
+    if (!latexerror) {
+      pixmap = QPixmap::fromImage(preview);
+      QGraphicsScene *sceneEquation = new QGraphicsScene(ui->equationView);
+      sceneEquation->setSceneRect(0,0,4000,200);
+      QGraphicsPixmapItem* item = sceneEquation->addPixmap(pixmap);
+      item->setPos(0, 0);
+      ui->equationView->setScene(sceneEquation);
+      ui->equationView->setFixedHeight(100);
+      ui->equationView->centerOn(0,0);
+    }
 }
