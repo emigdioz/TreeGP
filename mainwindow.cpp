@@ -12,6 +12,8 @@
 #include <iostream>
 #include <cstdio>
 #include <math.h>
+#include "aboutwindow.h"
+#include "ui_aboutwindow.h"
 
 Q_DECLARE_METATYPE(Worker::Stats);  // Needed for MetaType recognize new data type
 Q_DECLARE_METATYPE(Worker::TreeStruct);
@@ -38,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {    
     int id = QFontDatabase::addApplicationFont(":/fonts/Dosis-Medium.ttf");
     ui->setupUi(this);
+    aboutDialog = new aboutwindow(this);
+    //this->layout()->setSizeConstraint(QLayout::SetFixedSize) ;
     ui->progressBar->setMaximum(100);
     ui->progressBar->setMinimum(1);
     runCount = 0;
@@ -1340,4 +1344,9 @@ void MainWindow::showRealTimePreview(const QImage& preview, bool latexerror)
       ui->equationView->setFixedHeight(100);
       ui->equationView->centerOn(0,0);
     }
+}
+
+void MainWindow::on_actionAbout_triggered()
+{
+  aboutDialog->exec();
 }

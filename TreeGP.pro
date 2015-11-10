@@ -61,7 +61,8 @@ SOURCES += \
     klfbackend/klfblockprocess.cpp \
     klfbackend/klfdebug.cpp \
     klfbackend/klfdefs.cpp \
-    klfbackend/klfpreviewbuilderthread.cpp
+    klfbackend/klfpreviewbuilderthread.cpp \
+    aboutwindow.cpp
 
 # Default rules for deployment.
 include(deployment.pri)
@@ -121,10 +122,12 @@ HEADERS += \
     klfbackend/klfdebug.h \
     klfbackend/klfdefs.h \
     klfbackend/klfpreviewbuilderthread.h \
-    klfbackend/klfqt34common.h
+    klfbackend/klfqt34common.h \
+    aboutwindow.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    aboutwindow.ui
 
 RESOURCES += \
     images.qrc
