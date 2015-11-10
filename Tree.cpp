@@ -181,13 +181,46 @@ void Puppy::Tree::write_qstring_infix(QString& ioOS, unsigned int inIndex) const
     unarity = false;
   }
   if(lNbArgs > 0) ioOS.append(")");
+}
 
+void Puppy::Tree::write_qstring_latex(QString& ioOS, unsigned int inIndex) const
+{
+  assert(inIndex < size());
+  unsigned int lNbArgs = (*this)[inIndex].mPrimitive->getNumberArguments();
+  if(lNbArgs > 0) {
+    ioOS.append("(");
+  }
+  if(lNbArgs == 0) ioOS.append(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
 
-//  QString output;
-//  std::vector<unsigned int> depthv (size(),0);
-//  extractleavesdepth(depthv);
-//  extractparentsdepth(depthv);
-  //tree2infix(output,depthv);
+  if((*this)[inIndex].mPrimitive->getName()=="/") ioOS.append("\\frac{");
+
+  unsigned int j = inIndex + 1;
+  bool unarity = false;
+  for(unsigned int i=0;i<lNbArgs;++i) {
+    //output.append(" ");
+    if((i==0) && (lNbArgs==1)) {
+      ioOS.append(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
+      if((*this)[inIndex+1].mPrimitive->getNumberArguments()==0) {
+        ioOS.append("(");
+        unarity = true;
+      }
+    }
+    if((i==1) && (lNbArgs==2)) {
+      if((*this)[inIndex].mPrimitive->getName()=="/") ioOS.append("}{");
+      else ioOS.append(QString::fromStdString((*this)[inIndex].mPrimitive->getName()));
+    }
+    write_qstring_infix(ioOS,j);
+    j += (*this)[j].mSubTreeSize;
+  }
+
+  if(unarity) {
+    ioOS.append(")");
+    unarity = false;
+  }
+  if(lNbArgs > 0) {
+    if((*this)[inIndex].mPrimitive->getName()=="/") ioOS.append("}");
+    else ioOS.append(")");
+  }
 }
 
 void Puppy::Tree::tree2infix(QString& ioOS, std::vector<unsigned int> depthV, int index) const
@@ -214,7 +247,6 @@ void Puppy::Tree::tree2infix(QString& ioOS, std::vector<unsigned int> depthV, in
     index += 1;
     tree2infix(text,depthV,index);
   }
-
 
   if(!args.isEmpty()) {
     unsigned int lNbArgs = (*this)[index].mPrimitive->getNumberArguments();
