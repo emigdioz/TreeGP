@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>TreeGP</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="images.qrc">
+    <normaloff>:/icons/icon_app</normaloff>:/icons/icon_app</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
     <string notr="true"/>
@@ -710,13 +714,13 @@ font-size:14px;
                  </size>
                 </property>
                 <property name="movement">
-                 <enum>QListView::Free</enum>
+                 <enum>QListView::Static</enum>
                 </property>
                 <property name="flow">
-                 <enum>QListView::LeftToRight</enum>
+                 <enum>QListView::TopToBottom</enum>
                 </property>
                 <property name="isWrapping" stdset="0">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                 <property name="resizeMode">
                  <enum>QListView::Adjust</enum>
@@ -724,11 +728,8 @@ font-size:14px;
                 <property name="layoutMode">
                  <enum>QListView::SinglePass</enum>
                 </property>
-                <property name="spacing">
-                 <number>2</number>
-                </property>
                 <property name="viewMode">
-                 <enum>QListView::IconMode</enum>
+                 <enum>QListView::ListMode</enum>
                 </property>
                 <item>
                  <property name="text">
@@ -872,6 +873,11 @@ font-size:14px;
                 <item>
                  <property name="text">
                   <string>MAE</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>R²</string>
                  </property>
                 </item>
                </widget>
@@ -1905,9 +1911,17 @@ subcontrol-origin: margin;
      <property name="title">
       <string>Datasets</string>
      </property>
+     <widget class="QMenu" name="menuBenchmarks">
+      <property name="title">
+       <string>Benchmarks</string>
+      </property>
+      <addaction name="actionKoza_1"/>
+      <addaction name="actionKoza_2"/>
+      <addaction name="actionKoza_3"/>
+     </widget>
      <addaction name="actionLoad_file"/>
      <addaction name="separator"/>
-     <addaction name="actionBenchmarks"/>
+     <addaction name="menuBenchmarks"/>
     </widget>
     <addaction name="actionE_xit"/>
     <addaction name="menuDatasets"/>
@@ -1940,14 +1954,39 @@ subcontrol-origin: margin;
     <string>Load file...</string>
    </property>
   </action>
-  <action name="actionBenchmarks">
-   <property name="text">
-    <string>Benchmarks</string>
-   </property>
-  </action>
   <action name="actionAbout">
    <property name="text">
     <string>About...</string>
+   </property>
+  </action>
+  <action name="actionPrefix_syntax">
+   <property name="text">
+    <string>Prefix syntax</string>
+   </property>
+  </action>
+  <action name="actionInfix_syntax">
+   <property name="text">
+    <string>Infix syntax</string>
+   </property>
+  </action>
+  <action name="actionKoza_1">
+   <property name="text">
+    <string>Koza-1</string>
+   </property>
+  </action>
+  <action name="actionKoza_2">
+   <property name="text">
+    <string>Koza-2</string>
+   </property>
+  </action>
+  <action name="actionKoza_3">
+   <property name="text">
+    <string>Koza-3</string>
+   </property>
+  </action>
+  <action name="actionLatex_Syntax">
+   <property name="text">
+    <string>Latex_Syntax</string>
    </property>
   </action>
  </widget>
