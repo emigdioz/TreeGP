@@ -10,6 +10,7 @@
 #include <fstream>
 #include <iostream>
 #include <cstdio>
+#include <math.h>
 
 Q_DECLARE_METATYPE(Worker::Stats);  // Needed for MetaType recognize new data type
 Q_DECLARE_METATYPE(Worker::TreeStruct);
@@ -56,6 +57,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEdit_7->setValidator(new QRegExpValidator(Floating, ui->lineEdit_7));
     ui->lineEdit_11->setValidator(new QRegExpValidator(Floating, ui->lineEdit_11));
 
+
+
     connect(ui->listWidget, SIGNAL(currentRowChanged(int)), ui->stackedWidget, SLOT(setCurrentIndex(int)));
     ui->listWidget->setCurrentRow(0);
     GPthreadstarted = false;
@@ -69,6 +72,8 @@ MainWindow::MainWindow(QWidget *parent) :
     qRegisterMetaType<Worker::fitnessdata>();
 
     worker->moveToThread(thread);
+    ui->textEditTree->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->textEditTree, SIGNAL(customContextMenuRequested(const QPoint&)),this, SLOT(ShowContextMenu(const QPoint&)));
     connect(worker, SIGNAL(valueChanged(QString)), ui->textEdit, SLOT(append(QString)));
     connect(worker, SIGNAL(workRequested()), thread, SLOT(start()));
     connect(thread, SIGNAL(started()), worker, SLOT(doWork()));
@@ -82,6 +87,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(worker, SIGNAL(plot3DSendData(Worker::fitnessdata)), this, SLOT(plot3DUpdateData(Worker::fitnessdata)));
     connect(worker, SIGNAL(sendEvalFunc(unsigned long)), this, SLOT(receivedEvalFunc(unsigned long)));
     connect(worker, SIGNAL(send_tree_string(QString)), this, SLOT(received_tree_string(QString)));
+    connect(worker, SIGNAL(send_tree_infix_string(QString)), this, SLOT(received_tree_infix_string(QString)));
+    connect(worker, SIGNAL(send_tree_latex_string(QString)), this, SLOT(received_tree_latex_string(QString)));
     // Timer for running time
     connect(timerGP, SIGNAL(timeout()), this, SLOT(showElapsedTime()));
 
@@ -148,7 +155,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QString result;
     name.push_back("*");
-    name.push_back("-");
+    name.push_back("/");
     name.push_back("X2");
     name.push_back("cos");
     name.push_back("/");
@@ -189,6 +196,8 @@ void MainWindow::tree2infix(QString& output, int index) const
   }
   if(lNbArgs == 0) output.append(name.at(index));
 
+  if(name.at(index)=="/") output.append("\\frac{");
+
   unsigned int j = index + 1;
   bool unarity = false;
   for(unsigned int i=0;i<lNbArgs;++i) {
@@ -200,7 +209,10 @@ void MainWindow::tree2infix(QString& output, int index) const
         unarity = true;
       }
     }
-    if((i==1) && (lNbArgs==2)) output.append(name.at(index));
+    if((i==1) && (lNbArgs==2)) {
+      if(name.at(index)=="/") output.append("}{");
+      else output.append(name.at(index));
+    }
     tree2infix(output,j);
     j += subtreesize.at(j);
   }
@@ -209,7 +221,10 @@ void MainWindow::tree2infix(QString& output, int index) const
     output.append(")");
     unarity = false;
   }
-  if(lNbArgs > 0) output.append(")");
+  if(lNbArgs > 0) {
+    if(name.at(index)=="/") output.append("}");
+    else output.append(")");
+  }
 }
 
 void MainWindow::setupPlots()
@@ -284,7 +299,7 @@ void MainWindow::setupPlots()
   ui->outputPlot->replot();
   ui->sizePlot->replot();
   maxSize = 0;
-  maxFitness = 1;
+  maxFitness = 0;
 
   // BoxPlot
 
@@ -533,8 +548,7 @@ void MainWindow::received_stats(Worker::Stats data)
 {
   ui->outputPlot->graph(0)->addData(data.gen,data.train);
   ui->outputPlot->graph(1)->addData(data.gen,data.test);
-  ui->outputPlot->legend->setVisible(true);
-  ui->outputPlot->replot();
+  ui->outputPlot->legend->setVisible(true);  
   ui->sizePlot->graph(0)->addData(data.gen,data.maxsize);
   ui->sizePlot->graph(1)->addData(data.gen,data.minsize);
   ui->sizePlot->graph(2)->addData(data.gen,data.avgsize);
@@ -552,6 +566,7 @@ void MainWindow::received_stats(Worker::Stats data)
   }
   else
     ui->outputPlot->yAxis->setRange(0, maxFitness);
+  ui->outputPlot->replot();
 
   if(data.maxsize>maxSize){
     ui->sizePlot->yAxis->setRange(0, data.maxsize);
@@ -821,7 +836,7 @@ void MainWindow::on_ButtonStart_clicked()
       ui->sizePlot->graph(1)->clearData();
       ui->sizePlot->graph(2)->clearData();
       maxSize = 0;
-      maxFitness = 1;
+      maxFitness = 0;
       ui->treeGraph->scene()->clear();
       runCount += 1;
       ui->labelRun->setText(QString::number(runCount));
@@ -846,7 +861,7 @@ void MainWindow::on_ButtonBatch_clicked()
       ui->sizePlot->graph(1)->clearData();
       ui->sizePlot->graph(2)->clearData();
       maxSize = 0;
-      maxFitness = 1;
+      maxFitness = 0;
       ui->treeGraph->scene()->clear();
       if(batchRun == 0) {
         ui->labelElapsedTime->setText("0");
@@ -1124,6 +1139,16 @@ void MainWindow::received_tree_string(const QString data)
   TreeString.push_back(data);
 }
 
+void MainWindow::received_tree_infix_string(const QString data)
+{
+  TreeStringInfix.push_back(data);
+}
+
+void MainWindow::received_tree_latex_string(const QString data)
+{
+  TreeStringLatex.push_back(data);
+}
+
 void MainWindow::on_listTerminals_itemSelectionChanged()
 {
     int count = 0;
@@ -1209,4 +1234,75 @@ void MainWindow::on_spinBoxRuns_valueChanged(int arg1)
 {
   if((ui->tableView->model()->rowCount() != 0) && (arg1 > 1)) ui->ButtonBatch->setEnabled(true);
   else ui->ButtonBatch->setEnabled(false);
+}
+
+void MainWindow::ShowContextMenu(const QPoint& pos)
+{
+    QPoint globalPos = ui->textEditTree->mapToGlobal(pos);
+    QMenu myMenu;
+    myMenu.addAction(ui->actionPrefix_syntax);
+    myMenu.addAction(ui->actionInfix_syntax);
+    myMenu.addAction(ui->actionLatex_Syntax);
+    if(!TreeString.isEmpty()) QAction* selectedItem = myMenu.exec(globalPos);
+}
+
+void MainWindow::on_actionPrefix_syntax_triggered()
+{
+    ui->textEditTree->setText(TreeString.last());
+}
+
+void MainWindow::on_actionInfix_syntax_triggered()
+{
+    ui->textEditTree->setText(TreeStringInfix.last());
+}
+
+void MainWindow::on_actionKoza_1_triggered()
+{
+  gen_benchmark(0);
+  populateTable();
+}
+
+void MainWindow::on_actionKoza_2_triggered()
+{
+  gen_benchmark(1);
+  populateTable();
+}
+
+void MainWindow::on_actionKoza_3_triggered()
+{
+  gen_benchmark(2);
+  populateTable();
+}
+
+void MainWindow::populateTable()
+{
+  int i;
+  if(worker->dataset_cols == 2) {
+      ui->lineEdit->setText("1");
+  }
+  else {
+      ui->lineEdit->setText("1:" + QString::number(worker->dataset_cols-1));
+  }
+  ui->lineEdit_2->setText(QString::number(worker->dataset_cols));
+  ui->lineEdit_3->setText("1:" + QString::number(worker->dataset_rows));
+  ui->ButtonStart->setEnabled(true);
+  if(ui->spinBoxRuns->text().toInt() > 1) ui->ButtonBatch->setEnabled(true); else ui->ButtonBatch->setEnabled(false);
+
+  // Populate variables as terminals
+  std::vector<bool> terSelection;
+  for(i=1;i<worker->dataset_cols;i++) {
+      ui->listTerminals->addItem("X"+QString::number(i));
+  }
+  ui->listTerminals->addItem("Ephemeral Random Constant");
+  for(i=0;i<worker->dataset_cols;i++) {
+    ui->listTerminals->item(i)->setSelected(true);
+    terSelection.push_back(true);
+  }
+  worker->terminalselection = terSelection;
+
+}
+
+void MainWindow::on_actionLatex_Syntax_triggered()
+{
+  ui->textEditTree->setText(TreeStringLatex.last());
 }
