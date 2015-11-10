@@ -41,10 +41,11 @@ public:
     double *dataset;
     int dataset_cols;
     int dataset_rows;
+    double *dataset_training;
+    double *dataset_testing;
     int trainingP;    
     std::vector<bool> terminalselection;
-    std::vector<bool> functionselection;
-
+    std::vector<bool> functionselection;    
     void subsetData(double *input, double *training, double *testing, int cols, int rows, int trainsize, int *index);
     typedef struct
     {
@@ -104,6 +105,8 @@ signals:
     void plot3DSendData(Worker::fitnessdata data);
     void sendEvalFunc(unsigned long value);
     void send_tree_string(const QString data);
+    void send_tree_infix_string(const QString data);
+    void send_tree_latex_string(const QString data);
     /**
      * @brief This signal is emitted when process is finished (either by counting 60 sec or being aborted)
      */
