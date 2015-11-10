@@ -36,6 +36,7 @@ public:
     Qwt3D::GridPlot* plot;
     ~MainWindow();
     void calculateQuartiles(std::vector<double> data, double &Q1, double &Q2, double &Q3, double &min, double &max, QVector<double> &outliers);
+    double rollUniform(double inLow, double inUp);
     int runCount;
     int batchRun;
 
@@ -62,6 +63,10 @@ private:
     std::vector<Worker::TreeStruct> runTree;
     std::vector<Worker::Stats> runStats;
     QVector<QString> TreeString;
+    QVector<QString> TreeStringInfix;
+    QVector<QString> TreeStringLatex;
+    void gen_benchmark(int selection);
+    void populateTable();
 
     int plot3D_width1;
     int plot3D_width2;
@@ -111,11 +116,20 @@ private slots:
     void on_lineEdit_12_textChanged(const QString &arg1);
     void on_lineEdit_13_textChanged(const QString &arg1);
     void received_tree_string(const QString data);
+    void received_tree_infix_string(const QString data);
+    void received_tree_latex_string(const QString data);
 
     void showElapsedTime();
     void on_listTerminals_itemSelectionChanged();
     void on_tableRuns_itemSelectionChanged();
     void on_ButtonBatch_clicked();
     void on_spinBoxRuns_valueChanged(int arg1);
+    void ShowContextMenu(const QPoint& pos);
+    void on_actionPrefix_syntax_triggered();
+    void on_actionInfix_syntax_triggered();
+    void on_actionKoza_1_triggered();
+    void on_actionKoza_2_triggered();
+    void on_actionKoza_3_triggered();
+    void on_actionLatex_Syntax_triggered();
 };
 #endif // MAINWINDOW_H
