@@ -99,6 +99,7 @@ public:
   void         write(std::ostream& ioOS, unsigned int inIndex=0) const;
   void         write_qstring(QString& ioOS, unsigned int inIndex=0) const;
   void         write_qstring_infix(QString& ioOS, unsigned int inIndex=0) const;
+  void         write_qstring_latex(QString& ioOS, unsigned int inIndex=0) const;
 
   float mFitness;  //!< Fitness value of the GP tree
   float mFitnessTest;
