@@ -60,38 +60,12 @@ void GraphWidget::itemMoved()
 
 void GraphWidget::keyPressEvent(QKeyEvent *event)
 {
-//    switch (event->key()) {
-//    case Qt::Key_Up:
-//        centerNode->moveBy(0, -20);
-//        break;
-//    case Qt::Key_Down:
-//        centerNode->moveBy(0, 20);
-//        break;
-//    case Qt::Key_Left:
-//        centerNode->moveBy(-20, 0);
-//        break;
-//    case Qt::Key_Right:
-//        centerNode->moveBy(20, 0);
-//        break;
-//    case Qt::Key_Plus:
-//        zoomIn();
-//        break;
-//    case Qt::Key_Minus:
-//        zoomOut();
-//        break;
-//    case Qt::Key_Space:
-//    case Qt::Key_Enter:
-//        shuffle();
-//        break;
-//    default:
-//        QGraphicsView::keyPressEvent(event);
-//    }
 }
 
 #ifndef QT_NO_WHEELEVENT
 void GraphWidget::wheelEvent(QWheelEvent *event)
 {
-    scaleView(pow((double)2, -event->delta() / 240.0));
+    scaleView(pow((double)2, event->delta() / 240.0));
 }
 #endif
 
@@ -133,12 +107,12 @@ void GraphWidget::shuffle()
 
 void GraphWidget::zoomIn()
 {
-    scaleView(qreal(1.2));
+  //scaleView(qreal(1.2));
 }
 
 void GraphWidget::zoomOut()
 {
-    scaleView(1 / qreal(1.2));
+  //scaleView(1 / qreal(1.2));
 }
 
 
