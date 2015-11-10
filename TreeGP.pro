@@ -49,7 +49,8 @@ SOURCES += \
     qwtplot3d/qwt3d_scale.cpp \
     qwtplot3d/qwt3d_surfaceplot.cpp \
     qwtplot3d/qwt3d_types.cpp \
-    qwtplot3d/qwt3d_volumeplot.cpp
+    qwtplot3d/qwt3d_volumeplot.cpp \
+    benchmark.cpp
 
 # Default rules for deployment.
 include(deployment.pri)
