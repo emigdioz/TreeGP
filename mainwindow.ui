@@ -328,7 +328,7 @@ subcontrol-origin: margin;
               <item row="4" column="0">
                <widget class="QLabel" name="label_5">
                 <property name="text">
-                 <string>Training/Testing (75/30)</string>
+                 <string>Training/Testing (70/30)</string>
                 </property>
                </widget>
               </item>
