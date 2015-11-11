@@ -327,7 +327,7 @@ int Worker::start_main(void) {
   std::cout << "Starting evolution" << std::endl;
   emit Worker::valueChanged("Starting evolution");
   for(i=1; i<=lNbrGen; ++i) {
-    applySelectionTournament(lPopulation, lContext, lNbrPartTournament);  
+    applySelectionTournament(lPopulation, lContext, lNbrPartTournament);
     applyCrossover(lPopulation, lContext, lCrossoverProba, lCrossDistribProba, lMaxDepth);
     applyMutationStandard(lPopulation, lContext, lMutStdProba, lMutMaxRegenDepth, lMaxDepth);
     applyMutationSwap(lPopulation, lContext, lMutSwapProba, lMutSwapDistribProba);    
