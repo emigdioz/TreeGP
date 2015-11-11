@@ -1059,6 +1059,7 @@ void MainWindow::on_actionLoad_file_triggered()
 
     // Populate variables as terminals
     std::vector<bool> terSelection;
+    ui->listTerminals->clear();
     for(i=1;i<iCols;i++) {
         ui->listTerminals->addItem("X"+QString::number(i));
     }
