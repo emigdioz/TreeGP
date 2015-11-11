@@ -105,6 +105,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(worker, SIGNAL(send_tree_infix_string(QString)), this, SLOT(received_tree_infix_string(QString)));
     connect(worker, SIGNAL(send_tree_latex_string(QString)), this, SLOT(received_tree_latex_string(QString)));
     connect(mPreviewBuilderThread, SIGNAL(previewAvailable(const QImage&, bool)),this, SLOT(showRealTimePreview(const QImage&, bool)), Qt::QueuedConnection);
+
+    connect(ui->variablePlot, SIGNAL(mouseMove(QMouseEvent*)), this,SLOT(showPointToolTip(QMouseEvent*)));
+
     // Timer for running time
     connect(timerGP, SIGNAL(timeout()), this, SLOT(showElapsedTime()));
 
@@ -169,82 +172,142 @@ MainWindow::MainWindow(QWidget *parent) :
     setupPlots();
     initializePlots();
 
-    QString result;
-    name.push_back("*");
-    name.push_back("/");
-    name.push_back("X2");
-    name.push_back("cos");
-    name.push_back("/");
-    name.push_back("X4");
-    name.push_back("sin");
-    name.push_back("X6");
-    name.push_back("3.14");
+//    QString result;
+//    name.push_back("*");
+//    name.push_back("/");
+//    name.push_back("X2");
+//    name.push_back("cos");
+//    name.push_back("/");
+//    name.push_back("X4");
+//    name.push_back("sin");
+//    name.push_back("X6");
+//    name.push_back("3.14");
 
-    arity.push_back(2);
-    arity.push_back(2);
-    arity.push_back(0);
-    arity.push_back(1);
-    arity.push_back(2);
-    arity.push_back(0);
-    arity.push_back(1);
-    arity.push_back(0);
-    arity.push_back(0);
+//    arity.push_back(2);
+//    arity.push_back(2);
+//    arity.push_back(0);
+//    arity.push_back(1);
+//    arity.push_back(2);
+//    arity.push_back(0);
+//    arity.push_back(1);
+//    arity.push_back(0);
+//    arity.push_back(0);
 
-    subtreesize.push_back(9);
-    subtreesize.push_back(7);
-    subtreesize.push_back(1);
-    subtreesize.push_back(5);
-    subtreesize.push_back(4);
-    subtreesize.push_back(1);
-    subtreesize.push_back(2);
-    subtreesize.push_back(1);
-    subtreesize.push_back(1);
-    tree2infix(result);
-    qDebug()<<result;
+//    subtreesize.push_back(9);
+//    subtreesize.push_back(7);
+//    subtreesize.push_back(1);
+//    subtreesize.push_back(5);
+//    subtreesize.push_back(4);
+//    subtreesize.push_back(1);
+//    subtreesize.push_back(2);
+//    subtreesize.push_back(1);
+//    subtreesize.push_back(1);
+//    tree2infix(result);
+//    qDebug()<<result;
 }
 
-void MainWindow::tree2infix(QString& output, int index) const
+//void MainWindow::tree2infix(QString& output, int index) const
+//{
+//  assert(index < name.size());
+//  int lNbArgs = arity.at(index);
+//  if(lNbArgs > 0) {
+//    output.append("(");
+//  }
+//  if(lNbArgs == 0) output.append(name.at(index));
+
+//  if(name.at(index)=="/") output.append("\\frac{");
+
+//  unsigned int j = index + 1;
+//  bool unarity = false;
+//  for(unsigned int i=0;i<lNbArgs;++i) {
+//    //output.append(" ");
+//    if((i==0) && (lNbArgs==1)) {
+//      output.append(name.at(index));
+//      if(arity.at(index+1)==0) {
+//        output.append("(");
+//        unarity = true;
+//      }
+//    }
+//    if((i==1) && (lNbArgs==2)) {
+//      if(name.at(index)=="/") output.append("}{");
+//      else output.append(name.at(index));
+//    }
+//    tree2infix(output,j);
+//    j += subtreesize.at(j);
+//  }
+
+//  if(unarity) {
+//    output.append(")");
+//    unarity = false;
+//  }
+//  if(lNbArgs > 0) {
+//    if(name.at(index)=="/") output.append("}");
+//    else output.append(")");
+//  }
+//}
+
+void MainWindow::showPointToolTip(QMouseEvent *event)
 {
-  assert(index < name.size());
-  int lNbArgs = arity.at(index);
-  if(lNbArgs > 0) {
-    output.append("(");
-  }
-  if(lNbArgs == 0) output.append(name.at(index));
+  if(ui->tableView->model()->rowCount() != 0) {
+    if(ui->tableView->currentIndex().isValid()) {
+      int x = ui->variablePlot->xAxis->pixelToCoord(event->pos().x());
+      int y = ui->variablePlot->yAxis->pixelToCoord(event->pos().y());
 
-  if(name.at(index)=="/") output.append("\\frac{");
-
-  unsigned int j = index + 1;
-  bool unarity = false;
-  for(unsigned int i=0;i<lNbArgs;++i) {
-    //output.append(" ");
-    if((i==0) && (lNbArgs==1)) {
-      output.append(name.at(index));
-      if(arity.at(index+1)==0) {
-        output.append("(");
-        unarity = true;
+      QModelIndexList indexList = ui->tableView->selectionModel()->selectedColumns();
+      int col;
+      foreach (QModelIndex index, indexList) {
+        col = index.column();
       }
+      QString message = "";
+      if((x > 0) && (x < ui->tableView->model()->rowCount())) message = "(X" + QString::number(col+1) + " = " + (model->item(x-1,col)->text()) + ")";
+      //ui->label_29->setText("Variable plot " + message + QString("%1 , %2").arg(x).arg(y));
+      ui->label_29->setText("Variable plot " + message);
     }
-    if((i==1) && (lNbArgs==2)) {
-      if(name.at(index)=="/") output.append("}{");
-      else output.append(name.at(index));
-    }
-    tree2infix(output,j);
-    j += subtreesize.at(j);
-  }
-
-  if(unarity) {
-    output.append(")");
-    unarity = false;
-  }
-  if(lNbArgs > 0) {
-    if(name.at(index)=="/") output.append("}");
-    else output.append(")");
   }
 }
 
 void MainWindow::setupPlots()
 {
+  // Variable Plot
+  ui->variablePlot->addGraph();
+  ui->variablePlot->xAxis->setRange(0, 1);
+  ui->variablePlot->yAxis->setRange(0, 1);
+  QPen purpleLinePen;
+  purpleLinePen.setColor(QColor(116, 29, 136, 255));
+  purpleLinePen.setWidth(0.5);
+  ui->variablePlot->graph(0)->setPen(purpleLinePen);
+  ui->variablePlot->graph(0)->setName("Data");
+  ui->variablePlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignRight);
+  ui->variablePlot->axisRect()->setBackground(QColor(229, 229, 229, 255));
+  ui->variablePlot->xAxis->grid()->setPen(QColor(255, 255, 255, 255));
+  ui->variablePlot->yAxis->grid()->setPen(QColor(255, 255, 255, 255));
+  ui->variablePlot->xAxis->setBasePen(QColor(255, 255, 255, 255));
+  ui->variablePlot->yAxis->setBasePen(QColor(255, 255, 255, 255));
+  ui->variablePlot->xAxis->setTickPen(QColor(127, 127, 127, 255));
+  ui->variablePlot->xAxis->setSubTickPen(QColor(127, 127, 127, 255));
+  ui->variablePlot->yAxis->setTickPen(QColor(127, 127, 127, 255));
+  ui->variablePlot->yAxis->setSubTickPen(QColor(127, 127, 127, 255));
+  ui->variablePlot->xAxis->setTickLabels(false);
+  ui->variablePlot->yAxis->setTickLabels(false);
+  // Second Variable Plot
+  ui->variablePlot2->addGraph();
+  ui->variablePlot2->xAxis->setRange(0, 1);
+  ui->variablePlot2->yAxis->setRange(0, 1);
+  ui->variablePlot2->graph(0)->setPen(purpleLinePen);
+  ui->variablePlot2->graph(0)->setName("Data");
+  ui->variablePlot2->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignRight);
+  ui->variablePlot2->axisRect()->setBackground(QColor(229, 229, 229, 255));
+  ui->variablePlot2->xAxis->grid()->setPen(QColor(255, 255, 255, 255));
+  ui->variablePlot2->yAxis->grid()->setPen(QColor(255, 255, 255, 255));
+  ui->variablePlot2->xAxis->setBasePen(QColor(255, 255, 255, 255));
+  ui->variablePlot2->yAxis->setBasePen(QColor(255, 255, 255, 255));
+  ui->variablePlot2->xAxis->setTickPen(QColor(127, 127, 127, 255));
+  ui->variablePlot2->xAxis->setSubTickPen(QColor(127, 127, 127, 255));
+  ui->variablePlot2->yAxis->setTickPen(QColor(127, 127, 127, 255));
+  ui->variablePlot2->yAxis->setSubTickPen(QColor(127, 127, 127, 255));
+  ui->variablePlot2->xAxis->setTickLabels(false);
+  ui->variablePlot2->yAxis->setTickLabels(false);
+
   // Fitness plot
   ui->outputPlot->addGraph();
   ui->outputPlot->addGraph();
@@ -397,13 +460,16 @@ void MainWindow::initializePlots()
   ui->outputPlot->xAxis->setRange(1, worker->ngen);
   ui->outputPlot->graph(0)->clearData();
   ui->outputPlot->graph(1)->clearData();
-  //ui->outputPlot->yAxis->setRange(0, 1);
   ui->outputPlot->replot();
   ui->sizePlot->xAxis->setRange(1, worker->ngen);
   ui->sizePlot->graph(0)->clearData();
   ui->sizePlot->graph(1)->clearData();
   ui->sizePlot->graph(2)->clearData();
   ui->sizePlot->replot();
+  ui->variablePlot->graph(0)->clearData();
+  ui->variablePlot->replot();
+  ui->variablePlot2->graph(0)->clearData();
+  ui->variablePlot2->replot();
 
   // Setup 3D plot
   plot->setPlotStyle(Qwt3D::FILLED);
@@ -1002,6 +1068,10 @@ void MainWindow::on_actionLoad_file_triggered()
       terSelection.push_back(true);
     }
     worker->terminalselection = terSelection;
+    // Prepare variable plot
+    ui->variablePlot->xAxis->setRange(1, iRows);
+    ui->variablePlot->replot();
+
 }
 
 void MainWindow::checkString(QString &temp, QChar character)
@@ -1324,7 +1394,9 @@ void MainWindow::populateTable()
     terSelection.push_back(true);
   }
   worker->terminalselection = terSelection;
-
+  // Prepare variable plot
+  ui->variablePlot->xAxis->setRange(1, worker->dataset_rows);
+  ui->variablePlot->replot();
 }
 
 void MainWindow::on_actionLatex_Syntax_triggered()
@@ -1349,4 +1421,87 @@ void MainWindow::showRealTimePreview(const QImage& preview, bool latexerror)
 void MainWindow::on_actionAbout_triggered()
 {
   aboutDialog->exec();
+}
+
+void MainWindow::on_tableView_clicked(const QModelIndex &index)
+{
+    int indexCol = index.column();
+    double max,min;
+    double Xmin,Xmax,Ymin,Ymax;
+    int iRows = ui->tableView->model()->rowCount();
+    int iCols = ui->tableView->model()->columnCount();
+    ui->variablePlot->graph(0)->clearData();
+    ui->variablePlot->xAxis->setTickLabels(true);
+    ui->variablePlot->yAxis->setTickLabels(true);
+    ui->variablePlot2->xAxis->setTickLabels(true);
+    ui->variablePlot2->yAxis->setTickLabels(true);
+
+    QVector<double> X,X2;
+    QVector<double> Y,Y2;
+    QVector<double> variablePlotTicksY;
+    QVector<QString> variablePlotLabelsY;
+    QVector<double> variablePlot2TicksY;
+    QVector<QString> variablePlot2LabelsY;
+    QVector<double> variablePlotTicksX;
+    QVector<QString> variablePlotLabelsX;
+    QVector<double> variablePlot2TicksX;
+    QVector<QString> variablePlot2LabelsX;
+    for(unsigned int i = 0;i < iRows;i++) {
+      X.push_back(i+1);
+      Y.push_back(model->item(i,indexCol)->text().toDouble());
+      if(indexCol<iCols) {
+        X2.push_back(model->item(i,indexCol)->text().toDouble());
+        Y2.push_back(model->item(i,iCols-1)->text().toDouble());
+        if(i == 0) {
+            Ymin = Ymax = Y2.at(0);
+            Xmin = Xmax = X2.at(0);
+        }
+        else {
+          if(Y2.at(i)<Ymin) Ymin = Y2.at(i);
+          if(Y2.at(i)>Ymax) Ymax = Y2.at(i);
+          if(X2.at(i)<Xmin) Xmin = X2.at(i);
+          if(X2.at(i)>Xmax) Xmax = X2.at(i);
+        }
+      }
+      if(i == 0) min = max = Y.at(0);
+      else {
+        if(Y.at(i)<min) min = Y.at(i);
+        if(Y.at(i)>max) max = Y.at(i);
+      }
+    }
+    variablePlotTicksY << min << max;
+    variablePlotLabelsY << QString::number(min) << QString::number(max);
+    variablePlotTicksX << 1 << ((float)iRows/2) << iRows;
+    variablePlotLabelsX << "1" << QString::number((float)iRows/2)<< QString::number(iRows);
+    ui->variablePlot->graph(0)->setData(X,Y);
+    ui->variablePlot->yAxis->setRange(min, max);
+    ui->variablePlot->yAxis->setAutoTicks(false);
+    ui->variablePlot->yAxis->setAutoTickLabels(false);
+    ui->variablePlot->yAxis->setTickVector(variablePlotTicksY);
+    ui->variablePlot->yAxis->setTickVectorLabels(variablePlotLabelsY);
+    ui->variablePlot->xAxis->setAutoTicks(false);
+    ui->variablePlot->xAxis->setAutoTickLabels(false);
+    ui->variablePlot->xAxis->setTickVector(variablePlotTicksX);
+    ui->variablePlot->xAxis->setTickVectorLabels(variablePlotLabelsX);
+    ui->variablePlot->yAxis->setLabel("Magnitude");
+    ui->variablePlot->replot();
+    if(indexCol<iCols) {
+        variablePlot2TicksY << Ymin << Ymax;
+        variablePlot2LabelsY << QString::number(Ymin) << QString::number(Ymax);
+        variablePlot2TicksX << Xmin << (((Xmax-Xmin)/2)+Xmin) << Xmax;
+        variablePlot2LabelsX << QString::number(Xmin) << QString::number(((Xmax-Xmin)/2)+Xmin) << QString::number(Xmax);
+        ui->variablePlot2->graph(0)->setData(X2,Y2);
+        ui->variablePlot2->yAxis->setRange(Ymin, Ymax);
+        ui->variablePlot2->xAxis->setRange(Xmin, Xmax);
+        ui->variablePlot2->yAxis->setAutoTicks(false);
+        ui->variablePlot2->yAxis->setAutoTickLabels(false);
+        ui->variablePlot2->yAxis->setTickVector(variablePlot2TicksY);
+        ui->variablePlot2->yAxis->setTickVectorLabels(variablePlot2LabelsY);
+        ui->variablePlot2->xAxis->setAutoTicks(false);
+        ui->variablePlot2->xAxis->setAutoTickLabels(false);
+        ui->variablePlot2->xAxis->setTickVector(variablePlot2TicksX);
+        ui->variablePlot2->xAxis->setTickVectorLabels(variablePlot2LabelsX);
+        ui->variablePlot2->yAxis->setLabel("Magnitude");
+        ui->variablePlot2->replot();
+    }
 }

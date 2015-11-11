@@ -90,7 +90,7 @@ private:
     QVector<int>depth;
     QVector<QString>name;
     QVector<int>subtreesize;
-    void tree2infix(QString& output, int index=0) const;
+    //void tree2infix(QString& output, int index=0) const;
 
     KLFPreviewBuilderThread *mPreviewBuilderThread;
     KLFBackend::klfInput input;
@@ -145,5 +145,8 @@ private slots:
     void on_actionLatex_Syntax_triggered();
     void showRealTimePreview(const QImage& preview, bool latexerror);
     void on_actionAbout_triggered();
+    void on_tableView_clicked(const QModelIndex &index);
+
+    void showPointToolTip(QMouseEvent *event);
 };
 #endif // MAINWINDOW_H
