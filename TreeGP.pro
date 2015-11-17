@@ -9,6 +9,10 @@ macx: LIBS += -L../../lib -framework OpenGL
 
 linux-g++:QMAKE_CXXFLAGS += -fno-exceptions
 
+QMAKE_CXXFLAGS_RELEASE -= -O2
+QMAKE_CXXFLAGS_RELEASE += -O3
+QMAKE_LFLAGS_RELEASE -= -O1
+
 INCLUDEPATH    += ./qwtplot3d/include ./klfbackend/
 
 # KLF backend versions
