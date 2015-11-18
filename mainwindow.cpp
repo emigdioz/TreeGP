@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
     model = new QStandardItemModel(this);
     ui->tableView->setModel(model);
     // Limit numeric values for parameter inputs
-    QRegExp Integer("^[0-9]{1,5}$");
+    QRegExp Integer("^[0-9]{1,6}$");
     QRegExp Floating("^[0-9]\.?[0-9]{1,5}$");
     ui->lineEdit_5->setValidator(new QRegExpValidator(Integer, ui->lineEdit_5));
     ui->lineEdit_9->setValidator(new QRegExpValidator(Integer, ui->lineEdit_9));
