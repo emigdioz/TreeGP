@@ -87,6 +87,7 @@
 #include "worker.h"
 #include "matrix.h"
 #include "infix.h"
+#include <levmar.h>
 
 #define POP_SIZE_DEFAULT 100
 #define NBR_GEN_DEFAULT 100

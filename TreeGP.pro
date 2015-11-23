@@ -3,7 +3,7 @@ CONFIG      += qt warn_on thread
 QT       += core gui opengl
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
-unix:!macx { LIBS += -L../../lib -lGLU }
+unix:!macx { LIBS += -L../../lib -lGLU -lblas -llapack}
 
 macx: LIBS += -L../../lib -framework OpenGL
 
@@ -13,7 +13,7 @@ QMAKE_CXXFLAGS_RELEASE -= -O2
 QMAKE_CXXFLAGS_RELEASE += -O3
 QMAKE_LFLAGS_RELEASE -= -O1
 
-INCLUDEPATH    += ./qwtplot3d/include ./klfbackend/
+INCLUDEPATH    += ./qwtplot3d/include ./klfbackend/ ./levmar
 
 # KLF backend versions
 KLF_BACKEND_VERSION = 3.2.8
@@ -66,7 +66,21 @@ SOURCES += \
     klfbackend/klfdebug.cpp \
     klfbackend/klfdefs.cpp \
     klfbackend/klfpreviewbuilderthread.cpp \
-    aboutwindow.cpp
+    aboutwindow.cpp \
+    levmar/Axb.c \
+    levmar/Axb_core.c \
+    levmar/lm.c \
+    levmar/lm_core.c \
+    levmar/lmbc.c \
+    levmar/lmbc_core.c \
+    levmar/lmblec.c \
+    levmar/lmblec_core.c \
+    levmar/lmbleic.c \
+    levmar/lmbleic_core.c \
+    levmar/lmlec.c \
+    levmar/lmlec_core.c \
+    levmar/misc.c \
+    levmar/misc_core.c
 
 # Default rules for deployment.
 include(deployment.pri)
@@ -127,7 +141,11 @@ HEADERS += \
     klfbackend/klfdefs.h \
     klfbackend/klfpreviewbuilderthread.h \
     klfbackend/klfqt34common.h \
-    aboutwindow.h
+    aboutwindow.h \
+    levmar/compiler.h \
+    levmar/levmar.h \
+    levmar/lm.h \
+    levmar/misc.h
 
 FORMS += \
     mainwindow.ui \
