@@ -3,6 +3,6 @@ Graphical GP based on QT and puppy
 
 Requirements
 -------------------------
-- Qt 4.5
+- Qt 5.4
 - Blas
 - Lapack
