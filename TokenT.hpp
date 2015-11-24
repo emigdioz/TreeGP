@@ -105,7 +105,8 @@ template <class T>
 void Puppy::TokenT<T>::execute(void* outDatum, Puppy::Context& ioContext)
 {
   T& lResult = *(T*)outDatum;
-  lResult = mToken;
+  float par = (*ioContext.mTree)[ioContext.mCallStack.back()].parameter;
+  lResult = mToken*par;
 }
 
 

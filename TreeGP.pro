@@ -3,7 +3,7 @@ CONFIG      += qt warn_on thread
 QT       += core gui opengl
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
-unix:!macx { LIBS += -L../../lib -lGLU -lblas -llapack}
+unix:!macx { LIBS += -L../../lib -lGLU -lopenblas -llapack}
 
 macx: LIBS += -L../../lib -framework OpenGL
 

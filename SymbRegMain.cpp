@@ -123,7 +123,18 @@ unsigned int evaluateFitnessTraining(Tree &individual,
                              double* inX,
                              double* inF,int cols, int rows, std::vector<bool> &terSelection);
 
-void passTree(Tree &individual,Worker::TreeStruct& tree);
+int applyLS(Tree &individual, Context& ioContext, double* inX, double* inF, int cols, int rows, std::vector<bool> &terSelection, float &oriFit, float &optFit);
+void objFunc(double *p, double *x, int m, int n, void *data);
+
+struct OneTree {
+  Tree selTree;
+  double *inX;
+  int rows;
+  int cols;
+  std::vector<bool> terSelection;
+  Context ioContext;
+};
+
 
 /*!
  *  \brief Program main routine.
@@ -313,6 +324,7 @@ int Worker::start_main(void) {
   infix q;
   TreeStruct chosenTree;
   fitnessdata datafit;
+  float preFitness,optFitness;
 
   datafit.data = new double*[lNbrGen];
   // prefill population empty fitness data
@@ -343,6 +355,9 @@ int Worker::start_main(void) {
     lPopulation[bindex].write_qstring(output);
     qDebug()<<i<<" Train: "<<lPopulation[bindex].mFitness<<" Test: "<<lPopulation[bindex].mFitnessTest<<" "<<output;
     output.clear();
+    qDebug()<<"Start";
+    applyLS(lPopulation[bindex],lContext, trainingIn,trainingOut,Worker::dataset_cols-1,size_training,Worker::terminalselection,preFitness,optFitness);
+    qDebug()<<"End [Original: "<<preFitness<<" Optimized: "<<optFitness;
 
     emit Worker::valueChanged(message);
     emit Worker::send_stats(GPthis);
@@ -510,7 +525,81 @@ unsigned int evaluateFitnessTraining(Tree &individual,
   return lNbrEval;
 }
 
-void passTree(Tree &individual,Worker::TreeStruct& tree)
+int applyLS(Tree &individual, Context& ioContext, double* inX, double* inF, int cols, int rows, std::vector<bool> &terSelection, float &oriFit, float &optFit)
 {
+  //evaluateFitnessTraining(individual, ioContext, inX, inF, cols, rows, terSelection);
+  oriFit = individual.rFitness;
+  Tree tmpInd = individual;
+  struct OneTree bufferTree;
+  int counter = 0;
+  int ret;
+  double info[LM_INFO_SZ];
+  for(unsigned int i=0;i<tmpInd.size();i++) {
+    QString temp = QString::fromStdString(tmpInd[i].mPrimitive->getName());
+    if(temp.at(0) == 'X') counter += 1;
+  }
+  int m = counter; // Number of parameters
+  int n = rows; // Number of instances
+  double p[m], x[n];
+  // Parameter initialization
+  for(unsigned int i=0;i<m;i++) {
+    p[i] = 0.5;
+  }
+  bufferTree.selTree = tmpInd;
+  bufferTree.cols = cols;
+  bufferTree.rows = rows;
+  bufferTree.ioContext = ioContext;
+  bufferTree.inX = inX;
+  bufferTree.terSelection = terSelection;
 
+  // Real output
+  for(int j=0; j<rows; j++) x[j] = inF[j];
+  // Do Levenberg-Marquardt optimization
+  ret=dlevmar_dif(objFunc, p, x, m, n, 100, NULL, info, NULL, NULL, &bufferTree);
+  qDebug()<<info[5]<<" iterations";
+  // Update optimized parameters in tree
+  counter = 0;
+  for(unsigned int i=0;i<tmpInd.size();i++) {
+    QString temp = QString::fromStdString(tmpInd[i].mPrimitive->getName());
+    if(temp.at(0) == 'X') {
+      tmpInd[i].parameter = p[counter];
+      counter += 1;
+    }
+  }
+  //objFunc(p,x,m,n,&bufferTree);
+  evaluateFitnessTraining(tmpInd, ioContext, inX, inF, cols, rows, terSelection);
+  optFit = tmpInd.rFitness;
+}
+
+void objFunc(double *p, double *x, int m, int n, void *data)
+{
+  std::stringstream var;
+  struct OneTree *dptr;
+  dptr = (struct OneTree *)data;
+  int counter = 0;
+  // Retrieve parameter and update node parameter (here, only selected nodes are used by updating its values)
+  for(unsigned int i=0;i<dptr->selTree.size();i++) {
+    QString temp = QString::fromStdString(dptr->selTree[i].mPrimitive->getName());
+    if(temp.at(0) == 'X') {
+      dptr->selTree[i].parameter = p[counter];
+      counter += 1;
+    }
+  }
+  // Evaluate row wise
+  double rowV;
+  double lResult;
+  for(int j=0; j<n; j++) {
+    // Copy col wise data for variable usage
+    for(int k=0; k<dptr->cols;k++) {
+      if(dptr->terSelection.at(k)) {
+        rowV =  dptr->inX[(k*dptr->rows)+j];
+        var<<"X"<<(k+1);
+        dptr->ioContext.mPrimitiveMap[var.str()]->setValue(&rowV);
+        var.str(std::string());
+      }
+    }
+    lResult = 0.0;
+    dptr->selTree.interpret(&lResult, dptr->ioContext);
+    x[j] = lResult; // Fill tree output
+  }
 }

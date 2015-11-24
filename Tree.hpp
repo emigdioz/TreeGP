@@ -62,13 +62,16 @@ struct Node {
    *  \param inPrimitive Reference to the associated primitive.
    *  \param inSubTreeSize Sub-tree size value.
    */
-  inline explicit Node(PrimitiveHandle inPrimitive=NULL, unsigned int inSubTreeSize=0) :
+  inline explicit Node(PrimitiveHandle inPrimitive=NULL, unsigned int inSubTreeSize=0, float inParameter=1) :
     mPrimitive(inPrimitive),
-    mSubTreeSize(inSubTreeSize)
+    mSubTreeSize(inSubTreeSize),
+    parameter(inParameter)
   { }
   
   PrimitiveHandle mPrimitive;    //!< Smart pointer to the associated primitive.
   unsigned int    mSubTreeSize;  //!< Sub-tree size, including actual node.
+  float           parameter;   //!< Parameter associated with node
+
 };
 
 
