@@ -3,7 +3,7 @@ CONFIG      += qt warn_on thread
 QT       += core gui opengl
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
-unix:!macx { LIBS += -L../../lib -lGLU -lopenblas -llapack}
+unix:!macx { LIBS += -L../../lib -lGLU -L/home/emigdio/git_repositories/openblas/lib/ -lopenblas -lpthread}
 
 macx: LIBS += -L../../lib -framework OpenGL
 
@@ -13,13 +13,14 @@ QMAKE_CXXFLAGS_RELEASE -= -O2
 QMAKE_CXXFLAGS_RELEASE += -O3
 QMAKE_LFLAGS_RELEASE -= -O1
 
-INCLUDEPATH    += ./qwtplot3d/include ./klfbackend/ ./levmar
+INCLUDEPATH    += ./qwtplot3d/include ./klfbackend/ ./levmar /home/emigdio/git_repositories/openblas/include/
 
 # KLF backend versions
 KLF_BACKEND_VERSION = 3.2.8
 
 DEFINES +=KLF_VERSION_STRING=\\\"$$KLF_BACKEND_VERSION\\\" \
         KLF_SRC_BUILD
+        #HAVE_LAPACK \
 
 SOURCES += \
     main.cpp \
