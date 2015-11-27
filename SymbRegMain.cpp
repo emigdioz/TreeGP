@@ -87,6 +87,7 @@
 #include "worker.h"
 #include "matrix.h"
 #include "infix.h"
+#include "ceres/ceres.h"
 
 #define POP_SIZE_DEFAULT 100
 #define NBR_GEN_DEFAULT 100
@@ -122,7 +123,30 @@ unsigned int evaluateFitnessTraining(Tree &individual,
                              double* inX,
                              double* inF,int cols, int rows, std::vector<bool> &terSelection);
 
-void passTree(Tree &individual,Worker::TreeStruct& tree);
+int applyLS(Tree &individual, Context& ioContext, double* inX, double* inF, int cols, int rows, std::vector<bool> &terSelection, float &oriFit, float &optFit);
+
+using ceres::AutoDiffCostFunction;
+using ceres::CostFunction;
+using ceres::Problem;
+using ceres::Solver;
+using ceres::Solve;
+
+struct FunctionResidual {
+  FunctionResidual(double x, double y)
+      : x_(x), y_(y) {}
+
+  template <typename T>
+  bool operator()(const T* const m, const T* const c, T* residual) const {
+    residual[0] = T(y_) - exp(m[0] * T(x_) + c[0]);
+    return true;
+  }
+
+ private:
+  // Observations for a sample.
+  const double x_;
+  const double y_;
+};
+
 
 /*!
  *  \brief Program main routine.
@@ -509,7 +533,6 @@ unsigned int evaluateFitnessTraining(Tree &individual,
   return lNbrEval;
 }
 
-void passTree(Tree &individual,Worker::TreeStruct& tree)
+int applyLS(Tree &individual, Context& ioContext, double* inX, double* inF, int cols, int rows, std::vector<bool> &terSelection, float &oriFit, float &optFit)
 {
-
 }

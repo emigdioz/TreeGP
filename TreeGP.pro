@@ -3,7 +3,7 @@ CONFIG      += qt warn_on thread
 QT       += core gui opengl
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
-unix:!macx { LIBS += -L../../lib -lGLU }
+unix:!macx { LIBS += -L../../lib -lGLU}
 
 macx: LIBS += -L../../lib -framework OpenGL
 
@@ -13,7 +13,7 @@ QMAKE_CXXFLAGS_RELEASE -= -O2
 QMAKE_CXXFLAGS_RELEASE += -O3
 QMAKE_LFLAGS_RELEASE -= -O1
 
-INCLUDEPATH    += ./qwtplot3d/include ./klfbackend/
+INCLUDEPATH    += ./qwtplot3d/include ./klfbackend/ /usr/include/eigen3/
 
 # KLF backend versions
 KLF_BACKEND_VERSION = 3.2.8
@@ -127,7 +127,50 @@ HEADERS += \
     klfbackend/klfdefs.h \
     klfbackend/klfpreviewbuilderthread.h \
     klfbackend/klfqt34common.h \
-    aboutwindow.h
+    aboutwindow.h \
+    ceres/internal/autodiff.h \
+    ceres/internal/config.h \
+    ceres/internal/disable_warnings.h \
+    ceres/internal/eigen.h \
+    ceres/internal/fixed_array.h \
+    ceres/internal/macros.h \
+    ceres/internal/manual_constructor.h \
+    ceres/internal/numeric_diff.h \
+    ceres/internal/port.h \
+    ceres/internal/reenable_warnings.h \
+    ceres/internal/scoped_ptr.h \
+    ceres/internal/variadic_evaluate.h \
+    ceres/autodiff_cost_function.h \
+    ceres/autodiff_local_parameterization.h \
+    ceres/c_api.h \
+    ceres/ceres.h \
+    ceres/conditioned_cost_function.h \
+    ceres/cost_function.h \
+    ceres/cost_function_to_functor.h \
+    ceres/covariance.h \
+    ceres/crs_matrix.h \
+    ceres/cubic_interpolation.h \
+    ceres/dynamic_autodiff_cost_function.h \
+    ceres/dynamic_cost_function_to_functor.h \
+    ceres/dynamic_numeric_diff_cost_function.h \
+    ceres/fpclassify.h \
+    ceres/gradient_checker.h \
+    ceres/gradient_problem.h \
+    ceres/gradient_problem_solver.h \
+    ceres/iteration_callback.h \
+    ceres/jet.h \
+    ceres/local_parameterization.h \
+    ceres/loss_function.h \
+    ceres/normal_prior.h \
+    ceres/numeric_diff_cost_function.h \
+    ceres/numeric_diff_options.h \
+    ceres/ordered_groups.h \
+    ceres/problem.h \
+    ceres/rotation.h \
+    ceres/sized_cost_function.h \
+    ceres/solver.h \
+    ceres/types.h \
+    ceres/version.h
 
 FORMS += \
     mainwindow.ui \
