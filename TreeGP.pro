@@ -13,7 +13,9 @@ QMAKE_CXXFLAGS_RELEASE -= -O2
 QMAKE_CXXFLAGS_RELEASE += -O3
 QMAKE_LFLAGS_RELEASE -= -O1
 
-INCLUDEPATH    += ./qwtplot3d/include ./klfbackend/
+INCLUDEPATH    += ./qwtplot3d/include \
+                  ./klfbackend/ \
+                  ./widgets/qcustomplot
 
 # KLF backend versions
 KLF_BACKEND_VERSION = 3.2.8
@@ -30,7 +32,6 @@ SOURCES += \
     SymbRegMain.cpp \
     SymbRegPrimits.cpp \
     worker.cpp \
-    qcustomplot.cpp \
     infix.cpp \
     edge.cpp \
     graphwidget.cpp \
@@ -66,7 +67,8 @@ SOURCES += \
     klfbackend/klfdebug.cpp \
     klfbackend/klfdefs.cpp \
     klfbackend/klfpreviewbuilderthread.cpp \
-    aboutwindow.cpp
+    aboutwindow.cpp \
+    widgets/qcustomplot/qcustomplot.cpp
 
 # Default rules for deployment.
 include(deployment.pri)
@@ -83,7 +85,6 @@ HEADERS += \
     Tree.hpp \
     SymbRegPrimits.hpp \
     worker.h \
-    qcustomplot.h \
     matrix.h \
     infix.h \
     edge.h \
@@ -127,7 +128,8 @@ HEADERS += \
     klfbackend/klfdefs.h \
     klfbackend/klfpreviewbuilderthread.h \
     klfbackend/klfqt34common.h \
-    aboutwindow.h
+    aboutwindow.h \
+    widgets/qcustomplot/qcustomplot.h
 
 FORMS += \
     mainwindow.ui \
