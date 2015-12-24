@@ -68,7 +68,8 @@ SOURCES += \
     klfbackend/klfdefs.cpp \
     klfbackend/klfpreviewbuilderthread.cpp \
     aboutwindow.cpp \
-    widgets/qcustomplot/qcustomplot.cpp
+    widgets/qcustomplot/qcustomplot.cpp \
+    widgets/cprogress/cprogresswidget.cpp
 
 # Default rules for deployment.
 include(deployment.pri)
@@ -129,7 +130,8 @@ HEADERS += \
     klfbackend/klfpreviewbuilderthread.h \
     klfbackend/klfqt34common.h \
     aboutwindow.h \
-    widgets/qcustomplot/qcustomplot.h
+    widgets/qcustomplot/qcustomplot.h \
+    widgets/cprogress/cprogresswidget.h
 
 FORMS += \
     mainwindow.ui \
