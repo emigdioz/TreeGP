@@ -38,9 +38,25 @@
         <file>up_arrow.png</file>
         <file>icon_app</file>
         <file>icon_app_big</file>
+        <file>images/dataexp_hover.png</file>
+        <file>images/dataexp_normal.png</file>
+        <file>images/dataexp_selected.png</file>
+        <file>images/gpresult_hover.png</file>
+        <file>images/gpresult_normal.png</file>
+        <file>images/gpresult_selected.png</file>
+        <file>images/gprun_hover.png</file>
+        <file>images/gprun_normal.png</file>
+        <file>images/gprun_selected.png</file>
+        <file>images/gpsetup_hover.png</file>
+        <file>images/gpsetup_normal.png</file>
+        <file>images/gpsetup_selected.png</file>
     </qresource>
     <qresource prefix="/fonts">
         <file>Dosis-Medium.ttf</file>
+        <file>fonts/ArchivoNarrow-Bold.ttf</file>
+        <file>fonts/ArchivoNarrow-BoldItalic.ttf</file>
+        <file>fonts/ArchivoNarrow-Italic.ttf</file>
+        <file>fonts/ArchivoNarrow-Regular.ttf</file>
     </qresource>
     <qresource prefix="/others">
         <file>ROYAL.MAP</file>

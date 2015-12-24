@@ -15,7 +15,8 @@ QMAKE_LFLAGS_RELEASE -= -O1
 
 INCLUDEPATH    += ./qwtplot3d/include \
                   ./klfbackend/ \
-                  ./widgets/qcustomplot
+                  ./widgets/qcustomplot \
+                  ./fonts/
 
 # KLF backend versions
 KLF_BACKEND_VERSION = 3.2.8

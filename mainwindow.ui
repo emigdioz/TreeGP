@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>966</width>
-    <height>596</height>
+    <width>1067</width>
+    <height>580</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -41,13 +41,13 @@
      <widget class="QListWidget" name="listWidget">
       <property name="minimumSize">
        <size>
-        <width>80</width>
+        <width>130</width>
         <height>0</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>80</width>
+        <width>130</width>
         <height>16777215</height>
        </size>
       </property>
@@ -60,21 +60,22 @@
       <property name="styleSheet">
        <string notr="true">QListWidget 
 { 
-background: rgba(53, 64, 82, 255);
+background: rgba(44, 64, 99, 255);
 border: none;
-font-family: Dosis;
-font-weight: bold;
+font-family: ArchivoNarrow;
+font-weight: regular;
 font-size:15px;
 }
 
 QListWidget::item:hover 
 { 
-background: rgb(47,57, 73); 
+background: rgb(44,68,104); 
+color: rgb(196,205,214);
 }
 
 QListWidget::item:selected
 { 
-background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:0.1, stop:0 rgb(94, 13, 13) , stop:1 rgb(224,34,34));
+background: rgb(45,79,124);
 color: white; 
 }
 
@@ -83,8 +84,8 @@ QListWidget::item
 border-bottom: 2px gray; 
 padding-bottom: 10px;
 padding-top: 10px;
-color: rgb(160,171,190);
-width: 80px;
+color: rgb(128,151,169);
+width: 130px;
 }</string>
       </property>
       <property name="iconSize">
@@ -102,18 +103,21 @@ width: 80px;
       <property name="flow">
        <enum>QListView::TopToBottom</enum>
       </property>
+      <property name="isWrapping" stdset="0">
+       <bool>true</bool>
+      </property>
       <property name="viewMode">
-       <enum>QListView::IconMode</enum>
+       <enum>QListView::ListMode</enum>
       </property>
       <property name="wordWrap">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="selectionRectVisible">
        <bool>false</bool>
       </property>
       <item>
        <property name="text">
-        <string>DATA</string>
+        <string>Data exploration</string>
        </property>
        <property name="foreground">
         <brush brushstyle="NoBrush">
@@ -126,38 +130,38 @@ width: 80px;
        </property>
        <property name="icon">
         <iconset resource="images.qrc">
-         <normaloff>:/icons/data_selected.png</normaloff>
-         <selectedoff>:/icons/data_selected.png</selectedoff>:/icons/data_selected.png</iconset>
+         <normaloff>:/icons/images/dataexp_normal.png</normaloff>
+         <selectedoff>:/icons/images/dataexp_selected.png</selectedoff>:/icons/images/dataexp_normal.png</iconset>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>GP SETUP</string>
+        <string>GP setup</string>
        </property>
        <property name="icon">
         <iconset resource="images.qrc">
-         <normaloff>:/icons/setup_selected.png</normaloff>
-         <selectedoff>:/icons/setup_selected.png</selectedoff>:/icons/setup_selected.png</iconset>
+         <normaloff>:/icons/images/gpsetup_normal.png</normaloff>
+         <selectedoff>:/icons/images/gpsetup_selected.png</selectedoff>:/icons/images/gpsetup_normal.png</iconset>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>GP RUN</string>
+        <string>GP run</string>
        </property>
        <property name="icon">
         <iconset resource="images.qrc">
-         <normaloff>:/icons/gp_selected.png</normaloff>
-         <selectedoff>:/icons/gp_selected.png</selectedoff>:/icons/gp_selected.png</iconset>
+         <normaloff>:/icons/images/gprun_normal.png</normaloff>
+         <selectedoff>:/icons/images/gprun_selected.png</selectedoff>:/icons/images/gprun_normal.png</iconset>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>RESULTS</string>
+        <string>Results</string>
        </property>
        <property name="icon">
         <iconset resource="images.qrc">
-         <normaloff>:/icons/result_selected.png</normaloff>
-         <selectedoff>:/icons/result_selected.png</selectedoff>:/icons/result_selected.png</iconset>
+         <normaloff>:/icons/images/gpresult_normal.png</normaloff>
+         <selectedoff>:/icons/images/gpresult_selected.png</selectedoff>:/icons/images/gpresult_normal.png</iconset>
        </property>
       </item>
      </widget>
@@ -168,7 +172,7 @@ width: 80px;
        <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="pageData">
        <property name="styleSheet">
@@ -1977,7 +1981,7 @@ subcontrol-origin: margin;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>966</width>
+     <width>1067</width>
      <height>23</height>
     </rect>
    </property>

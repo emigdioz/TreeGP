@@ -39,6 +39,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {    
     int id = QFontDatabase::addApplicationFont(":/fonts/Dosis-Medium.ttf");
+    id = QFontDatabase::addApplicationFont(":/fonts/fonts/ArchivoNarrow-Bold.ttf");
+    id = QFontDatabase::addApplicationFont(":/fonts/fonts/ArchivoNarrow-BoldItalic.ttf");
+    id = QFontDatabase::addApplicationFont(":/fonts/fonts/ArchivoNarrow-Italic.ttf");
+    id = QFontDatabase::addApplicationFont(":/fonts/fonts/ArchivoNarrow-Regular.ttf");
     ui->setupUi(this);
     aboutDialog = new aboutwindow(this);
     //this->layout()->setSizeConstraint(QLayout::SetFixedSize) ;
